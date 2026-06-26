@@ -3387,3 +3387,29 @@ html.dark-mode .stat-card.completed,
     border: none !important;
     box-shadow: none !important;
 }
+
+/* Status Updates & Log Print Rows & Modal Styles */
+.wk-print-log-row {
+    display: none;
+}
+
+@media print {
+    /* Show the print log rows when printing the report */
+    .wk-print-log-row {
+        display: table-row !important;
+    }
+    
+    /* Ensure styles render correctly in print */
+    .wk-print-log-row td {
+        background-color: #f8fafc !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Ensure accurate color rendering for printed log layout */
+    .wk-print-log-row span {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

@@ -150,13 +150,22 @@ function startApp() {
     initSupabase();
     // Set Power Automate Webhook URL for OneDrive syncing if not configured or if using the old signature-less URL
     const newDefaultUrl = 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
-    const storedUrl = localStorage.getItem('mro_power_automate_url');
+    const storedUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     if (storedUrl === null || 
         storedUrl.includes('6aaa2f5c468f4ccc949d5a9f61a8ac9b') || 
         storedUrl.includes('ae6281c30602447b82eb4739ee110dcf') ||
         (storedUrl.includes('bd6fa12380224456960c9003b9f37992') && storedUrl !== newDefaultUrl) ||
         (storedUrl.includes('defaultc71838d2745b4a4fb00f2d0e6e1de6') && storedUrl !== newDefaultUrl)) {
         localStorage.setItem('mro_power_automate_url', newDefaultUrl);
+    }
+
+    // Set default Webhook URL for OneDrive file deletion if not configured
+    const newDefaultDeleteUrl = 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b3812d58a78441ec957d93d98a1be233/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7SgUjBpzW-lrGQvwJ1o0hRwSUitueC3gvb_DwG8QYW8';
+    const storedDeleteUrl = localStorage.getItem('mro_power_automate_delete_url');
+    if (storedDeleteUrl === null || 
+        storedDeleteUrl.trim() === '' || 
+        storedDeleteUrl !== newDefaultDeleteUrl) {
+        localStorage.setItem('mro_power_automate_delete_url', newDefaultDeleteUrl);
     }
 
     // Copy main logo to login logo dynamically to avoid duplicate base64 string
@@ -773,8 +782,21 @@ function calculateStats() {
 }
 
 // Filter and Search Tasks
+// Returns true if a completed task is old enough (>7 days) to be in History
+function isArchivedToHistory(task) {
+    if (task.currentStatus !== 'Completed') return false;
+    if (!task.completedDate) return false;
+    const completed = new Date(task.completedDate);
+    const now = new Date();
+    const diffDays = Math.floor((now - completed) / (1000 * 60 * 60 * 24));
+    return diffDays >= 7;
+}
+
 function getFilteredTasks() {
     return tasks.filter(task => {
+        // Exclude tasks archived to History (completed > 7 days ago)
+        if (isArchivedToHistory(task)) return false;
+
         // Search matches
         const searchLower = activeFilters.search.toLowerCase();
         const matchesSearch = 
@@ -794,6 +816,21 @@ function getFilteredTasks() {
         const matchesStatus = activeFilters.status === 'All' || task.currentStatus === activeFilters.status;
 
         return matchesSearch && matchesTeam && matchesPriority && matchesStatus;
+    });
+}
+
+// Get tasks archived to History (completed > 7 days ago)
+function getHistoryTasks(searchQuery) {
+    return tasks.filter(task => {
+        if (!isArchivedToHistory(task)) return false;
+        if (!searchQuery || searchQuery.trim() === '') return true;
+        const q = searchQuery.toLowerCase();
+        return (
+            (task.aircraftReg || '').toLowerCase().includes(q) ||
+            (task.topic || task.taskDescription || '').toLowerCase().includes(q) ||
+            (task.assignedTeam || '').toLowerCase().includes(q) ||
+            (task.ataChapter || '').toLowerCase().includes(q)
+        );
     });
 }
 
@@ -848,6 +885,127 @@ function renderKanban(filteredTasks) {
         });
     });
 }
+
+// ---- HISTORY TAB ----
+function renderHistoryTab() {
+    const container = document.getElementById('historyContent');
+    const searchInput = document.getElementById('historySearch');
+    const countEl = document.getElementById('historyCount');
+    if (!container) return;
+
+    const searchQuery = searchInput ? searchInput.value : '';
+    const historyTasks = getHistoryTasks(searchQuery);
+
+    if (countEl) countEl.textContent = historyTasks.length;
+
+    if (historyTasks.length === 0) {
+        container.innerHTML = `
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:1rem;color:var(--text-muted);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:0.3;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <p style="font-size:1rem;font-weight:600;">No archived tasks yet</p>
+                <p style="font-size:0.85rem;text-align:center;max-width:340px;">Tasks marked as <strong>Completed</strong> will automatically appear here after <strong>7 days</strong>.</p>
+            </div>`;
+        return;
+    }
+
+    // Group tasks by Month-Year of completedDate
+    const groups = {};
+    historyTasks.forEach(task => {
+        const d = new Date(task.completedDate);
+        const key = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(task);
+    });
+
+    // Sort groups newest first
+    const sortedGroups = Object.keys(groups).sort((a, b) => new Date('1 ' + b) - new Date('1 ' + a));
+
+    container.innerHTML = sortedGroups.map(month => {
+        const monthTasks = groups[month].sort((a, b) => new Date(b.completedDate) - new Date(a.completedDate));
+        const cards = monthTasks.map(task => {
+            const teams = (task.assignedTeam || '').split(',').map(s => s.trim()).filter(Boolean);
+            function getTeamBadgeClass(t) {
+                if (t.includes('Avionic')) return 'avionics';
+                if (t.includes('Structure')) return 'struct';
+                if (t.includes('Engines')) return 'engines';
+                if (t.includes('IERA')) return 'iera';
+                if (t.includes('Component')) return 'component';
+                return 'mech';
+            }
+            const teamBadges = teams.map(t => `<span class="team-badge ${getTeamBadgeClass(t)}" style="font-size:0.7rem;padding:0.15rem 0.5rem;">${t}</span>`).join('');
+            const prioColors = { AOG: '#dc2626', High: '#ea580c', Medium: '#d97706', Low: '#16a34a', Routine: '#0284c7' };
+            const prioColor = prioColors[task.priorityLevel] || '#64748b';
+            const topic = task.topic || '';
+            return `
+            <div class="task-card" style="border-left:3px solid #22c55e;cursor:default;" id="history-card-${task.id}">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;">
+                    <div style="display:flex;flex-direction:column;gap:0.2rem;min-width:0;">
+                        ${topic ? `<span style="font-size:0.8rem;font-weight:700;color:var(--text-primary);">${topic}</span>` : ''}
+                        <span style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);">${task.aircraftReg} &middot; ATA ${task.ataChapter || 'N/A'}</span>
+                    </div>
+                    <span style="font-size:0.7rem;font-weight:600;color:${prioColor};background:${prioColor}18;padding:0.15rem 0.45rem;border-radius:4px;white-space:nowrap;">${task.priorityLevel}</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.65rem;">${teamBadges}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:0.72rem;color:var(--text-muted);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Completed ${task.completedDate}
+                    </span>
+                    <button class="btn btn-secondary" onclick="restoreTaskFromHistory('${task.id}')" style="font-size:0.72rem;padding:0.2rem 0.55rem;height:auto;min-height:auto;gap:4px;" title="Restore to Board">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4.95"></path></svg>
+                        Restore
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+
+        return `
+        <div style="margin-bottom:2rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+                <h3 style="font-size:0.9rem;font-weight:700;color:var(--text-primary);margin:0;">${month}</h3>
+                <span style="font-size:0.75rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border-color);padding:0.1rem 0.45rem;border-radius:10px;">${monthTasks.length} task${monthTasks.length !== 1 ? 's' : ''}</span>
+                <div style="flex:1;height:1px;background:var(--border-color);"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;">
+                ${cards}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function restoreTaskFromHistory(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    delete task.completedDate;
+    task.currentStatus = 'Completed';
+    saveTaskData(task);
+    renderApp();
+    // Re-render History tab if it is currently visible
+    const historyTab = document.getElementById('historyTab');
+    if (historyTab && !historyTab.classList.contains('hidden')) {
+        renderHistoryTab();
+    }
+}
+
+window.restoreTaskFromHistory = restoreTaskFromHistory;
+window.renderHistoryTab = renderHistoryTab;
+
+function archiveTaskToHistory(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    if (task.currentStatus !== 'Completed') return;
+    // Set completedDate to exactly 7 days ago so isArchivedToHistory returns true
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    task.completedDate = sevenDaysAgo.toISOString().split('T')[0];
+    saveTaskData(task);
+    renderApp();
+    // Switch to History tab so user can see the archived task
+    const historyNavItem = document.querySelector('.tab-item[data-tab="history"]');
+    if (historyNavItem) historyNavItem.click();
+}
+
+window.archiveTaskToHistory = archiveTaskToHistory;
 
 // Create Kanban Card Element
 function createTaskCard(task) {
@@ -975,6 +1133,10 @@ function createTaskCard(task) {
                         <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                 </div>
+                ${task.currentStatus === 'Completed' ? `
+                <div class="action-icon" title="Move to History" onclick="event.stopPropagation(); archiveTaskToHistory('${task.id}')" style="color: #22c55e;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>` : ''}
             </div>
         </div>
         <div class="quick-update-box" style="margin-top: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 0.5rem; display: flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation();" ondragstart="event.stopPropagation();">
@@ -1355,6 +1517,11 @@ function setupEventListeners() {
             const task = tasks.find(t => t.id === id);
             if (task && task.currentStatus !== targetStatus) {
                 task.currentStatus = targetStatus;
+                if (targetStatus === 'Completed') {
+                    task.completedDate = new Date().toISOString().split('T')[0];
+                } else {
+                    delete task.completedDate;
+                }
                 saveTaskData(task);
                 renderApp();
             }
@@ -1490,7 +1657,7 @@ function setupEventListeners() {
             }
 
             const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-            const powerAutomateUrl = localStorage.getItem('mro_power_automate_url');
+            const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
             const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
             const maxLimit = hasCloud ? 10 * 1024 * 1024 : 1024 * 1024;
             
@@ -2368,8 +2535,10 @@ function toggleTaskCompletion(id, event) {
 
     if (task.currentStatus === 'Completed') {
         task.currentStatus = 'In Progress';
+        delete task.completedDate;
     } else {
         task.currentStatus = 'Completed';
+        task.completedDate = new Date().toISOString().split('T')[0];
     }
 
     saveTaskData(task);
@@ -2401,6 +2570,43 @@ function exportToExcel() {
         return;
     }
 
+    const activeTabItem = document.querySelector('.tab-item.active');
+    const activeTab = activeTabItem ? activeTabItem.dataset.tab : 'board';
+
+    let tasksToExport = tasks;
+    let filenamePrefix = 'MRO_All_Tasks_Report';
+
+    if (activeTab === 'summary') {
+        filenamePrefix = 'MRO_Weekly_Report';
+        const teamSelector = document.getElementById('summaryTeamSelector');
+        const selectedTeam = teamSelector ? teamSelector.value : 'All';
+        
+        // Filter by selected team exactly like the Weekly Summary tab
+        tasksToExport = tasks.filter(t => {
+            if (selectedTeam === 'All') return true;
+            return (t.assignedTeam || '').split(',').map(s => s.trim()).includes(selectedTeam);
+        });
+
+        // Sort identical to the Weekly Report table
+        const statusOrder = { 'Open': 1, 'In Progress': 2, 'Completed': 3 };
+        tasksToExport.sort((a, b) => {
+            const orderA = statusOrder[a.currentStatus] || 99;
+            const orderB = statusOrder[b.currentStatus] || 99;
+            if (orderA !== orderB) {
+                return orderA - orderB;
+            }
+            if (a.rtsDate === 'N/A' && b.rtsDate === 'N/A') return 0;
+            if (a.rtsDate === 'N/A') return 1;
+            if (b.rtsDate === 'N/A') return -1;
+            return new Date(a.rtsDate) - new Date(b.rtsDate);
+        });
+    }
+
+    if (tasksToExport.length === 0) {
+        alert('No tasks match the active filters to export.');
+        return;
+    }
+
     const headers = [
         'Aircraft Registration',
         'Aircraft Type',
@@ -2412,22 +2618,41 @@ function exportToExcel() {
         'Requestor Contact',
         'Status',
         'Task Description',
-        'Attachments Count'
+        'Attachments Count',
+        'Status Updates & Log'
     ];
 
-    const rows = tasks.map(task => [
-        task.aircraftReg,
-        task.aircraftType || 'A320',
-        task.ataChapter || 'N/A',
-        task.assignedTeam,
-        task.priorityLevel,
-        task.rtsDate,
-        task.requestor,
-        task.requestorContact || '',
-        task.currentStatus,
-        task.taskDescription,
-        task.attachments.length
-    ]);
+    const rows = tasksToExport.map(task => {
+        // Format status updates & logs
+        const updates = (task.comments || []).filter(item => item.type === 'update');
+        const sortedUpdates = [...updates].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        const updatesText = sortedUpdates.map((u, index) => {
+            let dateLabel = '';
+            try {
+                const d = new Date(u.timestamp);
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                dateLabel = `${day}/${m}`;
+            } catch(e) {}
+            const vNum = `v${index + 1}.0`;
+            return `${vNum} [${dateLabel}] ${u.author}: ${u.text}`;
+        }).join('\n');
+
+        return [
+            task.aircraftReg,
+            task.aircraftType || 'A320',
+            task.ataChapter || 'N/A',
+            task.assignedTeam,
+            task.priorityLevel,
+            task.rtsDate,
+            task.requestor,
+            task.requestorContact || '',
+            task.currentStatus,
+            task.taskDescription,
+            task.attachments.length,
+            updatesText
+        ];
+    });
 
     // Construct CSV String
     let csvContent = '\uFEFF'; // UTF-8 BOM for proper Excel encoding
@@ -2445,10 +2670,9 @@ function exportToExcel() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     
-    // File name: MRO_Weekly_Report_YYYY-MM-DD.csv
     const dateStamp = new Date().toISOString().split('T')[0];
     link.href = url;
-    link.download = `MRO_Weekly_Report_${dateStamp}.csv`;
+    link.download = `${filenamePrefix}_${dateStamp}.csv`;
     link.style.display = 'none';
     
     document.body.appendChild(link);
@@ -2473,7 +2697,7 @@ function handleFileSelect(e) {
 
 function processFiles(fileList) {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url');
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     // Max 10 files limit
@@ -3664,29 +3888,49 @@ function renderWeeklySummaryTab() {
                     <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${dotColor};"></span>
                     ${teamName}
                 </div>
+                <div style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.55rem;">
         `;
-        
-        const sentences = [];
+
+        // -- Successfully Completed paragraph --
         if (completedTasks.length > 0) {
-            const details = completedTasks.map(t => `${t.aircraftReg} (${t.aircraftType}): ${truncateSummaryString(t.taskDescription, 60)}`).join(', ');
-            sentences.push(`Successfully completed ${completedTasks.length} task(s): ${details}.`);
+            const details = completedTasks
+                .map(t => `${t.aircraftReg} (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}`)
+                .join(' / ');
+            narrativeHtml += `
+                <p style="margin:0; font-size:0.88rem; line-height:1.6;">
+                    <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#059669; background:rgba(5,150,105,0.1); border-radius:4px; padding:0.1rem 0.45rem; margin-right:0.4rem; vertical-align:middle;">Successfully Completed</span>
+                    ${details}.
+                </p>`;
         }
-        
-        if (activeTasks.length > 0) {
-            const aogActive = activeTasks.filter(t => t.priorityLevel === 'AOG');
-            const normalActive = activeTasks.filter(t => t.priorityLevel !== 'AOG');
-            
-            if (aogActive.length > 0) {
-                const details = aogActive.map(t => `${t.aircraftReg} (${t.aircraftType}): ${truncateSummaryString(t.taskDescription, 60)}`).join(', ');
-                sentences.push(`<span style="color: var(--priority-aog); font-weight: 600;">CRITICAL: Managing ${aogActive.length} active AOG defect(s) on ${details}.</span>`);
-            }
-            if (normalActive.length > 0) {
-                const details = normalActive.map(t => `${t.aircraftReg} (${t.aircraftType})`).join(', ');
-                sentences.push(`Currently progressing ${normalActive.length} active task(s) on ${details} (Status: ${normalActive.map(t => t.currentStatus).join(', ')}).`);
-            }
+
+        // -- CRITICAL AOG paragraph --
+        const aogActive = activeTasks.filter(t => t.priorityLevel === 'AOG');
+        if (aogActive.length > 0) {
+            const details = aogActive
+                .map(t => `${t.aircraftReg} (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}`)
+                .join(' / ');
+            narrativeHtml += `
+                <p style="margin:0; font-size:0.88rem; line-height:1.6;">
+                    <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--priority-aog); background:rgba(220,38,38,0.1); border-radius:4px; padding:0.1rem 0.45rem; margin-right:0.4rem; vertical-align:middle;">Critical / AOG</span>
+                    Managing ${aogActive.length} active AOG defect(s) — ${details}.
+                </p>`;
         }
-        
-        narrativeHtml += `<p style="margin: 0; padding-left: 1.25rem;">${sentences.join(' ')}</p></div>`;
+
+        // -- In Progress / Open paragraph --
+        const normalActive = activeTasks.filter(t => t.priorityLevel !== 'AOG');
+        if (normalActive.length > 0) {
+            const details = normalActive
+                .map(t => `${t.aircraftReg} (${t.aircraftType || 'A/C'})`)
+                .join(', ');
+            const statusSummary = [...new Set(normalActive.map(t => t.currentStatus))].join(' / ');
+            narrativeHtml += `
+                <p style="margin:0; font-size:0.88rem; line-height:1.6;">
+                    <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#d97706; background:rgba(217,119,6,0.1); border-radius:4px; padding:0.1rem 0.45rem; margin-right:0.4rem; vertical-align:middle;">${statusSummary}</span>
+                    Currently progressing ${normalActive.length} active task(s) on ${details}.
+                </p>`;
+        }
+
+        narrativeHtml += `</div></div>`;
         narrativeContainer.innerHTML += narrativeHtml;
     });
 
@@ -3791,26 +4035,17 @@ function renderWeeklySummaryTab() {
             
             const prioClass = t.priorityLevel.toLowerCase();
             
-            // Format status updates & logs
+            // Format status updates & logs as bullet list for dropdown
             const updates = (t.comments || []).filter(item => item.type === 'update');
-            let updatesHtml = '<span style="color: var(--text-muted); font-style: italic; font-size: 0.75rem;">No updates.</span>';
-            if (updates.length > 0) {
-                const sortedUpdates = [...updates].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-                updatesHtml = `<div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; line-height: 1.35; max-width: 250px; text-align: left;">` + 
-                    sortedUpdates.map(u => {
-                        let dateStr = '';
-                        try {
-                            const d = new Date(u.timestamp);
-                            const m = String(d.getMonth() + 1).padStart(2, '0');
-                            const date = String(d.getDate()).padStart(2, '0');
-                            dateStr = `${m}/${date}`;
-                        } catch(e) {
-                            dateStr = '';
-                        }
-                        return `<div><strong>[${dateStr}] ${u.author}:</strong> ${escapeHTMLApp(u.text)}</div>`;
-                    }).join('') + `</div>`;
-            }
-            
+            const rowId = `wk-log-${t.id}`;
+
+            const toggleBtn = updates.length > 0
+                ? `<button onclick="event.stopPropagation(); toggleWeeklyLogRow('${rowId}', this)" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:4px;font-size:0.75rem;font-weight:600;transition:color 0.2s;" title="Toggle status log">
+                    <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' style='width:12px;height:12px;transition:transform 0.2s;'><polyline points='6 9 12 15 18 9'></polyline></svg>
+                    ${updates.length}
+                  </button>`
+                : `<span style="color:var(--border-color);font-size:0.75rem;display:flex;align-items:center;justify-content:center;" title="No updates">—</span>`;
+
             row.innerHTML = `
                 <td><span class="tbl-reg">${t.aircraftReg}</span></td>
                 <td><span class="tbl-type">${t.aircraftType || 'A320'}</span></td>
@@ -3820,9 +4055,50 @@ function renderWeeklySummaryTab() {
                 <td><span class="badge-priority ${prioClass}">${t.priorityLevel}</span></td>
                 <td><span class="badge-status ${statusClass}">${t.currentStatus}</span></td>
                 <td><div class="tbl-desc" title="${t.taskDescription}"><strong>${t.topic || 'No Topic'}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${t.taskDescription}</span></div></td>
-                <td>${updatesHtml}</td>
+                <td style="text-align:center;vertical-align:middle;">${toggleBtn}</td>
             `;
             rtsTableBody.appendChild(row);
+
+            // Print-only log row (hidden on screen, visible when printing)
+            if (updates.length > 0) {
+                const sortedUpdates = [...updates].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                const logRow = document.createElement('tr');
+                logRow.id = rowId;
+                logRow.className = 'wk-print-log-row';
+                logRow.innerHTML = `
+                    <td colspan="9" style="padding:0;border-top:none;">
+                        <div style="padding:0.65rem 1rem 0.65rem 2rem;background:var(--bg-card);border-bottom:1px solid var(--border-color);border-left:3px solid var(--team-avionics);">
+                            <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.55rem;">Status Updates &amp; Log (${updates.length})</div>
+                            <div style="position:relative;padding-left:1.5rem;">
+                                <div style="position:absolute;left:0.35rem;top:0;bottom:0;width:1.5px;background:var(--border-color);"></div>
+                                ${sortedUpdates.map((u, i) => {
+                                    let dateLabel = '';
+                                    let relLabel = '';
+                                    try {
+                                        const d = new Date(u.timestamp);
+                                        const m = String(d.getMonth()+1).padStart(2,'0');
+                                        const day = String(d.getDate()).padStart(2,'0');
+                                        const yr = d.getFullYear();
+                                        const hr = String(d.getHours()).padStart(2,'0');
+                                        const mn = String(d.getMinutes()).padStart(2,'0');
+                                        dateLabel = `${day}/${m}/${yr}`;
+                                        relLabel = `${hr}:${mn}`;
+                                    } catch(e) {}
+                                    const vNum = `v${sortedUpdates.length - i}.0`;
+                                    return `
+                                        <div style="display:flex;gap:0.6rem;margin-bottom:0.6rem;align-items:flex-start;">
+                                            <span style="flex-shrink:0;min-width:2.5rem;text-align:center;font-size:0.65rem;font-weight:700;color:var(--text-muted);background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:10px;padding:0.1rem 0.3rem;margin-top:0.1rem;">${vNum}</span>
+                                            <div style="flex:1;">
+                                                <div style="font-size:0.8rem;font-weight:500;color:var(--text-primary);line-height:1.45;">${escapeHTMLApp(u.text)}</div>
+                                                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.15rem;">${u.author} &middot; ${dateLabel} ${relLabel}</div>
+                                            </div>
+                                        </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </td>`;
+                rtsTableBody.appendChild(logRow);
+            }
         });
     }
 }
@@ -4045,7 +4321,8 @@ function deleteFYIItem(id) {
                 itemToDelete.team || 'FYI',
                 itemToDelete.dateCreated || '',
                 'N-A',
-                itemToDelete.title || 'FYI Bulletin'
+                itemToDelete.title || 'FYI Bulletin',
+                true
             );
         }
         fyiItems = fyiItems.filter(item => item.id !== id);
@@ -4119,7 +4396,7 @@ function uploadQuickUpdateFile(taskId, fileInput) {
     }
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url');
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 10 * 1024 * 1024 : 1024 * 1024;
@@ -4189,7 +4466,7 @@ function uploadMaterialFile(fileInput) {
     const file = fileInput.files[0];
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url');
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 10 * 1024 * 1024 : 1024 * 1024;
@@ -4418,7 +4695,7 @@ function uploadFyiFile(fileInput) {
     const file = fileInput.files[0];
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url');
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 10 * 1024 * 1024 : 1024 * 1024;
@@ -4448,7 +4725,7 @@ function uploadFyiFile(fileInput) {
             document.getElementById('fyiAttachmentUrl').value = e.target.result; // Base64 data URL
             document.getElementById('fyiAttachmentName').value = file.name;
             alert(`File "${file.name}" cached locally!`);
-        }, fyiTeam || 'FYI', dateStr, 'N-A', fyiTitle);
+        }, fyiTeam || 'FYI', dateStr, 'N-A', fyiTitle, true);
     };
     reader.readAsDataURL(file);
 }
@@ -4475,12 +4752,12 @@ function getFrontendWeekFolderName(dateString) {
     return 'Week ' + formattedWeek + ' (' + year + ')';
 }
 
-function requestDeleteOneDriveFile(fileName, teamName, dateStr, aircraftReg, topic) {
+function requestDeleteOneDriveFile(fileName, teamName, dateStr, aircraftReg, topic, isFyi = false) {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
     if (isGas) {
         return;
     }
-    const powerAutomateDeleteUrl = localStorage.getItem('mro_power_automate_delete_url');
+    const powerAutomateDeleteUrl = localStorage.getItem('mro_power_automate_delete_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b3812d58a78441ec957d93d98a1be233/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7SgUjBpzW-lrGQvwJ1o0hRwSUitueC3gvb_DwG8QYW8';
     if (!powerAutomateDeleteUrl || !powerAutomateDeleteUrl.trim()) return;
 
     let teamNameSanitized = 'General';
@@ -4498,7 +4775,8 @@ function requestDeleteOneDriveFile(fileName, teamName, dateStr, aircraftReg, top
             team: teamNameSanitized,
             date: (dateStr === 'skip' ? '' : (dateStr || '')),
             aircraftReg: aircraftReg || 'N-A',
-            topic: topic || 'General'
+            topic: topic || 'General',
+            isFyi: isFyi
         })
     })
     .then(response => {
@@ -4514,7 +4792,7 @@ function requestDeleteOneDriveFile(fileName, teamName, dateStr, aircraftReg, top
 function deleteOneDriveFilesForTask(task) {
     if (!task || !task.attachments || task.attachments.length === 0) return;
     
-    const powerAutomateDeleteUrl = localStorage.getItem('mro_power_automate_delete_url');
+    const powerAutomateDeleteUrl = localStorage.getItem('mro_power_automate_delete_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b3812d58a78441ec957d93d98a1be233/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7SgUjBpzW-lrGQvwJ1o0hRwSUitueC3gvb_DwG8QYW8';
     if (!powerAutomateDeleteUrl || !powerAutomateDeleteUrl.trim()) return;
     
     task.attachments.forEach(attachment => {
@@ -4533,7 +4811,7 @@ function deleteOneDriveFilesForTask(task) {
 window.requestDeleteOneDriveFile = requestDeleteOneDriveFile;
 window.deleteOneDriveFilesForTask = deleteOneDriveFilesForTask;
 
-function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallbackCallback, teamName, dateStr, aircraftReg, topic) {
+function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallbackCallback, teamName, dateStr, aircraftReg, topic, isFyi = false) {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
     if (isGas) {
         showLoadingIndicator(true);
@@ -4556,7 +4834,7 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
             })
             .uploadFileToDrive(file.name, file.type, pureBase64, teamName || '', dateStr || '');
     } else {
-        const powerAutomateUrl = localStorage.getItem('mro_power_automate_url');
+        const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
         if (powerAutomateUrl && powerAutomateUrl.trim()) {
             showLoadingIndicator(true, "Uploading file to OneDrive...");
             
@@ -4588,7 +4866,8 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
                     date: (dateStr === 'skip' ? '' : (dateStr || '')),
                     weekFolder: weekFolder,
                     aircraftReg: aircraftReg || 'N-A',
-                    topic: topic || 'General'
+                    topic: topic || 'General',
+                    isFyi: isFyi
                 })
             })
             .then(response => {
@@ -4696,7 +4975,132 @@ document.addEventListener('click', (e) => {
 // Expose print function globally
 window.printSummaryReport = printSummaryReport;
 
+// ---- UPDATE LOG VERSION HISTORY MODAL ----
+function showUpdateLogModal(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const updates = (task.comments || []).filter(c => c.type === 'update');
+    const sortedUpdates = [...updates].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // newest first
+
+    let statusClass = 'open';
+    if (task.currentStatus === 'In Progress') statusClass = 'progress';
+    else if (task.currentStatus === 'Completed') statusClass = 'completed';
+
+    const timelineHtml = sortedUpdates.length === 0
+        ? `<div style="padding:2rem;text-align:center;color:var(--text-muted);font-style:italic;font-size:0.88rem;">No status updates have been recorded for this task.</div>`
+        : sortedUpdates.map((u, i) => {
+            let dateLabel = '', timeLabel = '', relLabel = '';
+            try {
+                const d = new Date(u.timestamp);
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                const day = String(d.getDate()).padStart(2,'0');
+                const mon = months[d.getMonth()];
+                const yr = d.getFullYear();
+                const hr = String(d.getHours()).padStart(2,'0');
+                const mn = String(d.getMinutes()).padStart(2,'0');
+                dateLabel = `${day} ${mon}, ${yr}`;
+                timeLabel = `${hr}:${mn}`;
+                const diffMs = Date.now() - d.getTime();
+                const diffH = Math.floor(diffMs / 3600000);
+                const diffD = Math.floor(diffMs / 86400000);
+                if (diffD === 0 && diffH === 0) relLabel = 'Just now';
+                else if (diffD === 0) relLabel = `${diffH} hour${diffH !== 1 ? 's' : ''} ago`;
+                else if (diffD === 1) relLabel = 'Yesterday';
+                else if (diffD < 30) relLabel = `${diffD} days ago`;
+                else relLabel = dateLabel;
+            } catch(e) {}
+
+            const vNum = `v${sortedUpdates.length - i}.0`;
+            const isLatest = i === 0;
+            const dotColor = isLatest ? 'var(--team-avionics)' : 'var(--border-color)';
+            const vBg = isLatest ? 'var(--team-avionics)' : 'var(--bg-secondary)';
+            const vTxtColor = isLatest ? '#fff' : 'var(--text-muted)';
+
+            return `
+            <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border-color);" class="update-log-entry">
+                <!-- Version badge + timeline line -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;width:3rem;">
+                    <span style="font-size:0.68rem;font-weight:800;background:${vBg};color:${vTxtColor};border-radius:20px;padding:0.18rem 0.4rem;border:1.5px solid ${dotColor};white-space:nowrap;">${vNum}</span>
+                    ${i < sortedUpdates.length - 1 ? `<div style="flex:1;width:1.5px;background:var(--border-color);margin-top:4px;min-height:1.5rem;"></div>` : ''}
+                </div>
+                <!-- Content -->
+                <div style="flex:1;padding-top:0.1rem;">
+                    <div style="font-size:0.9rem;font-weight:500;color:var(--text-primary);line-height:1.5;margin-bottom:0.3rem;">${escapeHTMLApp(u.text)}</div>
+                    <div style="font-size:0.77rem;color:var(--text-muted);display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <strong style="color:var(--text-secondary);">${u.author}</strong>
+                        <span>&middot;</span>
+                        <span>${relLabel}</span>
+                        <span style="color:var(--border-color);">|</span>
+                        <span>${dateLabel} ${timeLabel}</span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} – Status Log`;
+    document.getElementById('updateLogModalSubtitle').innerHTML =
+        `<span class="badge-status ${statusClass}" style="font-size:0.72rem;">${task.currentStatus}</span>
+         <span style="font-size:0.8rem;color:var(--text-muted);">${task.topic || task.taskDescription.substring(0,60)}</span>
+         <span style="font-size:0.8rem;color:var(--text-muted);">&middot; ${sortedUpdates.length} update${sortedUpdates.length !== 1 ? 's' : ''}</span>`;
+    document.getElementById('updateLogTimeline').innerHTML = timelineHtml;
+    openModal('updateLogModal');
+}
+
+function closeUpdateLogModal() {
+    closeModal('updateLogModal');
+}
+
+function toggleWeeklyLogRow(rowId, btn) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    const isHidden = window.getComputedStyle(row).display === 'none';
+    if (isHidden) {
+        row.style.setProperty('display', 'table-row', 'important');
+        const svg = btn.querySelector('svg');
+        if (svg) svg.style.transform = 'rotate(180deg)';
+        btn.style.color = 'var(--team-avionics)';
+    } else {
+        row.style.setProperty('display', 'none', 'important');
+        const svg = btn.querySelector('svg');
+        if (svg) svg.style.transform = 'rotate(0deg)';
+        btn.style.color = 'var(--text-muted)';
+    }
+}
+
+window.showUpdateLogModal = showUpdateLogModal;
+window.closeUpdateLogModal = closeUpdateLogModal;
+window.toggleWeeklyLogRow = toggleWeeklyLogRow;
+
+
 function handleSettingsBtnClick() {
+    // Show the password prompt first — settings are admin-only
+    const passwordInput = document.getElementById('settingsPasswordInput');
+    const errorMsg = document.getElementById('settingsPasswordError');
+    if (passwordInput) passwordInput.value = '';
+    if (errorMsg) errorMsg.style.display = 'none';
+    openModal('settingsPasswordModal');
+    setTimeout(() => { if (passwordInput) passwordInput.focus(); }, 200);
+}
+
+function verifySettingsPassword() {
+    const passwordInput = document.getElementById('settingsPasswordInput');
+    const errorMsg = document.getElementById('settingsPasswordError');
+    const entered = passwordInput ? passwordInput.value : '';
+
+    if (entered !== 'Admin_DMA') {
+        if (errorMsg) errorMsg.style.display = 'block';
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+        return;
+    }
+
+    // Correct password — close the prompt and open settings
+    closeModal('settingsPasswordModal');
+
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && typeof google.script.run.getFolderUrl === 'function';
     // Load local values first
     const localPowerAutomateUrl = localStorage.getItem('mro_power_automate_url') || '';
@@ -4713,7 +5117,7 @@ function handleSettingsBtnClick() {
     const supabaseAnonKeyInput = document.getElementById('supabaseAnonKey');
     if (supabaseUrlInput) supabaseUrlInput.value = localSupabaseUrl;
     if (supabaseAnonKeyInput) supabaseAnonKeyInput.value = localSupabaseAnonKey;
-    
+
     if (isGas) {
         google.script.run
             .withSuccessHandler(url => {
@@ -4727,5 +5131,6 @@ function handleSettingsBtnClick() {
     }
 }
 window.handleSettingsBtnClick = handleSettingsBtnClick;
+window.verifySettingsPassword = verifySettingsPassword;
 
 </script>

@@ -38,6 +38,11 @@ function initTabs() {
       if (target === 'sap' && typeof renderSAPTab === 'function') {
         renderSAPTab();
       }
+
+      // If we switched to the History tab, render archived tasks
+      if (target === 'history' && typeof renderHistoryTab === 'function') {
+        renderHistoryTab();
+      }
     });
   });
 }
