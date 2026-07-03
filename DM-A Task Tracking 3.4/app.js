@@ -382,6 +382,18 @@ function updateSyncIndicator(status, message) {
     }
 }
 
+function normalizeTasks() {
+    if (!Array.isArray(tasks)) return;
+    tasks.forEach(t => {
+        t.comments = t.comments || [];
+        t.attachments = t.attachments || [];
+        // If task is Completed but has no completedDate, fallback to createdDate or today
+        if (t.currentStatus === 'Completed' && !t.completedDate) {
+            t.completedDate = t.createdDate || new Date().toISOString().split('T')[0];
+        }
+    });
+}
+
 function initApp() {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run;
     const tomorrow = getRelativeDateString(1);
@@ -396,10 +408,7 @@ function initApp() {
             tasks = JSON.parse(localData);
             if (Array.isArray(tasks)) {
                 // Normalize attributes
-                tasks.forEach(t => {
-                    t.comments = t.comments || [];
-                    t.attachments = t.attachments || [];
-                });
+                normalizeTasks();
                 renderApp();
                 updateSyncIndicator('syncing', 'Syncing...');
                 loaded = true;
@@ -411,6 +420,7 @@ function initApp() {
     if (!loaded) {
         // If cache empty or invalid, seed with demo tasks first so page is never blank
         tasks = [...DEMO_TASKS];
+        normalizeTasks();
         renderApp();
         updateSyncIndicator('syncing', 'Syncing (First Load)...');
     }
@@ -439,11 +449,13 @@ function refreshTasksSilently() {
             if (data && Array.isArray(data)) {
                 if (data.length > 0) {
                     tasks = data;
+                    normalizeTasks();
                     saveToLocalStorage();
                     renderApp();
                 } else if (data.length === 0 && (!localData || localData === 'null' || localData === 'undefined')) {
                     // Seed if entirely empty
                     tasks = [...DEMO_TASKS];
+                    normalizeTasks();
                     saveToLocalStorage();
                     tasks.forEach(t => google.script.run.saveTask(t));
                     renderApp();
@@ -561,6 +573,7 @@ function loadLocalApp() {
                         }
                     }
                 });
+                normalizeTasks();
                 saveToLocalStorage();
                 loaded = true;
             }
@@ -570,6 +583,7 @@ function loadLocalApp() {
     }
     if (!loaded) {
         tasks = [...DEMO_TASKS];
+        normalizeTasks();
         saveToLocalStorage();
     }
     const tomorrow = getRelativeDateString(1);
@@ -1110,6 +1124,36 @@ function createTaskCard(task) {
         rtsText = 'N/A';
     }
 
+    // Calculate completed task countdown to archive (7-day rule)
+    let daysLeftText = '';
+    if (task.currentStatus === 'Completed' && task.completedDate) {
+        try {
+            const compParts = task.completedDate.split('-');
+            if (compParts.length === 3) {
+                const compYear = parseInt(compParts[0], 10);
+                const compMonth = parseInt(compParts[1], 10) - 1;
+                const compDay = parseInt(compParts[2], 10);
+                const completedLocal = new Date(compYear, compMonth, compDay);
+                
+                const now = new Date();
+                const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                
+                const diffTime = todayLocal - completedLocal;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const remaining = 7 - diffDays;
+                if (remaining > 1) {
+                    daysLeftText = ` (${remaining}d left)`;
+                } else if (remaining === 1) {
+                    daysLeftText = ` (1d left)`;
+                } else {
+                    daysLeftText = ` (Moves today)`;
+                }
+            }
+        } catch (e) {
+            console.error('Error calculating completed countdown:', e);
+        }
+    }
+
     let bannerText = '';
     if (task.priorityLevel === 'AOG') {
         bannerText = 'URGENT';
@@ -1158,7 +1202,7 @@ function createTaskCard(task) {
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
-                    <span>Done ${task.completedDate}</span>
+                    <span>Done ${task.completedDate}${daysLeftText}</span>
                 </div>
                 ` : `
                 <div class="meta-item ${rtsClass}" title="Return to Service" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
@@ -2928,9 +2972,17 @@ function renderComments(task) {
                         </svg>
                     </div>
                 </div>
-                <div class="dhl-timeline-content">
-                    <div class="dhl-status-title">${escapeHTMLApp(update.text)}</div>
-                    <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(update.author)}</div>
+                <div class="dhl-timeline-content" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <div style="flex: 1;">
+                        <div class="dhl-status-title">${escapeHTMLApp(update.text)}</div>
+                        <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(update.author)}</div>
+                    </div>
+                    <button onclick="deleteStatusUpdate('${task.id}', '${update.timestamp}')" class="delete-update-btn no-print" title="Delete status update" style="background: none; border: none; padding: 4px; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
                 </div>
             `;
             dhlTimeline.appendChild(itemDiv);
@@ -5040,6 +5092,12 @@ function renderWeeklySummaryTab() {
                     </div>
                 </td>`;
             rtsTableBody.appendChild(logRow);
+
+            // Spacer row for print/layout gaps between task card groupings
+            const spacerRow = document.createElement('tr');
+            spacerRow.className = 'wk-spacer-row';
+            spacerRow.innerHTML = '<td colspan="8" style="height: 10px; padding: 0 !important; border: none !important; background: transparent !important;"></td>';
+            rtsTableBody.appendChild(spacerRow);
         });
     }
 }
@@ -6171,9 +6229,108 @@ function toggleWeeklyLogRow(rowId, btn) {
     }
 }
 
+function deleteStatusUpdate(taskId, timestamp) {
+    if (!confirm('Are you sure you want to delete this status update?')) return;
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    if (typeof task.comments === 'string') {
+        try { task.comments = JSON.parse(task.comments); } catch(e) { task.comments = []; }
+    }
+    task.comments = task.comments || [];
+
+    // Find the update to delete
+    const updateToDelete = task.comments.find(c => c.timestamp === timestamp);
+    if (updateToDelete) {
+        // Remove associated attachment if it exists
+        if (updateToDelete.text && updateToDelete.text.startsWith('Attached file: ')) {
+            const firstLine = updateToDelete.text.split('\n')[0];
+            const fileName = firstLine.replace('Attached file: ', '').trim();
+            if (fileName) {
+                if (typeof task.attachments === 'string') {
+                    try { task.attachments = JSON.parse(task.attachments); } catch(e) { task.attachments = []; }
+                }
+                task.attachments = task.attachments || [];
+                task.attachments = task.attachments.filter(att => att.name !== fileName);
+            }
+        }
+    }
+
+    // Filter comments to remove the update
+    task.comments = task.comments.filter(c => c.timestamp !== timestamp);
+
+    saveTaskData(task);
+    renderComments(task);
+
+    // Refresh attachments container UI
+    const filesContainer = document.getElementById('detailFiles');
+    if (filesContainer) {
+        filesContainer.innerHTML = '';
+        if (task.attachments && task.attachments.length > 0) {
+            task.attachments.forEach(file => {
+                const btn = document.createElement('a');
+                btn.href = file.data;
+                btn.target = '_blank';
+                btn.rel = 'noopener noreferrer';
+                btn.className = 'download-file-btn';
+                
+                const isUrl = file.type === 'url';
+                if (!isUrl) {
+                    btn.download = file.name;
+                }
+
+                const sizeLabel = isUrl ? 'Link' : `${(file.size / 1024).toFixed(1)} KB`;
+                
+                const leftIconSvg = isUrl ? `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                ` : `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                `;
+
+                const rightIconSvg = isUrl ? `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                ` : `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                `;
+
+                btn.innerHTML = `
+                    <span class="btn-left">
+                        ${leftIconSvg}
+                        <span>${file.name} (${sizeLabel})</span>
+                    </span>
+                    ${rightIconSvg}
+                `;
+                filesContainer.appendChild(btn);
+            });
+        } else {
+            filesContainer.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted);">No files attached</span>';
+        }
+    }
+
+    renderApp();
+}
+
 window.showUpdateLogModal = showUpdateLogModal;
 window.closeUpdateLogModal = closeUpdateLogModal;
 window.toggleWeeklyLogRow = toggleWeeklyLogRow;
+window.deleteStatusUpdate = deleteStatusUpdate;
 
 
 function handleSettingsBtnClick() {

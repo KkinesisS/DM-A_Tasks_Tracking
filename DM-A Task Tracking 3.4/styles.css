@@ -2776,7 +2776,7 @@ header {
     .mro-table {
         width: 100% !important;
         border-collapse: separate !important; /* Needed for border-radius on rows */
-        border-spacing: 0 10px !important;    /* Gap between tasks */
+        border-spacing: 0 !important;         /* Remove default gap between task row and log row */
         margin-top: 0.4rem !important;
     }
 
@@ -3886,14 +3886,24 @@ html.dark-mode .stat-card.completed,
 }
 
 /* Status Updates & Log Print Rows & Modal Styles */
-.wk-print-log-row {
+.wk-print-log-row,
+.wk-spacer-row {
     display: none;
 }
 
 @media print {
     /* Show the print log rows when printing the report */
-    .wk-print-log-row {
+    .wk-print-log-row,
+    .wk-spacer-row {
         display: table-row !important;
+    }
+
+    /* Spacer row cells styling to create print/layout gaps between cards */
+    .wk-spacer-row td {
+        height: 10px !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
     }
     
     /* Ensure styles render correctly in print */
@@ -4036,6 +4046,11 @@ html.dark-mode .dhl-timeline-badge {
     font-size: 0.78rem;
     color: var(--text-muted);
     margin-top: 4px;
+}
+
+.delete-update-btn:hover {
+    color: var(--priority-aog) !important;
+    background-color: rgba(239, 68, 68, 0.08);
 }
 
 /* ==========================================
