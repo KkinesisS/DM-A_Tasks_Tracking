@@ -4410,6 +4410,10 @@ html.dark-mode .login-card {
     .mro-table tr.task-row td, .mro-table tr.wk-print-log-row td {
         border-radius: 0 !important; /* clear corner rounding since collapse doesn't support it */
     }
+    #summaryBacklogList {
+        max-height: none !important;
+        overflow: visible !important;
+    }
 }
 @media print {
     /* Force light mode colors for print regardless of dark mode toggle */

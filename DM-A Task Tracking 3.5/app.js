@@ -1270,7 +1270,7 @@ function createTaskCard(task) {
     card.innerHTML = `
         <div class="card-priority-banner ${prioClass}">${bannerText}</div>
         <div class="card-content-wrapper">
-            <div class="card-header" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+            <div class="card-header" style="margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
                 <span class="ac-reg" style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.35rem; color: var(--text-primary);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--text-muted);">
                         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -1278,15 +1278,15 @@ function createTaskCard(task) {
                     </svg>
                     ${task.aircraftReg} <span class="ac-type-muted" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-left: 0.15rem;">(${task.aircraftType || 'A320'})</span>
                 </span>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span title="Copy Task ID" class="copy-task-id-btn" style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 3px;" onclick="window.copyTaskId(event, '${task.customId || task.id}', this)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px;"><rect x="9" y="9" width="13" height="13" rx="3" ry="3"></rect><path d="M5 15H4a3 3 0 0 1-3-3V4a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v1"></path></svg>
-                        ${task.customId || task.id}
-                    </span>
-                    <span class="ata-badge" style="background: var(--bg-secondary); color: var(--text-secondary); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">ATA ${task.ataChapter || 'N/A'}</span>
-                </div>
+                <span class="ata-badge" style="background: var(--bg-secondary); color: var(--text-secondary); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">ATA ${task.ataChapter || 'N/A'}</span>
             </div>
-            <div class="card-topic" style="font-weight: 700; font-size: 0.92rem; margin-top: 0.5rem; margin-bottom: 0.15rem; color: var(--text-primary); font-family: var(--font-heading);">${task.topic || 'No Topic'}</div>
+            <div style="margin-bottom: 0.35rem; display: flex; align-items: center;">
+                <span title="Copy Task ID" class="copy-task-id-btn" style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 3px;" onclick="window.copyTaskId(event, '${task.customId || task.id}', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px;"><rect x="9" y="9" width="13" height="13" rx="3" ry="3"></rect><path d="M5 15H4a3 3 0 0 1-3-3V4a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v1"></path></svg>
+                    ${task.customId || task.id}
+                </span>
+            </div>
+            <div class="card-topic" style="font-weight: 700; font-size: 0.92rem; margin-top: 0.25rem; margin-bottom: 0.15rem; color: var(--text-primary); font-family: var(--font-heading);">${task.topic || 'No Topic'}</div>
             <div class="card-desc" style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 3.4em; margin-bottom: 0.75rem;">${task.taskDescription}</div>
             
             <div class="card-metadata" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; padding: 0.5rem 0; border-top: 1px dashed rgba(0,0,0,0.05); border-bottom: 1px dashed rgba(0,0,0,0.05); margin-bottom: 0.75rem; font-size: 0.75rem;">
@@ -1320,7 +1320,7 @@ function createTaskCard(task) {
                     <span>${getCompletedExpirationText(task.completedDate)}</span>
                 </div>
                 ` : `
-                <div class="meta-item ${rtsClass}" title="Return to Service" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
+                <div class="meta-item ${rtsClass}" title="Due Date" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px; color: var(--text-muted);">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -3808,7 +3808,7 @@ function exportToExcel() {
         'ATA Chapter',
         'Assigned Team',
         'Priority Level',
-        'RTS Date',
+        'Due Date',
         'Requestor',
         'Requestor Contact',
         'Status',
@@ -5374,7 +5374,7 @@ function renderWeeklySummaryTab() {
             alertDiv.innerHTML = `
                 <div style="font-weight: 700; margin-bottom: 0.25rem; display: flex; justify-content: space-between;">
                     <span>${task.aircraftReg} (${task.aircraftType})</span>
-                    <span style="font-size: 0.75rem; text-transform: uppercase;">RTS: ${task.rtsDate}</span>
+                    <span style="font-size: 0.75rem; text-transform: uppercase;">DUE: ${task.rtsDate}</span>
                 </div>
                 <div style="line-height: 1.4;">${task.taskDescription}</div>
             `;
@@ -5382,12 +5382,21 @@ function renderWeeklySummaryTab() {
         });
     }
 
-    // 4.5. Active Backlog (Open / In Progress) - Entire Database (Date-insensitive)
+    // 4.5. Active Backlog (Open / In Progress) - Entire Database (Date-insensitive, but Team-sensitive)
     const backlogContainer = document.getElementById('summaryBacklogList');
     const backlogCountBadge = document.getElementById('summaryBacklogCount');
     if (backlogContainer) {
         backlogContainer.innerHTML = '';
-        const activeBacklogTasks = weeklyTasks.filter(t => t.currentStatus === 'Open' || t.currentStatus === 'In Progress');
+        
+        // Filter by selected teams if selector is active
+        const activeBacklogTasks = weeklyTasks.filter(t => {
+            if (t.currentStatus !== 'Open' && t.currentStatus !== 'In Progress') return false;
+            if (selectedTeams.length > 0) {
+                const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
+                return taskTeams.some(team => selectedTeams.includes(team));
+            }
+            return true;
+        });
         
         if (backlogCountBadge) {
             backlogCountBadge.textContent = activeBacklogTasks.length;
@@ -5404,41 +5413,104 @@ function renderWeeklySummaryTab() {
                 </div>
             `;
         } else {
-            // Sort by priority (AOG first, then High, Normal, Low) and then by RTS date
-            const priorityOrder = { 'AOG': 1, 'High': 2, 'Normal': 3, 'Low': 4 };
-            const sortedBacklog = [...activeBacklogTasks].sort((a, b) => {
-                const pA = priorityOrder[a.priorityLevel] || 99;
-                const pB = priorityOrder[b.priorityLevel] || 99;
-                if (pA !== pB) return pA - pB;
+            // Group active backlog tasks by team name
+            const backlogGroups = {}; // key: team name, value: [tasks]
+            activeBacklogTasks.forEach(task => {
+                let teams = (task.assignedTeam || '').split(',').map(s => s.trim()).filter(Boolean);
+                if (teams.length === 0) {
+                    teams = ['Unassigned'];
+                }
                 
-                if (a.rtsDate === 'N/A' && b.rtsDate === 'N/A') return 0;
-                if (a.rtsDate === 'N/A') return 1;
-                if (b.rtsDate === 'N/A') return -1;
-                return new Date(a.rtsDate) - new Date(b.rtsDate);
+                teams.forEach(teamName => {
+                    if (selectedTeams.length > 0 && !selectedTeams.includes(teamName)) return;
+                    
+                    if (!backlogGroups[teamName]) {
+                        backlogGroups[teamName] = [];
+                    }
+                    backlogGroups[teamName].push(task);
+                });
             });
 
-            sortedBacklog.forEach(task => {
-                const itemDiv = document.createElement('div');
-                itemDiv.style = 'padding: 0.75rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px;';
-                
-                let statusClass = 'open';
-                if (task.currentStatus === 'In Progress') statusClass = 'progress';
-                const prioClass = task.priorityLevel.toLowerCase();
+            // Sort team names
+            const teamOrder = [
+                'Mechanical System Team',
+                'Avionic Systems Team',
+                'Structure Team',
+                'Engines Team',
+                'IERA Shop',
+                'Component Team',
+                'Unassigned'
+            ];
+            
+            const sortedTeamNames = Object.keys(backlogGroups).sort((a, b) => {
+                let idxA = teamOrder.indexOf(a);
+                let idxB = teamOrder.indexOf(b);
+                if (idxA === -1) idxA = 99;
+                if (idxB === -1) idxB = 99;
+                if (idxA !== idxB) return idxA - idxB;
+                return a.localeCompare(b);
+            });
 
-                itemDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 700; color: var(--text-primary);">${task.aircraftReg} (${task.aircraftType || 'A320'})</span>
-                        <span class="badge-priority ${prioClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.priorityLevel}</span>
-                    </div>
-                    <div style="color: var(--text-secondary); line-height: 1.35; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.taskDescription || '')}">
-                        ${escapeHTMLApp(task.taskDescription || '')}
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 0.75rem; color: var(--text-muted);">
-                        <span>${escapeHTMLApp((task.assignedTeam || 'Unassigned').split(',')[0])}</span>
-                        <span class="badge-status ${statusClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.currentStatus}</span>
-                    </div>
+            const priorityOrder = { 'AOG': 1, 'High': 2, 'Normal': 3, 'Low': 4 };
+            function getTeamColor(teamName) {
+                if (teamName.includes('Mechanical')) return 'var(--team-mech, #10b981)';
+                if (teamName.includes('Avionic')) return 'var(--team-avionics, #0ea5e9)';
+                if (teamName.includes('Structure')) return 'var(--team-struct, #a855f7)';
+                if (teamName.includes('Engines')) return 'var(--team-engines, #ec4899)';
+                if (teamName.includes('IERA')) return 'var(--team-iera, #6366f1)';
+                if (teamName.includes('Component')) return 'var(--team-component, #f59e0b)';
+                return '#64748b';
+            }
+
+            sortedTeamNames.forEach(teamName => {
+                const teamTasks = backlogGroups[teamName].sort((a, b) => {
+                    const pA = priorityOrder[a.priorityLevel] || 99;
+                    const pB = priorityOrder[b.priorityLevel] || 99;
+                    if (pA !== pB) return pA - pB;
+                    
+                    if (a.rtsDate === 'N/A' && b.rtsDate === 'N/A') return 0;
+                    if (a.rtsDate === 'N/A') return 1;
+                    if (b.rtsDate === 'N/A') return -1;
+                    return new Date(a.rtsDate) - new Date(b.rtsDate);
+                });
+
+                // Render Team Sub-header
+                const headerDiv = document.createElement('div');
+                headerDiv.style = 'margin-top: 0.65rem; margin-bottom: 0.35rem; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; letter-spacing: 0.03em;';
+                headerDiv.innerHTML = `
+                    <span style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: ${getTeamColor(teamName)};"></span>
+                    ${teamName}
+                    <span style="font-size: 0.68rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 0 4px; border-radius: 6px; font-weight: 600; margin-left: 2px;">${teamTasks.length}</span>
                 `;
-                backlogContainer.appendChild(itemDiv);
+                backlogContainer.appendChild(headerDiv);
+
+                // Render tasks under this team
+                teamTasks.forEach(task => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
+                    
+                    let statusClass = 'open';
+                    if (task.currentStatus === 'In Progress') statusClass = 'progress';
+                    const prioClass = task.priorityLevel.toLowerCase();
+
+                    itemDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 700; color: var(--text-primary);">${task.aircraftReg} (${task.aircraftType || 'A320'})</span>
+                            <span class="badge-priority ${prioClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.priorityLevel}</span>
+                        </div>
+                        <div style="color: var(--text-secondary); line-height: 1.35; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.taskDescription || '')}">
+                            ${escapeHTMLApp(task.taskDescription || '')}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; font-size: 0.72rem; color: var(--text-muted); gap: 4px;">
+                            <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1;">
+                                <span style="font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.assignedTeam || 'Unassigned')}">${escapeHTMLApp(task.assignedTeam || 'Unassigned')}</span>
+                                <span style="font-size: 0.68rem; opacity: 0.85;">Created: ${task.createdDate || 'N/A'}</span>
+                            </div>
+                            <span class="badge-status ${statusClass}" style="font-size: 0.68rem; padding: 1px 6px; white-space: nowrap;">${task.currentStatus}</span>
+                        </div>
+                    `;
+                    backlogContainer.appendChild(itemDiv);
+                });
             });
         }
     }
