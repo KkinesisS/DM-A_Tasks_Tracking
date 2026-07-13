@@ -2383,6 +2383,255 @@ function openExternalRequestModal() {
     openModal('taskModal');
 }
 
+function openTrackRequestModal() {
+    // Hide login card box
+    const loginCard = document.getElementById('loginCard');
+    if (loginCard) loginCard.style.display = 'none';
+    
+    // Elevate trackRequestModal z-index
+    const trackModal = document.getElementById('trackRequestModal');
+    if (trackModal) {
+        trackModal.style.display = 'flex';
+        trackModal.style.zIndex = '100000';
+        trackModal.classList.add('active');
+    }
+    
+    document.getElementById('trackRequestId').value = '';
+    document.getElementById('trackRequestResult').style.display = 'none';
+}
+
+function closeTrackRequestModal() {
+    const trackModal = document.getElementById('trackRequestModal');
+    if (trackModal) {
+        trackModal.classList.remove('active');
+        setTimeout(() => {
+            trackModal.style.display = 'none';
+        }, 300);
+    }
+    
+    // Show login card box
+    const loginCard = document.getElementById('loginCard');
+    if (loginCard) loginCard.style.display = '';
+}
+
+async function trackRequestStatus() {
+    const trackId = document.getElementById('trackRequestId').value.trim();
+    const resultDiv = document.getElementById('trackRequestResult');
+    
+    if (!trackId) {
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<span style="color: var(--priority-aog);">Please enter a valid Task ID.</span>';
+        return;
+    }
+    
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<span style="color: var(--text-secondary);">Searching...</span>';
+    
+    let task = null;
+    
+    if (typeof tasks !== 'undefined' && tasks && tasks.length > 0) {
+        task = tasks.find(t => t.id === trackId || (t.customId && t.customId === trackId));
+    }
+    
+    if (!task && typeof window.supabaseClient !== 'undefined' && window.supabaseClient) {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('tasks')
+                .select('*')
+                .eq(trackId.startsWith('task-') ? 'customId' : 'id', trackId)
+                .limit(1);
+                
+            if (error) {
+                console.error('Supabase query error:', error);
+            } else if (data && data.length > 0) {
+                task = data[0];
+            }
+        } catch (e) {
+            console.error('Error fetching task status:', e);
+        }
+    }
+    
+    if (!task) {
+        const localData = localStorage.getItem('mro_tasks');
+        if (localData && localData !== 'null' && localData !== 'undefined') {
+            try {
+                const allTasks = JSON.parse(localData);
+                task = allTasks.find(t => t.id === trackId || (t.customId && t.customId === trackId));
+            } catch(e) {}
+        }
+    }
+    
+    if (task) {
+        resultDiv.style.padding = '0';
+        resultDiv.style.background = 'transparent';
+        resultDiv.style.border = 'none';
+        
+        let resultHtml = `
+            <div style="background: #ffffff; border-radius: 16px; padding: 24px 0 0 0; font-family: 'Inter', sans-serif; overflow: hidden; color: #111111; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                <div style="padding: 0 24px 16px 24px;">
+                    <h3 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: #111111;">Request details</h3>
+                    <div style="font-size: 1.05rem; color: #666666; margin-top: 6px; font-weight: 600;">No: ${task.customId || task.id}</div>
+                    ${task.taskDescription ? `<div style="font-size: 1.1rem; color: #333333; margin-top: 16px; line-height: 1.5; font-weight: 500;">${task.taskDescription}</div>` : ''}
+                    ${task.assignedTeam ? `<div style="font-size: 0.85rem; color: #666666; margin-top: 6px; font-weight: 600;">Team: ${task.assignedTeam}</div>` : ''}
+                </div>
+                <div style="position: relative; padding-bottom: 16px; margin-top: 8px; background: #fafafa; border-top: 1px solid #eeeeee;">
+        `;
+
+        // Determine timeline items (status changes + comments)
+        let timelineItems = [];
+        if (task.comments && task.comments.length > 0) {
+            timelineItems = [...task.comments];
+        }
+        
+        if (timelineItems.length === 0) {
+            timelineItems.push({
+                text: 'Request created',
+                timestamp: task.createdAt || task.createdDate || new Date().toISOString(),
+                type: 'creation'
+            });
+        }
+        
+        // Sort ascending (oldest first, newest at bottom)
+        const sortedItems = timelineItems.sort((a, b) => new Date(a.timestamp || a.createdDate) - new Date(b.timestamp || b.createdDate));
+        
+        // Add the single vertical line that connects all circles
+        if (sortedItems.length > 1) {
+            resultHtml += `
+                <div style="position: absolute; left: 39px; top: 32px; bottom: 48px; width: 2px; background-color: #d8d8e6; z-index: 1;"></div>
+            `;
+        }
+
+        sortedItems.forEach((item, index) => {
+            let dateStr = "";
+            try {
+                const d = new Date(item.timestamp || item.createdDate);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const date = d.getDate();
+                const month = months[d.getMonth()];
+                const hours = String(d.getHours()).padStart(2, '0');
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                dateStr = `${date} ${month} ${hours}:${minutes}`;
+            } catch(e) {
+                dateStr = item.timestamp || '';
+            }
+            
+            const isLast = index === sortedItems.length - 1;
+            const bgStyle = isLast ? 'background-color: #f0f5e5;' : 'background-color: transparent;';
+            const dotColor = isLast ? '#8bc34a' : '#1e1b4b';
+            const dotOuterBg = isLast ? '#ffffff' : '#e6e6f0';
+            
+            // Format text
+            let itemText = item.text || item.comment || 'Status updated';
+            if (item.type === 'status_change') {
+                itemText = `Status changed to ${item.newStatus || 'Updated'}`;
+            }
+            
+            resultHtml += `
+                <div style="position: relative; display: flex; padding: 16px 24px; ${bgStyle} z-index: 2;">
+                    <!-- Icon Circle -->
+                    <div style="position: relative; z-index: 3; width: 32px; height: 32px; border-radius: 50%; background-color: ${dotOuterBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 16px; border: 1px solid #d8d8e6;">
+                        <div style="width: 16px; height: 16px; border-radius: 50%; background-color: ${dotColor};"></div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div style="flex-grow: 1; padding-top: 4px;">
+                        <div style="font-weight: 700; font-size: 1.1rem; color: #111111; margin-bottom: 6px; line-height: 1.3;">${itemText}</div>
+                        <div style="font-size: 0.8rem; color: #666666; font-weight: 600;">${dateStr}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        resultHtml += `
+                </div>
+            </div>
+        `;
+        
+        resultDiv.innerHTML = resultHtml;
+    } else {
+        resultDiv.style.padding = '1rem';
+        resultDiv.style.background = 'var(--bg-secondary)';
+        resultDiv.style.border = '1px solid var(--border-color)';
+        resultDiv.innerHTML = '<span style="color: var(--priority-aog);">Request not found. Please check your Task ID.</span>';
+    }
+}
+
+function showSuccessModal(trackingCode, requestorName, priorityLevel) {
+    document.getElementById('successTrackingCode').innerText = trackingCode;
+    if (document.getElementById('successRequestorText')) {
+        document.getElementById('successRequestorText').innerText = requestorName || 'Unknown';
+    }
+    if (document.getElementById('successPriorityText')) {
+        document.getElementById('successPriorityText').innerText = priorityLevel || 'Routine';
+    }
+    
+    // Set current date and time
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dateStr = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+    const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('successDateText').innerText = dateStr + ' • ' + timeStr;
+
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+        modal.style.visibility = 'visible';
+        modal.style.zIndex = '9999999';
+        void modal.offsetWidth;
+        modal.classList.add('active');
+    }
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+}
+
+function copyTrackingCode() {
+    const code = document.getElementById('successTrackingCode').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Tracking code copied to clipboard!', 'success');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    let iconSvg = '';
+    if (type === 'success') {
+        iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    } else if (type === 'error') {
+        iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+    } else {
+        iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+    }
+    
+    toast.innerHTML = `<div class="toast-icon">${iconSvg}</div><div class="toast-message">${message}</div><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
+    
+    container.appendChild(toast);
+    
+    // Trigger reflow to apply animation
+    toast.offsetHeight;
+    toast.classList.add('show');
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
+}
+
 // Open Add Task Modal
 function openAddTaskModal() {
     const titleText = isExternalRequest ? 'Create Request' : 'Create Maintenance Task';
@@ -3070,7 +3319,8 @@ function saveTaskWithUploads(taskToSave, wasExternal) {
         closeModal('taskModal');
         renderApp();
         if (wasExternal) {
-            alert('Request submitted successfully! Maintenance Control will review your request.');
+            const trackingCode = taskToSave.customId || taskToSave.id;
+            showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel);
         }
         return;
     }
@@ -3113,7 +3363,8 @@ function saveTaskWithUploads(taskToSave, wasExternal) {
             closeModal('taskModal');
             renderApp();
             if (wasExternal) {
-                alert('Request submitted successfully! Maintenance Control will review your request.');
+                const trackingCode = taskToSave.customId || taskToSave.id;
+                showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel);
             }
         })
         .catch(err => {
@@ -3128,7 +3379,8 @@ function saveTaskWithUploads(taskToSave, wasExternal) {
             closeModal('taskModal');
             renderApp();
             if (wasExternal) {
-                alert('Request submitted successfully! Maintenance Control will review your request.');
+                const trackingCode = taskToSave.customId || taskToSave.id;
+                showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel);
             }
         });
 }

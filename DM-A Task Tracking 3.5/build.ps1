@@ -22,6 +22,14 @@ $indexHtml = Get-Content -Path $templatePath -Raw -Encoding UTF8
 $stylesContent = Get-Content -Path "styles.css" -Raw -Encoding UTF8
 $darkModeContent = Get-Content -Path "dark-mode.css" -Raw -Encoding UTF8
 
+if (Test-Path "THAI787.jpeg") {
+    $bytes = [System.IO.File]::ReadAllBytes("THAI787.jpeg")
+    $base64 = [System.Convert]::ToBase64String($bytes)
+    $bgImageUrl = "data:image/jpeg;base64,$base64"
+    $stylesContent = $stylesContent -replace "url\(['`"]?THAI787\.jpeg['`"]?\)", "url('$bgImageUrl')"
+    $stylesContent = $stylesContent -replace "url\(['`"]?<!-- THAI787_BG_BASE64 -->['`"]?\)", "url('$bgImageUrl')"
+}
+
 # Read script contents
 $tabsContent = Get-Content -Path "tabs.js" -Raw -Encoding UTF8
 $manualIssuesContent = Get-Content -Path "manualIssues.js" -Raw -Encoding UTF8
@@ -46,6 +54,9 @@ $cssFiles = @('styles.css', 'dark-mode.css')
 foreach ($file in $cssFiles) {
     if (Test-Path $file) {
         $content = Get-Content -Path $file -Raw -Encoding UTF8
+        if ($file -eq "styles.css") {
+            $content = $stylesContent
+        }
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file)
         "<style>`n$content`n</style>" | Set-Content -Path "build/$baseName.html" -Encoding UTF8
         Write-Host "$file wrapped -> build/$baseName.html"

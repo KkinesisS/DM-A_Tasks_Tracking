@@ -25,8 +25,16 @@ console.log(`Using ${templatePath} as template source...`);
 let indexHtml = fs.readFileSync(templatePath, 'utf8');
 
 // Inline stylesheet contents
-const stylesContent = fs.readFileSync('styles.css', 'utf8');
+let stylesContent = fs.readFileSync('styles.css', 'utf8');
 const darkModeContent = fs.readFileSync('dark-mode.css', 'utf8');
+
+// Replace local image references or placeholders with base64 data
+if (fs.existsSync('THAI787.jpeg')) {
+    const bgImageBase64 = fs.readFileSync('THAI787.jpeg').toString('base64');
+    const bgImageUrl = `data:image/jpeg;base64,${bgImageBase64}`;
+    stylesContent = stylesContent.replace(/url\(['"]?THAI787\.jpeg['"]?\)/g, `url('${bgImageUrl}')`);
+    stylesContent = stylesContent.replace(/url\(['"]?<!-- THAI787_BG_BASE64 -->['"]?\)/g, `url('${bgImageUrl}')`);
+}
 
 // Inline script contents
 const tabsContent = fs.readFileSync('tabs.js', 'utf8');
@@ -50,7 +58,10 @@ console.log(`${templatePath} -> build/index.html and index.html compiled (fully 
 // Wrap and write CSS files as HTML
 cssFiles.forEach(file => {
     if (fs.existsSync(file)) {
-        const content = fs.readFileSync(file, 'utf8');
+        let content = fs.readFileSync(file, 'utf8');
+        if (file === 'styles.css') {
+            content = stylesContent;
+        }
         const baseName = path.basename(file, '.css');
         fs.writeFileSync(path.join('build', `${baseName}.html`), `<style>\n${content}\n</style>`);
         console.log(`${file} wrapped -> build/${baseName}.html`);

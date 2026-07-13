@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
     /* Base Colors (Light Mode - Monochromatic Purple Theme) */
@@ -4181,7 +4181,7 @@ html.dark-mode .dhl-timeline-badge {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)), url('<!-- THAI787_BG_BASE64 -->') !important;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)), url('THAI787.jpeg') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
@@ -4193,7 +4193,7 @@ html.dark-mode .dhl-timeline-badge {
 }
 
 html.dark-mode .login-overlay {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('<!-- THAI787_BG_BASE64 -->') !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('THAI787.jpeg') !important;
 }
 
 .login-card {
@@ -4466,4 +4466,81 @@ html.dark-mode .login-card {
     animation: float3D 4s ease-in-out infinite;
     transform-origin: center bottom;
     transition: all 0.3s ease;
+}
+
+/* Toast Notification System */
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 999999;
+    pointer-events: none;
+}
+.toast {
+    min-width: 300px;
+    max-width: 450px;
+    background: rgba(27, 15, 30, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+.toast-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+.toast-success .toast-icon {
+    background: rgba(39, 174, 96, 0.2);
+    color: #2ecc71;
+}
+.toast-error .toast-icon {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+.toast-info .toast-icon {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+.toast-message {
+    flex-grow: 1;
+}
+.toast-close {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    pointer-events: auto;
+}
+.toast-close:hover {
+    color: #fff;
 }
