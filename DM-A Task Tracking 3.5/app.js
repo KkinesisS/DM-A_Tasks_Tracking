@@ -2610,7 +2610,14 @@ async function trackRequestStatus() {
         let resultHtml = `
             <div style="background: #ffffff; border-radius: 16px; padding: 24px 0 0 0; font-family: 'Inter', sans-serif; overflow: hidden; color: #111111; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                 <div style="padding: 0 24px 16px 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: #111111;">Request details</h3>
+                    <span style="display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; ${
+                        task.currentStatus === 'Completed' ? 'background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.3);' :
+                        task.currentStatus === 'In Progress' ? 'background: rgba(59, 130, 246, 0.12); color: #1d4ed8; border: 1px solid rgba(59, 130, 246, 0.3);' :
+                        'background: rgba(234, 179, 8, 0.12); color: #a16207; border: 1px solid rgba(234, 179, 8, 0.3);'
+                    }">${task.currentStatus || 'Open'}</span>
+                </div>
                     <div style="font-size: 1.05rem; color: #666666; margin-top: 6px; font-weight: 600;">No: ${task.customId || task.id}</div>
                     ${task.taskDescription ? `<div style="font-size: 1.1rem; color: #333333; margin-top: 16px; line-height: 1.5; font-weight: 500;">${task.taskDescription}</div>` : ''}
                     ${task.assignedTeam ? `<div style="font-size: 0.85rem; color: #666666; margin-top: 6px; font-weight: 600;">Team: ${task.assignedTeam}</div>` : ''}
