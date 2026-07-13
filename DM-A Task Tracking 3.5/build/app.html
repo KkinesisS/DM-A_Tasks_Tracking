@@ -822,6 +822,32 @@ function calculateStats() {
 }
 
 // Filter and Search Tasks
+function getCompletedExpirationText(completedDateStr) {
+    if (!completedDateStr) return '';
+    const parts = completedDateStr.split('-');
+    if (parts.length !== 3) return '';
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    
+    const completedLocal = new Date(year, month, day);
+    const now = new Date();
+    const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const diffTime = todayLocal - completedLocal;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const daysRemaining = 7 - diffDays;
+    
+    if (daysRemaining <= 0) {
+        return 'Moves to History today';
+    } else if (daysRemaining === 1) {
+        return 'Moves to History tomorrow';
+    } else {
+        return `Moves to History in ${daysRemaining} days`;
+    }
+}
+window.getCompletedExpirationText = getCompletedExpirationText;
+
 // Returns true if a completed task is old enough (>7 days) to be in History
 function isArchivedToHistory(task) {
     if (task.currentStatus !== 'Completed') return false;
@@ -956,62 +982,144 @@ function renderHistoryTab() {
     if (countEl) countEl.textContent = historyTasks.length;
 
     if (historyTasks.length === 0) {
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.alignItems = 'center';
+        container.style.justifyContent = 'center';
+        container.style.padding = '4rem 2rem';
+        container.style.color = 'var(--text-muted)';
+        
         container.innerHTML = `
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:1rem;color:var(--text-muted);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:0.3;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <p style="font-size:1rem;font-weight:600;">No archived tasks yet</p>
-                <p style="font-size:0.85rem;text-align:center;max-width:340px;">Tasks marked as <strong>Completed</strong> will automatically appear here after <strong>7 days</strong>.</p>
-            </div>`;
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:0.3;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <p style="font-size:1rem;font-weight:600;">No archived tasks yet</p>
+            <p style="font-size:0.85rem;text-align:center;max-width:340px;">Tasks marked as <strong>Completed</strong> will automatically appear here after <strong>7 days</strong>.</p>
+        `;
         return;
     }
 
-    // Group tasks by Month-Year of completedDate
-    const groups = {};
+    // Reset container style for list layout
+    container.style.display = 'block';
+    container.style.padding = '1.5rem 0';
+    container.style.color = 'inherit';
+
+    // Group tasks by Month-Year and then by Team
+    const groups = {}; // key: "Month Year", value: { "Team Name": [tasks] }
     historyTasks.forEach(task => {
         const d = new Date(task.completedDate);
-        const key = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(task);
+        const monthKey = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        
+        if (!groups[monthKey]) {
+            groups[monthKey] = {};
+        }
+        
+        // Extract teams (supports multiple teams per task)
+        let teams = (task.assignedTeam || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (teams.length === 0) {
+            teams = ['Unassigned'];
+        }
+        
+        teams.forEach(teamName => {
+            if (!groups[monthKey][teamName]) {
+                groups[monthKey][teamName] = [];
+            }
+            groups[monthKey][teamName].push(task);
+        });
     });
 
-    // Sort groups newest first
-    const sortedGroups = Object.keys(groups).sort((a, b) => new Date('1 ' + b) - new Date('1 ' + a));
+    // Sort months newest first
+    const sortedMonths = Object.keys(groups).sort((a, b) => new Date('1 ' + b) - new Date('1 ' + a));
 
-    container.innerHTML = sortedGroups.map(month => {
-        const monthTasks = groups[month].sort((a, b) => new Date(b.completedDate) - new Date(a.completedDate));
-        const cards = monthTasks.map(task => {
-            const teams = (task.assignedTeam || '').split(',').map(s => s.trim()).filter(Boolean);
-            function getTeamBadgeClass(t) {
-                if (t.includes('Avionic')) return 'avionics';
-                if (t.includes('Structure')) return 'struct';
-                if (t.includes('Engines')) return 'engines';
-                if (t.includes('IERA')) return 'iera';
-                if (t.includes('Component')) return 'component';
-                return 'mech';
-            }
-            const teamBadges = teams.map(t => `<span class="team-badge ${getTeamBadgeClass(t)}" style="font-size:0.7rem;padding:0.15rem 0.5rem;">${t}</span>`).join('');
-            const prioColors = { AOG: '#dc2626', High: '#ea580c', Medium: '#d97706', Low: '#16a34a', Routine: '#0284c7' };
-            const prioColor = prioColors[task.priorityLevel] || '#64748b';
-            const topic = task.topic || '';
-            return `
-            <div class="task-card" style="border-left:4px solid #10b981;cursor:pointer;padding:1.1rem !important;" id="history-card-${task.id}" onclick="openDetailsModal('${task.id}')">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;">
-                    <div style="display:flex;flex-direction:column;gap:0.2rem;min-width:0;">
-                        ${topic ? `<span style="font-size:0.8rem;font-weight:700;color:var(--text-primary);">${topic}</span>` : ''}
-                        <span style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);">${task.aircraftReg} &middot; ATA ${task.ataChapter || 'N/A'}</span>
+    const teamOrder = [
+        'Mechanical System Team',
+        'Avionic Systems Team',
+        'Structure Team',
+        'Engines Team',
+        'IERA Shop',
+        'Component Team',
+        'Unassigned'
+    ];
+
+    const sortTeams = (teamA, teamB) => {
+        let idxA = teamOrder.indexOf(teamA);
+        let idxB = teamOrder.indexOf(teamB);
+        if (idxA === -1) idxA = 99;
+        if (idxB === -1) idxB = 99;
+        if (idxA !== idxB) {
+            return idxA - idxB;
+        }
+        return teamA.localeCompare(teamB);
+    };
+
+    function getTeamColor(teamName) {
+        if (teamName.includes('Mechanical')) return 'var(--team-mech, #10b981)';
+        if (teamName.includes('Avionic')) return 'var(--team-avionics, #0ea5e9)';
+        if (teamName.includes('Structure')) return 'var(--team-struct, #a855f7)';
+        if (teamName.includes('Engines')) return 'var(--team-engines, #ec4899)';
+        if (teamName.includes('IERA')) return 'var(--team-iera, #6366f1)';
+        if (teamName.includes('Component')) return 'var(--team-component, #f59e0b)';
+        return '#64748b';
+    }
+
+    container.innerHTML = sortedMonths.map(month => {
+        const teamsInMonth = Object.keys(groups[month]).sort(sortTeams);
+        
+        // Count total unique tasks in the month
+        const uniqueTaskIds = new Set();
+        teamsInMonth.forEach(team => {
+            groups[month][team].forEach(t => uniqueTaskIds.add(t.id));
+        });
+        const monthTaskCount = uniqueTaskIds.size;
+
+        const teamSectionsHtml = teamsInMonth.map(teamName => {
+            const teamTasks = groups[month][teamName].sort((a, b) => new Date(b.completedDate) - new Date(a.completedDate));
+            
+            const cards = teamTasks.map(task => {
+                const teams = (task.assignedTeam || '').split(',').map(s => s.trim()).filter(Boolean);
+                function getTeamBadgeClass(t) {
+                    if (t.includes('Avionic')) return 'avionics';
+                    if (t.includes('Structure')) return 'struct';
+                    if (t.includes('Engines')) return 'engines';
+                    if (t.includes('IERA')) return 'iera';
+                    if (t.includes('Component')) return 'component';
+                    return 'mech';
+                }
+                const teamBadges = teams.map(t => `<span class="team-badge ${getTeamBadgeClass(t)}" style="font-size:0.7rem;padding:0.15rem 0.5rem;">${t}</span>`).join('');
+                const prioColors = { AOG: '#dc2626', High: '#ea580c', Medium: '#d97706', Low: '#16a34a', Routine: '#0284c7' };
+                const prioColor = prioColors[task.priorityLevel] || '#64748b';
+                const topic = task.topic || '';
+                
+                return `
+                <div class="task-card" style="border-left:4px solid #10b981;cursor:pointer;padding:1.1rem !important;" id="history-card-${task.id}" onclick="openDetailsModal('${task.id}')">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;">
+                        <div style="display:flex;flex-direction:column;gap:0.2rem;min-width:0;">
+                            ${topic ? `<span style="font-size:0.8rem;font-weight:700;color:var(--text-primary);">${topic}</span>` : ''}
+                            <span style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);">${task.aircraftReg} &middot; ATA ${task.ataChapter || 'N/A'}</span>
+                        </div>
+                        <span style="font-size:0.7rem;font-weight:600;color:${prioColor};background:${prioColor}18;padding:0.15rem 0.45rem;border-radius:4px;white-space:nowrap;">${task.priorityLevel}</span>
                     </div>
-                    <span style="font-size:0.7rem;font-weight:600;color:${prioColor};background:${prioColor}18;padding:0.15rem 0.45rem;border-radius:4px;white-space:nowrap;">${task.priorityLevel}</span>
-                </div>
-                <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.65rem;">${teamBadges}</div>
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:0.72rem;color:var(--text-muted);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Completed ${task.completedDate}
-                    </span>
-                    <button class="btn btn-secondary" onclick="event.stopPropagation(); restoreTaskFromHistory('${task.id}')" style="font-size:0.72rem;padding:0.2rem 0.55rem;height:auto;min-height:auto;gap:4px;" title="Restore to Board">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4.95"></path></svg>
-                        Restore
-                    </button>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.65rem;">${teamBadges}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:0.72rem;color:var(--text-muted);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Completed ${task.completedDate}
+                        </span>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); restoreTaskFromHistory('${task.id}')" style="font-size:0.72rem;padding:0.2rem 0.55rem;height:auto;min-height:auto;gap:4px;" title="Restore to Board">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4.95"></path></svg>
+                            Restore
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            return `
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin: 1rem 0 0.65rem 0; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: ${getTeamColor(teamName)};"></span>
+                    ${teamName}
+                    <span style="font-size: 0.72rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 1px 6px; border-radius: 12px; font-weight: 600; margin-left: 4px;">${teamTasks.length}</span>
+                </h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;">
+                    ${cards}
                 </div>
             </div>`;
         }).join('');
@@ -1020,11 +1128,11 @@ function renderHistoryTab() {
         <div style="margin-bottom:2rem;">
             <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
                 <h3 style="font-size:0.9rem;font-weight:700;color:var(--text-primary);margin:0;">${month}</h3>
-                <span style="font-size:0.75rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border-color);padding:0.1rem 0.45rem;border-radius:10px;">${monthTasks.length} task${monthTasks.length !== 1 ? 's' : ''}</span>
+                <span style="font-size:0.75rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border-color);padding:0.1rem 0.45rem;border-radius:10px;">${monthTaskCount} task${monthTaskCount !== 1 ? 's' : ''}</span>
                 <div style="flex:1;height:1px;background:var(--border-color);"></div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;">
-                ${cards}
+            <div style="padding-left: 0.5rem;">
+                ${teamSectionsHtml}
             </div>
         </div>`;
     }).join('');
@@ -1205,6 +1313,13 @@ function createTaskCard(task) {
                     </svg>
                     <span>Done ${task.completedDate}</span>
                 </div>
+                <div class="meta-item" title="History Countdown" style="display: flex; align-items: center; gap: 0.35rem; color: #f59e0b; font-weight: 500; font-size: 0.8rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px; color: #f59e0b;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>${getCompletedExpirationText(task.completedDate)}</span>
+                </div>
                 ` : `
                 <div class="meta-item ${rtsClass}" title="Return to Service" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px; color: var(--text-muted);">
@@ -1327,7 +1442,7 @@ function renderList(filteredTasks) {
                 <td><span class="badge-priority ${prioClass}">${task.priorityLevel}</span></td>
                 <td><div class="tbl-desc" title="${task.taskDescription}"><strong>${task.topic || 'No Topic'}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${task.taskDescription}</span></div></td>
                 <td><span>${task.createdDate || 'N/A'}</span></td>
-                <td><span>${task.currentStatus === 'Completed' && task.completedDate ? `<strong style="color: #10b981;">Done ${task.completedDate}</strong>` : task.rtsDate}</span></td>
+                <td><span>${task.currentStatus === 'Completed' && task.completedDate ? `<strong style="color: #10b981;">Done ${task.completedDate}</strong><br><span style="font-size: 0.72rem; color: #f59e0b; font-weight: 500;">(${getCompletedExpirationText(task.completedDate)})</span>` : task.rtsDate}</span></td>
                 <td><span>${task.requestor}</span></td>
                 <td><span class="badge-status ${statusClass}">${task.currentStatus}</span></td>
                 <td style="text-align: right;">
@@ -2212,12 +2327,38 @@ function setupEventListeners() {
     });
 
     // Weekly Summary Date & Team Selectors
+    function getWeeklySummaryDefaultDates() {
+        const now = new Date();
+        const day = now.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+        
+        const monday = new Date(now);
+        monday.setDate(now.getDate() + diffToMonday);
+        
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        
+        const format = (d) => {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        };
+        
+        return {
+            start: format(monday),
+            end: format(sunday)
+        };
+    }
+    window.getWeeklySummaryDefaultDates = getWeeklySummaryDefaultDates;
+
     const startSel = document.getElementById('summaryStartDateSelector');
     const endSel = document.getElementById('summaryEndDateSelector');
     const summaryDropdown = document.getElementById('summaryTeamDropdown');
     if (startSel && endSel) {
-        startSel.value = '2026-06-15';
-        endSel.value = '2026-06-21';
+        const defaults = getWeeklySummaryDefaultDates();
+        startSel.value = defaults.start;
+        endSel.value = defaults.end;
         
         startSel.addEventListener('change', () => {
             renderWeeklySummaryTab();
@@ -2950,10 +3091,14 @@ function openDetailsModal(id) {
     // Show/hide Completed Date section
     const completedSection = document.getElementById('detailCompletedSection');
     const completedDateSpan = document.getElementById('detailCompletedDate');
+    const completedExpirySpan = document.getElementById('detailCompletedExpiry');
     if (completedSection && completedDateSpan) {
         if (task.currentStatus === 'Completed' && task.completedDate) {
             completedSection.style.display = 'block';
             completedDateSpan.textContent = task.completedDate;
+            if (completedExpirySpan) {
+                completedExpirySpan.textContent = getCompletedExpirationText(task.completedDate);
+            }
         } else {
             completedSection.style.display = 'none';
         }
@@ -3135,6 +3280,22 @@ function openDetailsModal(id) {
     openModal('detailsModal');
 }
 
+// Helper: Delete individual status updates from comments log
+function deleteLogUpdate(taskId, timestamp) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    if (!confirm('Are you sure you want to delete this status update?')) {
+        return;
+    }
+    
+    task.comments = (task.comments || []).filter(item => item.timestamp !== timestamp);
+    saveTaskData(task);
+    renderComments(task);
+    renderApp();
+}
+window.deleteLogUpdate = deleteLogUpdate;
+
 // Helper: Render Comments and Updates inside Details Modal
 function renderComments(task) {
     const commentsList = document.getElementById('detailCommentsList');
@@ -3222,9 +3383,14 @@ function renderComments(task) {
                         </svg>
                     </div>
                 </div>
-                <div class="dhl-timeline-content">
-                    <div class="dhl-status-title">${escapeHTMLApp(update.text)}</div>
-                    <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(update.author)}</div>
+                <div class="dhl-timeline-content" style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; width: 100%;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="dhl-status-title">${escapeHTMLApp(update.text)}</div>
+                        <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(update.author)}</div>
+                    </div>
+                    <button class="delete-update-btn" onclick="deleteLogUpdate('${task.id}', '${update.timestamp}')" onmouseover="this.style.opacity='1'; this.style.color='var(--priority-aog, #ef4444)';" onmouseout="this.style.opacity='0.4'; this.style.color='var(--text-muted)';" style="background: none; border: none; padding: 4px; cursor: pointer; color: var(--text-muted); opacity: 0.4; transition: opacity 0.2s, color 0.2s; display: flex; align-items: center; justify-content: center; margin-top: 2px;" title="Delete update">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
                 </div>
             `;
             dhlTimeline.appendChild(itemDiv);
@@ -4821,8 +4987,9 @@ function renderWeeklySummaryTab() {
     const startSelector = document.getElementById('summaryStartDateSelector');
     const endSelector = document.getElementById('summaryEndDateSelector');
     
-    let startDateStr = '2026-06-15'; // default
-    let endDateStr = '2026-06-21'; // default
+    const defaults = typeof getWeeklySummaryDefaultDates === 'function' ? getWeeklySummaryDefaultDates() : { start: '2026-06-15', end: '2026-06-21' };
+    let startDateStr = defaults.start; // default
+    let endDateStr = defaults.end; // default
     
     if (startSelector && startSelector.value) {
         startDateStr = startSelector.value;
@@ -4876,11 +5043,33 @@ function renderWeeklySummaryTab() {
     const teamHidden = document.getElementById('summaryTeamHidden');
     const selectedTeams = teamHidden && teamHidden.value ? teamHidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
 
-    // Filter tasks by selected teams — supports multi-team (comma-separated)
+    // Filter tasks by selected teams & date range
     const filteredTasks = weeklyTasks.filter(t => {
-        if (selectedTeams.length === 0) return true;
-        const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
-        return taskTeams.some(team => selectedTeams.includes(team));
+        // 1. Team filtering
+        if (selectedTeams.length > 0) {
+            const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
+            const matchesTeam = taskTeams.some(team => selectedTeams.includes(team));
+            if (!matchesTeam) return false;
+        }
+
+        // 2. Date range filtering (Active during the week: createdDate <= endDateStr AND (not completed OR completedDate >= startDateStr))
+        const created = t.createdDate || '';
+        const completed = t.completedDate || '';
+        const rts = t.rtsDate || '';
+
+        // If created date is after end date, it wasn't created yet
+        if (created && created > endDateStr) return false;
+
+        // If completed date is before start date, it was already completed before this week
+        if (completed && completed < startDateStr) return false;
+
+        // Fallback: If RTS date is within range, always include it
+        if (rts && rts !== 'N/A' && rts >= startDateStr && rts <= endDateStr) {
+            return true;
+        }
+
+        // Otherwise, check if it was active during this week
+        return (!created || created <= endDateStr) && (!completed || completed >= startDateStr);
     });
 
     // 1. KPI Calculations
@@ -5031,7 +5220,7 @@ function renderWeeklySummaryTab() {
     const teamsToRender = selectedTeams.length === 0 ? teams : selectedTeams;
     
     teamsToRender.forEach(teamName => {
-        const teamTasks = weeklyTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(teamName));
+        const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(teamName));
         if (teamTasks.length === 0) {
             narrativeContainer.innerHTML += `
                 <div class="narrative-item">
@@ -5194,11 +5383,75 @@ function renderWeeklySummaryTab() {
         });
     }
 
+    // 4.5. Active Backlog (Open / In Progress) - Entire Database (Date-insensitive)
+    const backlogContainer = document.getElementById('summaryBacklogList');
+    const backlogCountBadge = document.getElementById('summaryBacklogCount');
+    if (backlogContainer) {
+        backlogContainer.innerHTML = '';
+        const activeBacklogTasks = weeklyTasks.filter(t => t.currentStatus === 'Open' || t.currentStatus === 'In Progress');
+        
+        if (backlogCountBadge) {
+            backlogCountBadge.textContent = activeBacklogTasks.length;
+        }
+
+        if (activeBacklogTasks.length === 0) {
+            backlogContainer.innerHTML = `
+                <div style="padding: 0.75rem; border-radius: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); color: #15803d; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 16px; height: 16px; flex-shrink:0;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    No active backlog. All tasks completed!
+                </div>
+            `;
+        } else {
+            // Sort by priority (AOG first, then High, Normal, Low) and then by RTS date
+            const priorityOrder = { 'AOG': 1, 'High': 2, 'Normal': 3, 'Low': 4 };
+            const sortedBacklog = [...activeBacklogTasks].sort((a, b) => {
+                const pA = priorityOrder[a.priorityLevel] || 99;
+                const pB = priorityOrder[b.priorityLevel] || 99;
+                if (pA !== pB) return pA - pB;
+                
+                if (a.rtsDate === 'N/A' && b.rtsDate === 'N/A') return 0;
+                if (a.rtsDate === 'N/A') return 1;
+                if (b.rtsDate === 'N/A') return -1;
+                return new Date(a.rtsDate) - new Date(b.rtsDate);
+            });
+
+            sortedBacklog.forEach(task => {
+                const itemDiv = document.createElement('div');
+                itemDiv.style = 'padding: 0.75rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px;';
+                
+                let statusClass = 'open';
+                if (task.currentStatus === 'In Progress') statusClass = 'progress';
+                const prioClass = task.priorityLevel.toLowerCase();
+
+                itemDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700; color: var(--text-primary);">${task.aircraftReg} (${task.aircraftType || 'A320'})</span>
+                        <span class="badge-priority ${prioClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.priorityLevel}</span>
+                    </div>
+                    <div style="color: var(--text-secondary); line-height: 1.35; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.taskDescription || '')}">
+                        ${escapeHTMLApp(task.taskDescription || '')}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 0.75rem; color: var(--text-muted);">
+                        <span>${escapeHTMLApp((task.assignedTeam || 'Unassigned').split(',')[0])}</span>
+                        <span class="badge-status ${statusClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.currentStatus}</span>
+                    </div>
+                `;
+                backlogContainer.appendChild(itemDiv);
+            });
+        }
+    }
+
     // 5. Weekly Report Table
     const rtsTableBody = document.getElementById('summaryRtsTableBody');
-      const rtsTable = rtsTableBody.closest('table');
-      // Clear existing tbodys (including the default one)
-      rtsTable.querySelectorAll('tbody').forEach(tbody => tbody.remove());
+    const rtsTable = rtsTableBody ? rtsTableBody.closest('table') : null;
+    if (!rtsTableBody || !rtsTable) return;
+
+    rtsTableBody.innerHTML = '';
+    // Remove dynamic task-group tbodys, preserving the container tbody
+    rtsTable.querySelectorAll('tbody.task-group').forEach(tbody => tbody.remove());
     
     const sortedTasks = [...filteredTasks].sort((a,b) => {
         const statusOrder = { 'Open': 1, 'In Progress': 2, 'Completed': 3 };
@@ -5213,9 +5466,7 @@ function renderWeeklySummaryTab() {
         return new Date(a.rtsDate) - new Date(b.rtsDate);
     });
     if (sortedTasks.length === 0) {
-        const emptyBody = document.createElement('tbody');
-          emptyBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No tasks recorded for this period.</td></tr>';
-          rtsTable.appendChild(emptyBody);
+        rtsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No tasks recorded for this period.</td></tr>';
     } else {
         sortedTasks.forEach(t => {
             const row = document.createElement('tr');
