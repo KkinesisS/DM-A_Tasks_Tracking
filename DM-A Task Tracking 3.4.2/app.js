@@ -1,4 +1,4 @@
-﻿// MRO Maintenance Task Tracker Logic
+// MRO Maintenance Task Tracker Logic
 
 // State Management
 let tasks = [];
@@ -150,11 +150,12 @@ const DEMO_TASKS = [
 function startApp() {
     initSupabase();
     // Set Power Automate Webhook URL for OneDrive syncing if not configured or if using the old signature-less URL
-    const newDefaultUrl = 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
-    const storedUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+    const newDefaultUrl = 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
+    const storedUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     if (storedUrl === null || 
         storedUrl.includes('6aaa2f5c468f4ccc949d5a9f61a8ac9b') || 
         storedUrl.includes('ae6281c30602447b82eb4739ee110dcf') ||
+        storedUrl.includes('80688bcb2a584f84bfa08606d6419e6b') ||
         (storedUrl.includes('bd6fa12380224456960c9003b9f37992') && storedUrl !== newDefaultUrl) ||
         (storedUrl.includes('defaultc71838d2745b4a4fb00f2d0e6e1de6') && storedUrl !== newDefaultUrl)) {
         localStorage.setItem('mro_power_automate_url', newDefaultUrl);
@@ -2088,7 +2089,7 @@ function setupEventListeners() {
             }
 
             const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-            const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+            const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
             const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
             const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
             
@@ -3473,7 +3474,7 @@ function handleFileSelect(e) {
 
 function processFiles(fileList) {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     // Max 10 files limit
@@ -5418,7 +5419,7 @@ function uploadEditFyiFile(fileInput) {
     const file = fileInput.files[0];
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
@@ -5511,7 +5512,7 @@ function uploadQuickUpdateFile(taskId, fileInput) {
     }
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
@@ -5581,7 +5582,7 @@ function uploadMaterialFile(fileInput) {
     const file = fileInput.files[0];
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
@@ -5810,7 +5811,7 @@ function uploadFyiFile(fileInput) {
     const file = fileInput.files[0];
     
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
     const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
     
     const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
@@ -5956,7 +5957,7 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
             })
             .uploadFileToDrive(file.name, file.type, pureBase64, teamName || '', dateStr || '');
     } else {
-        const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/80688bcb2a584f84bfa08606d6419e6b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cyO-rLqHEA8mmG-DyVBMgTrY8_Vwy23yrdSLEHTTPus';
+        const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bd6fa12380224456960c9003b9f37992/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3z3pW754II2nFkKkReGGm2xXiiIH1piGeaphI7Z60zs';
         if (powerAutomateUrl && powerAutomateUrl.trim()) {
             showLoadingIndicator(true, "Uploading file to OneDrive...");
             
@@ -5975,6 +5976,58 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
                 weekFolder = getFrontendWeekFolderName(dateStr);
             }
             
+            // Retrieve other task details for the details text file
+            let aircraftType = 'N/A';
+            let ataChapter = 'N/A';
+            let rtsDate = 'N/A';
+            let requestor = 'N/A';
+            let requestorContact = 'N/A';
+            let priorityLevel = 'Medium';
+            let taskDescription = 'N/A';
+
+            const aircraftTypeEl = document.getElementById('aircraftType');
+            const aircraftTypeNaEl = document.getElementById('aircraftTypeNa');
+            if (aircraftTypeEl) {
+                const isNa = aircraftTypeNaEl && aircraftTypeNaEl.checked;
+                aircraftType = isNa ? 'N/A' : (aircraftTypeEl.value || 'N/A');
+            }
+
+            const ataChapterEl = document.getElementById('ataChapter');
+            const ataChapterNaEl = document.getElementById('ataChapterNa');
+            if (ataChapterEl) {
+                const isNa = ataChapterNaEl && ataChapterNaEl.checked;
+                ataChapter = isNa ? 'N/A' : (ataChapterEl.value.trim() || 'N/A');
+            }
+
+            const rtsDateEl = document.getElementById('rtsDate');
+            const rtsDateNaEl = document.getElementById('rtsDateNa');
+            if (rtsDateEl) {
+                const isNa = rtsDateNaEl && rtsDateNaEl.checked;
+                rtsDate = isNa ? 'N/A' : (rtsDateEl.value || 'N/A');
+            }
+
+            const requestorEl = document.getElementById('requestor');
+            if (requestorEl) {
+                requestor = requestorEl.value.trim() || 'N/A';
+            }
+
+            const requestorContactEl = document.getElementById('requestorContact');
+            const requestorContactNaEl = document.getElementById('requestorContactNa');
+            if (requestorContactEl) {
+                const isNa = requestorContactNaEl && requestorContactNaEl.checked;
+                requestorContact = isNa ? 'N/A' : (requestorContactEl.value.trim() || 'N/A');
+            }
+
+            const priorityLevelEl = document.getElementById('priorityLevel');
+            if (priorityLevelEl) {
+                priorityLevel = priorityLevelEl.value || 'Medium';
+            }
+
+            const taskDescriptionEl = document.getElementById('taskDescription');
+            if (taskDescriptionEl) {
+                taskDescription = taskDescriptionEl.value.trim() || 'N/A';
+            }
+
             fetch(powerAutomateUrl.trim(), {
                 method: 'POST',
                 headers: {
@@ -5989,7 +6042,14 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
                     weekFolder: weekFolder,
                     aircraftReg: aircraftReg || 'N-A',
                     topic: topic || 'General',
-                    isFyi: isFyi
+                    isFyi: isFyi,
+                    aircraftType: aircraftType,
+                    ataChapter: ataChapter,
+                    dueDate: rtsDate,
+                    requestor: requestor,
+                    requestorContact: requestorContact,
+                    priorityLevel: priorityLevel,
+                    taskDescription: taskDescription
                 })
             })
             .then(response => {
