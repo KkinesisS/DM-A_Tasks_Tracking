@@ -6202,43 +6202,11 @@ function uploadQuickUpdateFile(taskId, fileInput) {
     reader.readAsDataURL(file);
 }
 
-// Upload file from Material Catalog form
+// Handle file selection from Material Catalog form
 function uploadMaterialFile(fileInput) {
-    if (!fileInput || fileInput.files.length === 0) return;
-    const file = fileInput.files[0];
-    
-    const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
-    const powerAutomateUrl = localStorage.getItem('mro_power_automate_url') || 'https://defaultc71838d2745b4a4fb00f2d0e6e1de6.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/04/workflows/173fba0ca0734ea49aee1878dd543b27/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=iPo8-DTf51LBSFMTFifROrdMcnxgtTgfuUS_7fmWWJ4';
-    const hasCloud = isGas || (powerAutomateUrl && powerAutomateUrl.trim() !== '');
-    
-    const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
-    if (file.size > maxLimit) {
-        alert(`File "${file.name}" exceeds the ${hasCloud ? '20MB' : '1MB'} limit.`);
-        fileInput.value = '';
-        return;
+    if (fileInput.files && fileInput.files.length > 0) {
+        document.getElementById('sapSourceFile').value = fileInput.files[0].name;
     }
-    
-    if (isGas) {
-        showLoadingIndicator(true);
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const dotIndex = file.name.lastIndexOf('.');
-        const extension = dotIndex !== -1 ? file.name.substring(dotIndex) : '';
-        const renamedFile = {
-            name: 'Material Catalog' + extension,
-            type: file.type
-        };
-        handleCloudOrLocalUpload(renamedFile, e.target.result, (url) => {
-            document.getElementById('sapSourceFile').value = url;
-            alert(`File "${file.name}" uploaded successfully!`);
-        }, () => {
-            document.getElementById('sapSourceFile').value = e.target.result; // Base64 data URL
-            alert(`File "${file.name}" cached locally!`);
-        }, 'Materials', 'skip', 'N-A', 'Material Catalog');
-    };
-    reader.readAsDataURL(file);
 }
 
 // SAP Codes functions
@@ -6359,7 +6327,7 @@ function saveSAPCodeItem() {
     if (!idEl || !descEl || !fileEl) return;
     
     const description = descEl.value.trim();
-    const sourceFile = fileEl.value.trim();
+    let sourceFile = fileEl.value.trim();
     
     if (!description || !sourceFile) return;
     
@@ -6372,8 +6340,30 @@ function saveSAPCodeItem() {
         sourceFile: sourceFile
     };
     
+    const fileInput = document.getElementById('materialFileAttachment');
+    if (fileInput && fileInput.files.length > 0 && sourceFile === fileInput.files[0].name) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Re-use isFyi logic by setting isMaterialCatalog flag at the end
+            handleCloudOrLocalUpload(file, e.target.result, (url) => {
+                newItem.sourceFile = url;
+                finishSaveSAPCodeItem(newItem, isEdit, fileInput);
+            }, () => {
+                newItem.sourceFile = e.target.result; // Base64 fallback
+                finishSaveSAPCodeItem(newItem, isEdit, fileInput);
+            }, 'Materials', 'skip', 'N-A', description, false, false, true); 
+        };
+        reader.readAsDataURL(file);
+        return; // Wait for upload
+    }
+    
+    finishSaveSAPCodeItem(newItem, isEdit, fileInput);
+}
+
+function finishSaveSAPCodeItem(newItem, isEdit, fileInput) {
     if (isEdit) {
-        sapCodes = sapCodes.map(item => String(item.id) === String(id) ? newItem : item);
+        sapCodes = sapCodes.map(item => String(item.id) === String(newItem.id) ? newItem : item);
     } else {
         sapCodes.push(newItem);
     }
@@ -6386,6 +6376,7 @@ function saveSAPCodeItem() {
         google.script.run.saveSAPCode(newItem);
     }
     
+    if (fileInput) fileInput.value = '';
     clearSapForm();
     renderSAPTab();
 }
@@ -6540,7 +6531,7 @@ function deleteOneDriveFilesForTask(task) {
 window.requestDeleteOneDriveFile = requestDeleteOneDriveFile;
 window.deleteOneDriveFilesForTask = deleteOneDriveFilesForTask;
 
-function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallbackCallback, teamName, dateStr, aircraftReg, topic, isFyi = false, isExternalReq = false) {
+function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallbackCallback, teamName, dateStr, aircraftReg, topic, isFyi = false, isExternalReq = false, isMaterialCatalog = false) {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && !google.script.isMock;
     if (isGas) {
         showLoadingIndicator(true);
@@ -6605,6 +6596,13 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
             if (isFyi) {
                 const cleanTitle = (topic || 'General').replace(/[\\/:*?"<>|]/g, '_');
                 infoLogPath = `Information Logs/${cleanTitle}`;
+            }
+            
+            // Override for Material Catalog to re-use the isFyi boolean in Power Automate!
+            // This prevents Power Automate from creating a text file, and forces it to use infoLogPath directly.
+            if (isMaterialCatalog) {
+                const cleanTitle = (topic || 'General').replace(/[\\/:*?"<>|]/g, '_');
+                infoLogPath = `Material Catalog/${cleanTitle}`;
             }
             
             // Retrieve other task details for the details text file
@@ -6673,7 +6671,7 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
                     weekFolder: weekFolder,
                     aircraftReg: (aircraftReg || 'N-A').replace(/[\\/:*?"<>|]/g, '_'),
                     topic: (topic || 'General').replace(/[\\/:*?"<>|]/g, '_'),
-                    isFyi: isFyi,
+                    isFyi: isFyi || isMaterialCatalog,
                     infoLogPath: infoLogPath,
                     isExternalRequest: isExternalReq,
                     externalPath: externalPath,
