@@ -7351,7 +7351,7 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
             else if (firstTeam === 'IERA Shop') teamClass = 'iera-team';
 
             const priorityText = task.priorityLevel === 'AOG' ? '⚠️ ' : '';
-            const statusText = task.currentStatus === 'Completed' ? '✅ ' : '';
+            const statusText = '';
             tasksHtml += `
                 <div class="calendar-task-badge ${teamClass}" 
                      onclick="event.stopPropagation(); openDetailsModal('${task.id}');"
@@ -7370,7 +7370,7 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
         if (holidayName) {
             holidayHtml = `
                 <div class="calendar-holiday-badge" title="${escapeHTMLApp(holidayName)}">
-                    🎉 ${escapeHTMLApp(holidayName)}
+                    ${escapeHTMLApp(holidayName)}
                 </div>
             `;
         }
