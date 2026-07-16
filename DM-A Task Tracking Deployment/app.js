@@ -221,12 +221,53 @@ function checkAuthentication() {
         if (typeof window.trackPresence === 'function') {
             window.trackPresence(username, role);
         }
+        updateUserAvatar(username);
         
         initApp();
         setupEventListeners();
     } else {
         document.getElementById('loginOverlay').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
+    }
+}
+
+// Update Active User Avatar UI
+function renderActiveUsers(users) {
+    const container = document.getElementById('activeUsersContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const uniqueList = [...new Set(users)];
+    
+    uniqueList.slice(0, 5).forEach((u, index) => {
+        const letter = u ? u.charAt(0).toUpperCase() : '?';
+        let hash = 0;
+        for (let i = 0; i < (u || '').length; i++) {
+            hash = u.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const colors = ['#ec4899', '#22c55e', '#8b5cf6', '#f59e0b', '#3b82f6', '#ef4444', '#14b8a6', '#f43f5e'];
+        const bgColor = colors[Math.abs(hash) % colors.length];
+        
+        const avatar = document.createElement('div');
+        avatar.title = u;
+        avatar.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; text-transform: uppercase; box-sizing: border-box; padding: 0; line-height: 1; border: 2px solid var(--bg-card); margin-left: ${index > 0 ? '-12px' : '0'}; z-index: ${10 - index}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);`;
+        avatar.textContent = letter;
+        container.appendChild(avatar);
+    });
+    
+    if (uniqueList.length > 5) {
+        const more = document.createElement('div');
+        more.title = `+${uniqueList.length - 5} more users`;
+        more.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card-hover); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; box-sizing: border-box; border: 2px solid var(--bg-card); margin-left: -12px; z-index: 1;`;
+        more.textContent = `+${uniqueList.length - 5}`;
+        container.appendChild(more);
+    }
+}
+
+function updateUserAvatar(username) {
+    window.localUsername = username;
+    if (!window.currentOnlineUsers || window.currentOnlineUsers.length === 0) {
+        renderActiveUsers([username]);
     }
 }
 
@@ -280,6 +321,7 @@ function handleLogin() {
                     if (typeof window.trackPresence === 'function') {
                         window.trackPresence(usernameInput, authResult.user.role);
                     }
+                    updateUserAvatar(usernameInput);
                     
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
@@ -316,6 +358,7 @@ function handleLogin() {
                 if (typeof window.trackPresence === 'function') {
                     window.trackPresence(usernameInput, 'Administrator');
                 }
+                updateUserAvatar(usernameInput);
                 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
@@ -786,9 +829,14 @@ function calculateStats() {
     const activeCount = internalTasks.filter(t => t.currentStatus === 'In Progress').length;
     const completedCount = internalTasks.filter(t => t.currentStatus === 'Completed').length;
 
-    document.getElementById('statAogCount').textContent = aogCount;
-    document.getElementById('statActiveCount').textContent = activeCount;
-    document.getElementById('statCompletedCount').textContent = completedCount;
+    const aogEl = document.getElementById('statAogCount');
+    if (aogEl) aogEl.textContent = aogCount;
+    
+    const activeEl = document.getElementById('statActiveCount');
+    if (activeEl) activeEl.textContent = activeCount;
+    
+    const completedEl = document.getElementById('statCompletedCount');
+    if (completedEl) completedEl.textContent = completedCount;
 
     // Pulse style if AOG is greater than 0
     const aogCard = document.querySelector('.stat-card.aog');
@@ -7082,9 +7130,10 @@ function renderNotifications() {
     const lastReadTime = new Date(lastReadStr).getTime();
     
     let hasUnread = false;
+    let unreadCount = 0;
 
     if (topActivities.length === 0) {
-        listEl.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No recent activities</div>`;
+        listEl.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No notifications</div>`;
         if (badgeEl) badgeEl.classList.add('hidden');
         return;
     }
@@ -7092,7 +7141,10 @@ function renderNotifications() {
     listEl.innerHTML = topActivities.map(act => {
         const actTime = new Date(act.timestamp).getTime() || 0;
         const isUnread = actTime > lastReadTime;
-        if (isUnread) hasUnread = true;
+        if (isUnread) {
+            hasUnread = true;
+            unreadCount++;
+        }
 
         let iconHtml = '';
         let clickHandler = '';
@@ -7118,20 +7170,45 @@ function renderNotifications() {
             `;
         }
 
-        const dateFormatted = new Date(act.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+        // Format date like "Jul 23, 2021 at 09:15 AM"
+        const d = new Date(act.timestamp);
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const dateFormatted = `${dateStr} at ${timeStr}`;
+
+        let authorStr = '';
+        let contentStr = act.description || '';
+        if (contentStr.includes(': ')) {
+            const split = contentStr.split(': ');
+            authorStr = split[0];
+            contentStr = split.slice(1).join(': ');
+        }
+        if (!authorStr && act.title) authorStr = act.title;
+        const subtitle = authorStr ? `${authorStr} • ${dateFormatted}` : dateFormatted;
+
+        const firstLetter = (authorStr || act.title || 'S').charAt(0).toUpperCase();
+        let hash = 0;
+        for (let i = 0; i < (authorStr || '').length; i++) {
+            hash = authorStr.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const colors = ['#ec4899', '#22c55e', '#8b5cf6', '#f59e0b', '#3b82f6', '#ef4444', '#14b8a6', '#f43f5e'];
+        const bgColor = colors[Math.abs(hash) % colors.length];
+
+        const avatarHtml = `
+            <div style="width: 36px; height: 36px; border-radius: 50%; background-color: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600; flex-shrink: 0; font-family: var(--font-body);">
+                ${firstLetter}
+            </div>
+        `;
 
         return `
-            <div ${clickHandler} class="notification-item" style="display: flex; gap: 10px; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; align-items: flex-start; ${isUnread ? 'background: rgba(124, 58, 237, 0.03);' : ''}">
-                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                    ${iconHtml}
-                </div>
+            <div ${clickHandler} class="notification-item" style="position: relative; display: flex; gap: 12px; padding: 1rem 1.25rem 1rem 1.5rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; align-items: center;">
+                <div style="position: absolute; left: 8px; width: 8px; height: 8px; border-radius: 50%; background-color: #3b82f6; opacity: ${isUnread ? '1' : '0'};"></div>
+                
+                ${avatarHtml}
+                
                 <div style="display: flex; flex-direction: column; flex-grow: 1; align-items: flex-start;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary); text-align: left;">${act.title}</span>
-                        ${isUnread ? '<span style="width: 6px; height: 6px; border-radius: 50%; background-color: var(--priority-aog);"></span>' : ''}
-                    </div>
-                    <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; text-align: left; line-height: 1.25;">${act.description}</span>
-                    <span style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; font-weight: 500;">${dateFormatted}</span>
+                    <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary); text-align: left; line-height: 1.4; margin-bottom: 2px;">${contentStr}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">${subtitle}</span>
                 </div>
             </div>
         `;
@@ -7139,8 +7216,10 @@ function renderNotifications() {
 
     if (badgeEl) {
         if (hasUnread) {
+            badgeEl.textContent = unreadCount > 9 ? '9+' : unreadCount;
             badgeEl.classList.remove('hidden');
         } else {
+            badgeEl.textContent = '';
             badgeEl.classList.add('hidden');
         }
     }
