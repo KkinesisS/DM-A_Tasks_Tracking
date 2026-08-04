@@ -1,4 +1,4 @@
-<script>
+﻿<script>
 // MRO Maintenance Task Tracker Logic
 
 // State Management
@@ -222,12 +222,53 @@ function checkAuthentication() {
         if (typeof window.trackPresence === 'function') {
             window.trackPresence(username, role);
         }
+        updateUserAvatar(username);
         
         initApp();
         setupEventListeners();
     } else {
         document.getElementById('loginOverlay').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
+    }
+}
+
+// Update Active User Avatar UI
+function renderActiveUsers(users) {
+    const container = document.getElementById('activeUsersContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const uniqueList = [...new Set(users)];
+    
+    uniqueList.slice(0, 5).forEach((u, index) => {
+        const letter = u ? u.charAt(0).toUpperCase() : '?';
+        let hash = 0;
+        for (let i = 0; i < (u || '').length; i++) {
+            hash = u.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const colors = ['#ec4899', '#22c55e', '#8b5cf6', '#f59e0b', '#3b82f6', '#ef4444', '#14b8a6', '#f43f5e'];
+        const bgColor = colors[Math.abs(hash) % colors.length];
+        
+        const avatar = document.createElement('div');
+        avatar.title = u;
+        avatar.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; text-transform: uppercase; box-sizing: border-box; padding: 0; line-height: 1; border: 2px solid var(--bg-card); margin-left: ${index > 0 ? '-12px' : '0'}; z-index: ${10 - index}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);`;
+        avatar.textContent = letter;
+        container.appendChild(avatar);
+    });
+    
+    if (uniqueList.length > 5) {
+        const more = document.createElement('div');
+        more.title = `+${uniqueList.length - 5} more users`;
+        more.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card-hover); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; box-sizing: border-box; border: 2px solid var(--bg-card); margin-left: -12px; z-index: 1;`;
+        more.textContent = `+${uniqueList.length - 5}`;
+        container.appendChild(more);
+    }
+}
+
+function updateUserAvatar(username) {
+    window.localUsername = username;
+    if (!window.currentOnlineUsers || window.currentOnlineUsers.length === 0) {
+        renderActiveUsers([username]);
     }
 }
 
@@ -281,6 +322,7 @@ function handleLogin() {
                     if (typeof window.trackPresence === 'function') {
                         window.trackPresence(usernameInput, authResult.user.role);
                     }
+                    updateUserAvatar(usernameInput);
                     
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
@@ -317,6 +359,7 @@ function handleLogin() {
                 if (typeof window.trackPresence === 'function') {
                     window.trackPresence(usernameInput, 'Administrator');
                 }
+                updateUserAvatar(usernameInput);
                 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
@@ -892,7 +935,7 @@ function getFilteredTasks() {
             task.taskDescription.toLowerCase().includes(searchLower) ||
             (task.customId || task.id || '').toLowerCase().includes(searchLower);
 
-        // Team filter matches � supports comma-separated multi-team values
+        // Team filter matches — supports comma-separated multi-team values
         const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
         const matchesTeam = activeFilters.team === 'All' || assignedTeams.includes(activeFilters.team);
 
@@ -1505,7 +1548,7 @@ function handleDragEnd() {
     });
 }
 
-// -- Multi-Select Dropdown Helpers ------------------------------------------
+// ── Multi-Select Dropdown Helpers ──────────────────────────────────────────
 
 /**
  * Initialise a custom multiselect dropdown.
@@ -2724,7 +2767,7 @@ function showSuccessModal(trackingCode, requestorName, priorityLevel) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const dateStr = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
     const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('successDateText').innerText = dateStr + ' � ' + timeStr;
+    document.getElementById('successDateText').innerText = dateStr + ' • ' + timeStr;
 
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -3116,7 +3159,7 @@ function openDetailsModal(id) {
         }
     }
     
-    // Team badges � supports multiple teams (comma-separated)
+    // Team badges — supports multiple teams (comma-separated)
     function getTeamClassDetail(t) {
         if (t.includes('Avionic')) return 'avionics';
         if (t.includes('Structure')) return 'struct';
@@ -5066,24 +5109,10 @@ function renderWeeklySummaryTab() {
             if (!matchesTeam) return false;
         }
 
-        // 2. Date range filtering (Active during the week: createdDate <= endDateStr AND (not completed OR completedDate >= startDateStr))
+        // 2. Date range filtering: Only include tasks created in the selected date interval
         const created = t.createdDate || '';
-        const completed = t.completedDate || '';
-        const rts = t.rtsDate || '';
-
-        // If created date is after end date, it wasn't created yet
-        if (created && created > endDateStr) return false;
-
-        // If completed date is before start date, it was already completed before this week
-        if (completed && completed < startDateStr) return false;
-
-        // Fallback: If RTS date is within range, always include it
-        if (rts && rts !== 'N/A' && rts >= startDateStr && rts <= endDateStr) {
-            return true;
-        }
-
-        // Otherwise, check if it was active during this week
-        return (!created || created <= endDateStr) && (!completed || completed >= startDateStr);
+        if (!created) return false;
+        return created >= startDateStr && created <= endDateStr;
     });
 
     // 1. KPI Calculations
@@ -5324,7 +5353,7 @@ function renderWeeklySummaryTab() {
         narrativeContainer.innerHTML += narrativeHtml;
     });
 
-    // 3. Team Workload Analysis � count each team a task is assigned to
+    // 3. Team Workload Analysis — count each team a task is assigned to
     const teamCounts = {};
     filteredTasks.forEach(t => {
         const teamNames = (t.assignedTeam || 'Unassigned').split(',').map(s => s.trim()).filter(Boolean);
@@ -5502,11 +5531,13 @@ function renderWeeklySummaryTab() {
                 // Render tasks under this team
                 teamTasks.forEach(task => {
                     const itemDiv = document.createElement('div');
-                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
                     
                     let statusClass = 'open';
                     if (task.currentStatus === 'In Progress') statusClass = 'progress';
                     const prioClass = task.priorityLevel.toLowerCase();
+
+                    itemDiv.className = `backlog-card status-${statusClass}`;
+                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
 
                     itemDiv.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -6897,7 +6928,7 @@ function showUpdateLogModal(taskId) {
             }).join('')}
            </div>`;
 
-    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} � Status Log`;
+    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} – Status Log`;
     document.getElementById('updateLogModalSubtitle').innerHTML =
         `<span class="badge-status ${statusClass}" style="font-size:0.72rem;">${task.currentStatus}</span>
          <span style="font-size:0.8rem;color:var(--text-muted);">${task.topic || task.taskDescription.substring(0,60)}</span>
@@ -6933,7 +6964,7 @@ window.toggleWeeklyLogRow = toggleWeeklyLogRow;
 
 
 function handleSettingsBtnClick() {
-    // Show the password prompt first � settings are admin-only
+    // Show the password prompt first — settings are admin-only
     const passwordInput = document.getElementById('settingsPasswordInput');
     const errorMsg = document.getElementById('settingsPasswordError');
     if (passwordInput) passwordInput.value = '';
@@ -6956,7 +6987,7 @@ function verifySettingsPassword() {
         return;
     }
 
-    // Correct password � close the prompt and open settings
+    // Correct password — close the prompt and open settings
     closeModal('settingsPasswordModal');
 
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && typeof google.script.run.getFolderUrl === 'function';
@@ -7088,6 +7119,7 @@ function renderNotifications() {
     const lastReadTime = new Date(lastReadStr).getTime();
     
     let hasUnread = false;
+    let unreadCount = 0;
 
     if (topActivities.length === 0) {
         listEl.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No notifications</div>`;
@@ -7098,7 +7130,10 @@ function renderNotifications() {
     listEl.innerHTML = topActivities.map(act => {
         const actTime = new Date(act.timestamp).getTime() || 0;
         const isUnread = actTime > lastReadTime;
-        if (isUnread) hasUnread = true;
+        if (isUnread) {
+            hasUnread = true;
+            unreadCount++;
+        }
 
         let iconHtml = '';
         let clickHandler = '';
@@ -7170,8 +7205,10 @@ function renderNotifications() {
 
     if (badgeEl) {
         if (hasUnread) {
+            badgeEl.textContent = unreadCount > 9 ? '9+' : unreadCount;
             badgeEl.classList.remove('hidden');
         } else {
+            badgeEl.textContent = '';
             badgeEl.classList.add('hidden');
         }
     }
@@ -7302,8 +7339,8 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
             else if (firstTeam === 'Engines Team') teamClass = 'eng-team';
             else if (firstTeam === 'IERA Shop') teamClass = 'iera-team';
 
-            const priorityText = task.priorityLevel === 'AOG' ? '?? ' : '';
-            const statusText = task.currentStatus === 'Completed' ? '? ' : '';
+            const priorityText = task.priorityLevel === 'AOG' ? '⚠️ ' : '';
+            const statusText = '';
             tasksHtml += `
                 <div class="calendar-task-badge ${teamClass}" 
                      onclick="event.stopPropagation(); openDetailsModal('${task.id}');"
@@ -7322,7 +7359,7 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
         if (holidayName) {
             holidayHtml = `
                 <div class="calendar-holiday-badge" title="${escapeHTMLApp(holidayName)}">
-                    ?? ${escapeHTMLApp(holidayName)}
+                    ${escapeHTMLApp(holidayName)}
                 </div>
             `;
         }

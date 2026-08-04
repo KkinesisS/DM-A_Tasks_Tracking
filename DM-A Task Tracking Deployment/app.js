@@ -5108,24 +5108,10 @@ function renderWeeklySummaryTab() {
             if (!matchesTeam) return false;
         }
 
-        // 2. Date range filtering (Active during the week: createdDate <= endDateStr AND (not completed OR completedDate >= startDateStr))
+        // 2. Date range filtering: Only include tasks created in the selected date interval
         const created = t.createdDate || '';
-        const completed = t.completedDate || '';
-        const rts = t.rtsDate || '';
-
-        // If created date is after end date, it wasn't created yet
-        if (created && created > endDateStr) return false;
-
-        // If completed date is before start date, it was already completed before this week
-        if (completed && completed < startDateStr) return false;
-
-        // Fallback: If RTS date is within range, always include it
-        if (rts && rts !== 'N/A' && rts >= startDateStr && rts <= endDateStr) {
-            return true;
-        }
-
-        // Otherwise, check if it was active during this week
-        return (!created || created <= endDateStr) && (!completed || completed >= startDateStr);
+        if (!created) return false;
+        return created >= startDateStr && created <= endDateStr;
     });
 
     // 1. KPI Calculations
@@ -5544,11 +5530,13 @@ function renderWeeklySummaryTab() {
                 // Render tasks under this team
                 teamTasks.forEach(task => {
                     const itemDiv = document.createElement('div');
-                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
                     
                     let statusClass = 'open';
                     if (task.currentStatus === 'In Progress') statusClass = 'progress';
                     const prioClass = task.priorityLevel.toLowerCase();
+
+                    itemDiv.className = `backlog-card status-${statusClass}`;
+                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
 
                     itemDiv.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center;">

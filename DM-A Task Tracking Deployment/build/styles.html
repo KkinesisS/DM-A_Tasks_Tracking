@@ -2178,6 +2178,11 @@ header {
    PRINT LAYOUT - OPTIMIZED FOR PDF GENERATION
    ========================================================================== */
 @media print {
+    *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
     /* Hide all interactive components, navigations, and buttons */
     header,
     .tab-nav,
@@ -4548,5 +4553,24 @@ html.dark-mode .login-card {
 }
 .toast-close:hover {
     color: #fff;
+}
+
+/* Active Backlog Card Status Coloring */
+.backlog-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+.backlog-card.status-open {
+    background: color-mix(in srgb, var(--status-open) 8%, var(--bg-card));
+    border-color: color-mix(in srgb, var(--status-open) 35%, var(--border-color));
+}
+.backlog-card.status-progress {
+    background: color-mix(in srgb, var(--status-progress) 8%, var(--bg-card));
+    border-color: color-mix(in srgb, var(--status-progress) 35%, var(--border-color));
+}
+.backlog-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 </style>

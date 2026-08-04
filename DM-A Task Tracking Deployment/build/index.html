@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1194,7 +1194,7 @@ header {
     min-height: 100px;
 }
 
-/* -- Custom Multi-Select Dropdown ----------------------------------- */
+/* ── Custom Multi-Select Dropdown ─────────────────────────────────── */
 .multiselect-container {
     position: relative;
     width: 100%;
@@ -2202,6 +2202,11 @@ header {
    PRINT LAYOUT - OPTIMIZED FOR PDF GENERATION
    ========================================================================== */
 @media print {
+    *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
     /* Hide all interactive components, navigations, and buttons */
     header,
     .tab-nav,
@@ -4573,6 +4578,25 @@ html.dark-mode .login-card {
 .toast-close:hover {
     color: #fff;
 }
+
+/* Active Backlog Card Status Coloring */
+.backlog-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+.backlog-card.status-open {
+    background: color-mix(in srgb, var(--status-open) 8%, var(--bg-card));
+    border-color: color-mix(in srgb, var(--status-open) 35%, var(--border-color));
+}
+.backlog-card.status-progress {
+    background: color-mix(in srgb, var(--status-progress) 8%, var(--bg-card));
+    border-color: color-mix(in srgb, var(--status-progress) 35%, var(--border-color));
+}
+.backlog-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
 </style>
     <style>
 /* Dark mode CSS variables and element overrides (Violet Dusk Shading Theme) */
@@ -5023,7 +5047,7 @@ html.dark-mode .team-badge.component {
     border: 1px solid rgba(251, 191, 36, 0.25) !important;
 }
 
-/* -- Dark Mode: Custom Multi-Select Dropdown ------------------------- */
+/* ── Dark Mode: Custom Multi-Select Dropdown ───────────────────────── */
 html.dark-mode .multiselect-trigger {
     background-color: rgba(26, 14, 29, 0.85) !important;
     border: 1px solid rgba(147, 80, 115, 0.3) !important;
@@ -5117,9 +5141,10 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
         <header>
             <div class="logo-section">
                 <img src="Thai_Airways_International_logo_PNG1.png" alt="Thai Airways International Logo" class="app-logo" />
+                <div class="logo-divider"></div>
                 <div>
-                    <h1>DM-A Task Tracking</h1>
-                    <p>Engineering Maintenance Control Board</p>
+                    <h1>Task Tracking</h1>
+                    <p><span class="wingspan">DM-A</span> &nbsp;|&nbsp; Engineering Support System</p>
                 </div>
             </div>
             
@@ -5158,19 +5183,30 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
                         <!-- Notification Badge -->
-                        <span id="notificationBadge" class="hidden" style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; background-color: var(--priority-aog); border-radius: 50%; border: 1.5px solid var(--bg-card);"></span>
+                        <span id="notificationBadge" class="hidden" style="position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; background-color: #ef4444; border-radius: 10px; padding: 0 4px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></span>
                     </button>
                     <!-- Notification Panel -->
-                    <div id="notificationPanel" class="dropdown-content hidden" style="position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; width: 320px; max-height: 400px; display: flex; flex-direction: column; overflow: hidden;">
-                        <div class="notification-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary);">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Recent Activities</span>
-                            <button id="markAllReadBtn" style="background: none; border: none; font-size: 0.75rem; color: var(--status-progress); font-weight: 600; cursor: pointer; padding: 0; font-family: var(--font-body);">Mark read</button>
+                    <div id="notificationPanel" class="dropdown-content hidden" style="position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; width: 340px; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0;">
+                        <div class="notification-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.25rem 1rem 1.25rem;">
+                            <span style="font-size: 1.05rem; font-weight: 600; color: var(--text-primary);">Notifications</span>
+                            <button id="markAllReadBtn" style="background: none; border: none; font-size: 0.85rem; color: #3b82f6; font-weight: 500; cursor: pointer; padding: 0; font-family: var(--font-body); display: flex; align-items: center; gap: 4px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                    <path d="M18 6L7 17l-5-5"></path>
+                                    <path d="M22 10l-5.5 5.5"></path>
+                                </svg>
+                                Mark as read
+                            </button>
                         </div>
-                        <div id="notificationList" style="display: flex; flex-direction: column; overflow-y: auto; max-height: 340px;">
+                        <div id="notificationList" style="display: flex; flex-direction: column; overflow-y: auto; max-height: 400px;">
                             <!-- Dynamically populated updates will go here -->
                         </div>
+
                     </div>
                 </div>
+
+                <!-- Active User Avatar -->
+                <div id="activeUsersContainer" style="display: flex; align-items: center; justify-content: flex-end; margin-left: 0.75rem; padding-left: 4px;"></div>
+
             </div>
         </header>
 
@@ -7108,7 +7144,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
         <div class="ticket-wrapper ticket-wrapper-animated" style="position: relative; width: 480px; background: #ffffff; border-radius: 32px; overflow: hidden; font-family: 'Inter', 'Segoe UI', sans-serif;">
             
             <div class="ticket-header" style="text-align: center; padding: 30px 20px 20px 20px;">
-                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">??</div>
+                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">🎉</div>
                 <h2 style="margin: 0 0 8px 0; font-size: 1.8rem; color: #111; font-weight: 800; letter-spacing: -0.5px;">Thank you!</h2>
                 <p style="margin: 0; font-size: 1.1rem; color: #666; line-height: 1.4;">Your ticket has been issued<br>successfully</p>
             </div>
@@ -7132,7 +7168,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 <div class="ticket-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <div>
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">DATE & TIME</div>
-                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 � 10:15</div>
+                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 • 10:15</div>
                     </div>
                     <div style="text-align: right;">
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">REQUESTOR</div>
@@ -7148,7 +7184,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 </div>
                 
                 <div class="ticket-card-info" style="background: #f8f9fb; border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; margin-top: 24px; border: 1px solid #f0f0f0;">
-                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">??</div>
+                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">👤</div>
                     <div>
                         <div class="ticket-card-text" style="font-size: 1.05rem; color: #111; font-weight: 600;">Maintenance Control</div>
                         <div class="ticket-card-subtext" style="font-size: 1.1rem; color: #777; margin-top: 2px;">Will review shortly</div>
@@ -7284,7 +7320,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 if (presences && presences.length > 0) {
                     const role = presences[0].role || 'User';
                     const countStr = presences.length > 1 ? ` (${presences.length} tabs)` : '';
-                    usersList.push(`� ${userKey} (${role})${countStr}`);
+                    usersList.push(`• ${userKey} (${role})${countStr}`);
                 }
             });
             
@@ -8560,12 +8596,53 @@ function checkAuthentication() {
         if (typeof window.trackPresence === 'function') {
             window.trackPresence(username, role);
         }
+        updateUserAvatar(username);
         
         initApp();
         setupEventListeners();
     } else {
         document.getElementById('loginOverlay').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
+    }
+}
+
+// Update Active User Avatar UI
+function renderActiveUsers(users) {
+    const container = document.getElementById('activeUsersContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const uniqueList = [...new Set(users)];
+    
+    uniqueList.slice(0, 5).forEach((u, index) => {
+        const letter = u ? u.charAt(0).toUpperCase() : '?';
+        let hash = 0;
+        for (let i = 0; i < (u || '').length; i++) {
+            hash = u.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const colors = ['#ec4899', '#22c55e', '#8b5cf6', '#f59e0b', '#3b82f6', '#ef4444', '#14b8a6', '#f43f5e'];
+        const bgColor = colors[Math.abs(hash) % colors.length];
+        
+        const avatar = document.createElement('div');
+        avatar.title = u;
+        avatar.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; text-transform: uppercase; box-sizing: border-box; padding: 0; line-height: 1; border: 2px solid var(--bg-card); margin-left: ${index > 0 ? '-12px' : '0'}; z-index: ${10 - index}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);`;
+        avatar.textContent = letter;
+        container.appendChild(avatar);
+    });
+    
+    if (uniqueList.length > 5) {
+        const more = document.createElement('div');
+        more.title = `+${uniqueList.length - 5} more users`;
+        more.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card-hover); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; box-sizing: border-box; border: 2px solid var(--bg-card); margin-left: -12px; z-index: 1;`;
+        more.textContent = `+${uniqueList.length - 5}`;
+        container.appendChild(more);
+    }
+}
+
+function updateUserAvatar(username) {
+    window.localUsername = username;
+    if (!window.currentOnlineUsers || window.currentOnlineUsers.length === 0) {
+        renderActiveUsers([username]);
     }
 }
 
@@ -8619,6 +8696,7 @@ function handleLogin() {
                     if (typeof window.trackPresence === 'function') {
                         window.trackPresence(usernameInput, authResult.user.role);
                     }
+                    updateUserAvatar(usernameInput);
                     
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
@@ -8655,6 +8733,7 @@ function handleLogin() {
                 if (typeof window.trackPresence === 'function') {
                     window.trackPresence(usernameInput, 'Administrator');
                 }
+                updateUserAvatar(usernameInput);
                 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
@@ -9230,7 +9309,7 @@ function getFilteredTasks() {
             task.taskDescription.toLowerCase().includes(searchLower) ||
             (task.customId || task.id || '').toLowerCase().includes(searchLower);
 
-        // Team filter matches � supports comma-separated multi-team values
+        // Team filter matches — supports comma-separated multi-team values
         const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
         const matchesTeam = activeFilters.team === 'All' || assignedTeams.includes(activeFilters.team);
 
@@ -9843,7 +9922,7 @@ function handleDragEnd() {
     });
 }
 
-// -- Multi-Select Dropdown Helpers ------------------------------------------
+// ── Multi-Select Dropdown Helpers ──────────────────────────────────────────
 
 /**
  * Initialise a custom multiselect dropdown.
@@ -11062,7 +11141,7 @@ function showSuccessModal(trackingCode, requestorName, priorityLevel) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const dateStr = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
     const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('successDateText').innerText = dateStr + ' � ' + timeStr;
+    document.getElementById('successDateText').innerText = dateStr + ' • ' + timeStr;
 
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -11454,7 +11533,7 @@ function openDetailsModal(id) {
         }
     }
     
-    // Team badges � supports multiple teams (comma-separated)
+    // Team badges — supports multiple teams (comma-separated)
     function getTeamClassDetail(t) {
         if (t.includes('Avionic')) return 'avionics';
         if (t.includes('Structure')) return 'struct';
@@ -13404,24 +13483,10 @@ function renderWeeklySummaryTab() {
             if (!matchesTeam) return false;
         }
 
-        // 2. Date range filtering (Active during the week: createdDate <= endDateStr AND (not completed OR completedDate >= startDateStr))
+        // 2. Date range filtering: Only include tasks created in the selected date interval
         const created = t.createdDate || '';
-        const completed = t.completedDate || '';
-        const rts = t.rtsDate || '';
-
-        // If created date is after end date, it wasn't created yet
-        if (created && created > endDateStr) return false;
-
-        // If completed date is before start date, it was already completed before this week
-        if (completed && completed < startDateStr) return false;
-
-        // Fallback: If RTS date is within range, always include it
-        if (rts && rts !== 'N/A' && rts >= startDateStr && rts <= endDateStr) {
-            return true;
-        }
-
-        // Otherwise, check if it was active during this week
-        return (!created || created <= endDateStr) && (!completed || completed >= startDateStr);
+        if (!created) return false;
+        return created >= startDateStr && created <= endDateStr;
     });
 
     // 1. KPI Calculations
@@ -13662,7 +13727,7 @@ function renderWeeklySummaryTab() {
         narrativeContainer.innerHTML += narrativeHtml;
     });
 
-    // 3. Team Workload Analysis � count each team a task is assigned to
+    // 3. Team Workload Analysis — count each team a task is assigned to
     const teamCounts = {};
     filteredTasks.forEach(t => {
         const teamNames = (t.assignedTeam || 'Unassigned').split(',').map(s => s.trim()).filter(Boolean);
@@ -13840,11 +13905,13 @@ function renderWeeklySummaryTab() {
                 // Render tasks under this team
                 teamTasks.forEach(task => {
                     const itemDiv = document.createElement('div');
-                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
                     
                     let statusClass = 'open';
                     if (task.currentStatus === 'In Progress') statusClass = 'progress';
                     const prioClass = task.priorityLevel.toLowerCase();
+
+                    itemDiv.className = `backlog-card status-${statusClass}`;
+                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
 
                     itemDiv.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -15235,7 +15302,7 @@ function showUpdateLogModal(taskId) {
             }).join('')}
            </div>`;
 
-    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} � Status Log`;
+    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} – Status Log`;
     document.getElementById('updateLogModalSubtitle').innerHTML =
         `<span class="badge-status ${statusClass}" style="font-size:0.72rem;">${task.currentStatus}</span>
          <span style="font-size:0.8rem;color:var(--text-muted);">${task.topic || task.taskDescription.substring(0,60)}</span>
@@ -15271,7 +15338,7 @@ window.toggleWeeklyLogRow = toggleWeeklyLogRow;
 
 
 function handleSettingsBtnClick() {
-    // Show the password prompt first � settings are admin-only
+    // Show the password prompt first — settings are admin-only
     const passwordInput = document.getElementById('settingsPasswordInput');
     const errorMsg = document.getElementById('settingsPasswordError');
     if (passwordInput) passwordInput.value = '';
@@ -15294,7 +15361,7 @@ function verifySettingsPassword() {
         return;
     }
 
-    // Correct password � close the prompt and open settings
+    // Correct password — close the prompt and open settings
     closeModal('settingsPasswordModal');
 
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && typeof google.script.run.getFolderUrl === 'function';
@@ -15426,6 +15493,7 @@ function renderNotifications() {
     const lastReadTime = new Date(lastReadStr).getTime();
     
     let hasUnread = false;
+    let unreadCount = 0;
 
     if (topActivities.length === 0) {
         listEl.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No notifications</div>`;
@@ -15436,7 +15504,10 @@ function renderNotifications() {
     listEl.innerHTML = topActivities.map(act => {
         const actTime = new Date(act.timestamp).getTime() || 0;
         const isUnread = actTime > lastReadTime;
-        if (isUnread) hasUnread = true;
+        if (isUnread) {
+            hasUnread = true;
+            unreadCount++;
+        }
 
         let iconHtml = '';
         let clickHandler = '';
@@ -15508,8 +15579,10 @@ function renderNotifications() {
 
     if (badgeEl) {
         if (hasUnread) {
+            badgeEl.textContent = unreadCount > 9 ? '9+' : unreadCount;
             badgeEl.classList.remove('hidden');
         } else {
+            badgeEl.textContent = '';
             badgeEl.classList.add('hidden');
         }
     }
@@ -15640,8 +15713,8 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
             else if (firstTeam === 'Engines Team') teamClass = 'eng-team';
             else if (firstTeam === 'IERA Shop') teamClass = 'iera-team';
 
-            const priorityText = task.priorityLevel === 'AOG' ? '?? ' : '';
-            const statusText = task.currentStatus === 'Completed' ? '? ' : '';
+            const priorityText = task.priorityLevel === 'AOG' ? '⚠️ ' : '';
+            const statusText = '';
             tasksHtml += `
                 <div class="calendar-task-badge ${teamClass}" 
                      onclick="event.stopPropagation(); openDetailsModal('${task.id}');"
@@ -15660,7 +15733,7 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
         if (holidayName) {
             holidayHtml = `
                 <div class="calendar-holiday-badge" title="${escapeHTMLApp(holidayName)}">
-                    ?? ${escapeHTMLApp(holidayName)}
+                    ${escapeHTMLApp(holidayName)}
                 </div>
             `;
         }

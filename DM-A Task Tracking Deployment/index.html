@@ -151,50 +151,26 @@ header {
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 0.75rem;
 }
 
 .logo-section .app-logo {
-    height: 4rem;
+    height: 3.5rem;
     width: auto;
     object-fit: contain;
 }
 
-.logo-section .logo-divider {
-    width: 1px;
-    height: 4.5rem;
-    background-color: var(--border-color);
-}
-
 .logo-section h1 {
-    font-size: 25px;
-    font-weight: 800;
-    color: #0f172a;
-    line-height: 1.2;
-    margin: 0;
-    letter-spacing: -0.01em;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .logo-section p {
-    font-size: 0.95rem;
-    color: #4b5563;
-    margin: 4px 0 0 0;
-    font-weight: 500;
-}
-
-.logo-section p .wingspan {
-    color: #6d28d9;
-    font-weight: 700;
-}
-
-html.dark-mode .logo-section h1 {
-    color: #f8fafc;
-}
-html.dark-mode .logo-section p {
-    color: #cbd5e1;
-}
-html.dark-mode .logo-section p .wingspan {
-    color: #c084fc;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .header-actions {
@@ -608,21 +584,12 @@ html.dark-mode .logo-section p .wingspan {
 
 .col-count {
     background: rgba(0, 0, 0, 0.05);
-    border-radius: 9999px;
-    padding: 2px 10px;
+    border-radius: 12px;
+    padding: 2px 8px;
     font-size: 0.75rem;
-    font-weight: 700;
     font-family: var(--font-heading);
-    color: #ffffff;
-    min-width: 24px;
-    text-align: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    color: var(--text-secondary);
 }
-
-.kanban-col[data-status="Open"] .col-count { background: var(--status-open); }
-.kanban-col[data-status="In Progress"] .col-count { background: var(--status-progress); }
-.kanban-col[data-status="Pending Review"] .col-count { background: var(--status-review); }
-.kanban-col[data-status="Completed"] .col-count { background: var(--status-completed); }
 
 .kanban-col[data-status="Open"] .col-indicator { background: var(--status-open); }
 .kanban-col[data-status="In Progress"] .col-indicator { background: var(--status-progress); }
@@ -703,7 +670,7 @@ html.dark-mode .logo-section p .wingspan {
 
 .card-content-wrapper {
     background: var(--bg-card);
-    border: none;
+    border: 1.5px dashed var(--border-color);
     border-radius: 14px;
     margin: 24px 0 0 0;
     padding: 1rem;
@@ -817,8 +784,8 @@ html.dark-mode .logo-section p .wingspan {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
     padding: 0.5rem 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px dashed rgba(0, 0, 0, 0.05);
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
     margin-bottom: 0.75rem;
     font-size: 0.75rem;
 }
@@ -1227,7 +1194,7 @@ html.dark-mode .logo-section p .wingspan {
     min-height: 100px;
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Custom Multi-Select Dropdown Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Custom Multi-Select Dropdown ─────────────────────────────────── */
 .multiselect-container {
     position: relative;
     width: 100%;
@@ -2235,6 +2202,11 @@ html.dark-mode .logo-section p .wingspan {
    PRINT LAYOUT - OPTIMIZED FOR PDF GENERATION
    ========================================================================== */
 @media print {
+    *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
     /* Hide all interactive components, navigations, and buttons */
     header,
     .tab-nav,
@@ -4538,7 +4510,7 @@ html.dark-mode .login-card {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    z-index: 99999999;
+    z-index: 999999;
     pointer-events: none;
 }
 .toast {
@@ -4589,8 +4561,6 @@ html.dark-mode .login-card {
 }
 .toast-message {
     flex-grow: 1;
-    color: #ffffff !important;
-    font-weight: 500;
 }
 .toast-close {
     cursor: pointer;
@@ -4607,6 +4577,25 @@ html.dark-mode .login-card {
 }
 .toast-close:hover {
     color: #fff;
+}
+
+/* Active Backlog Card Status Coloring */
+.backlog-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+.backlog-card.status-open {
+    background: color-mix(in srgb, var(--status-open) 8%, var(--bg-card));
+    border-color: color-mix(in srgb, var(--status-open) 35%, var(--border-color));
+}
+.backlog-card.status-progress {
+    background: color-mix(in srgb, var(--status-progress) 8%, var(--bg-card));
+    border-color: color-mix(in srgb, var(--status-progress) 35%, var(--border-color));
+}
+.backlog-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 </style>
     <style>
@@ -4789,8 +4778,8 @@ html.dark-mode .mro-table td {
     color: #cbd5e1 !important;
     border-bottom: 1px solid rgba(147, 80, 115, 0.15) !important;
 }
-html.dark-mode .mro-table tbody tr:hover td {
-    background-color: var(--bg-card-hover) !important;
+html.dark-mode .mro-table tbody tr:hover {
+    background-color: rgba(147, 80, 115, 0.05) !important;
 }
 
 /* Modal Content overrides */
@@ -5058,7 +5047,7 @@ html.dark-mode .team-badge.component {
     border: 1px solid rgba(251, 191, 36, 0.25) !important;
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Dark Mode: Custom Multi-Select Dropdown Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Dark Mode: Custom Multi-Select Dropdown ───────────────────────── */
 html.dark-mode .multiselect-trigger {
     background-color: rgba(26, 14, 29, 0.85) !important;
     border: 1px solid rgba(147, 80, 115, 0.3) !important;
@@ -5121,15 +5110,6 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
     </style>
-<style>
-html.dark-mode .status-mini-card {
-    background: var(--bg-card) !important;
-    border-color: var(--border-color) !important;
-}
-html.dark-mode .status-mini-card:hover {
-    background: var(--bg-card-hover) !important;
-}
-</style>
 </head>
 <body>
     <div id="appContainer" class="container" style="display: none;">
@@ -5236,11 +5216,6 @@ html.dark-mode .status-mini-card:hover {
             <nav class="tab-nav" style="display: flex; flex-direction: column; width: 260px; min-width: 260px; gap: 1.25rem; padding: 1.25rem; align-items: stretch; justify-content: flex-start; height: auto; margin-bottom: 0; position: sticky; top: 1rem; flex-shrink: 0;">
                 
                 <section class="sidebar-actions" style="display: flex; flex-direction: column; gap: 0.65rem; width: 100%;">
-                    <!-- User Greeting -->
-                    <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.25rem; letter-spacing: -0.3px;">
-                        Hi <span id="sidebarUserNameDisplay">User</span>!
-                    </div>
-                    
                     <!-- New Task Button -->
                     <button id="addTaskBtn" class="btn btn-primary" style="width: 100%; justify-content: center; height: 38px; font-weight: 600; gap: 6px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;">
@@ -5377,14 +5352,9 @@ html.dark-mode .status-mini-card:hover {
 
         <!-- Main Content -->
         <main class="main-content" style="flex-grow: 1; min-width: 0;">
-        <!-- Board Tab -->
-        <section id="boardTab" class="tab-content">
-            <!-- Summary Board Header -->
-            <div style="padding: 0.5rem 1rem 1rem 0.5rem;">
-                <h1 style="margin: 0; color: var(--text-primary); font-size: 1.75rem; font-weight: 700; font-family: var(--font-heading, sans-serif); letter-spacing: 0.5px;">Summary Board</h1>
-            </div>
-            
-            <!-- Stats Dashboard -->
+            <!-- Board Tab -->
+            <section id="boardTab" class="tab-content">
+                <!-- Stats Dashboard -->
 
 
         <!-- Controls Panel -->
@@ -5473,7 +5443,7 @@ html.dark-mode .status-mini-card:hover {
                             <span class="col-indicator"></span>
                             <h3>Open</h3>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><span id="aog-count-Open" class="aog-pill" style="display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: bold; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); animation: alertPulse 2s infinite;">AOG 0</span><span id="count-Open" class="col-count">0</span></div>
+                        <span id="count-Open" class="col-count">0</span>
                     </div>
                     <div class="task-list-container" data-status="Open">
                         <!-- Task cards will insert here -->
@@ -5487,7 +5457,7 @@ html.dark-mode .status-mini-card:hover {
                             <span class="col-indicator"></span>
                             <h3>In Progress</h3>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><span id="aog-count-InProgress" class="aog-pill" style="display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: bold; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); animation: alertPulse 2s infinite;">AOG 0</span><span id="count-InProgress" class="col-count">0</span></div>
+                        <span id="count-InProgress" class="col-count">0</span>
                     </div>
                     <div class="task-list-container" data-status="In Progress">
                         <!-- Task cards will insert here -->
@@ -5503,7 +5473,7 @@ html.dark-mode .status-mini-card:hover {
                             <span class="col-indicator"></span>
                             <h3>Completed</h3>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><span id="aog-count-Completed" class="aog-pill" style="display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: bold; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); animation: alertPulse 2s infinite;">AOG 0</span><span id="count-Completed" class="col-count">0</span></div>
+                        <span id="count-Completed" class="col-count">0</span>
                     </div>
                     <div class="task-list-container" data-status="Completed">
                         <!-- Task cards will insert here -->
@@ -7174,22 +7144,7 @@ html.dark-mode .status-mini-card:hover {
         <div class="ticket-wrapper ticket-wrapper-animated" style="position: relative; width: 480px; background: #ffffff; border-radius: 32px; overflow: hidden; font-family: 'Inter', 'Segoe UI', sans-serif;">
             
             <div class="ticket-header" style="text-align: center; padding: 30px 20px 20px 20px;">
-                <div class="success-icon-container" style="margin-bottom: 12px; display: flex; justify-content: center; align-items: center;">
-                    <style>
-                        @keyframes pulse-glow {
-                            0% { filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.4)); }
-                            50% { filter: drop-shadow(0 0 24px rgba(37, 99, 235, 0.9)); }
-                            100% { filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.4)); }
-                        }
-                        .verified-icon {
-                            animation: pulse-glow 3s ease-in-out infinite;
-                        }
-                    </style>
-                    <svg class="verified-icon" viewBox="0 0 24 24" width="72" height="72">
-                        <path fill="#2563eb" d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12Z" />
-                        <path fill="#ffffff" d="M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
-                    </svg>
-                </div>
+                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">🎉</div>
                 <h2 style="margin: 0 0 8px 0; font-size: 1.8rem; color: #111; font-weight: 800; letter-spacing: -0.5px;">Thank you!</h2>
                 <p style="margin: 0; font-size: 1.1rem; color: #666; line-height: 1.4;">Your ticket has been issued<br>successfully</p>
             </div>
@@ -7213,7 +7168,7 @@ html.dark-mode .status-mini-card:hover {
                 <div class="ticket-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <div>
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">DATE & TIME</div>
-                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 &bull; 10:15</div>
+                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 • 10:15</div>
                     </div>
                     <div style="text-align: right;">
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">REQUESTOR</div>
@@ -7229,11 +7184,9 @@ html.dark-mode .status-mini-card:hover {
                 </div>
                 
                 <div class="ticket-card-info" style="background: #f8f9fb; border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; margin-top: 24px; border: 1px solid #f0f0f0;">
-                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; color: #555;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
+                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">👤</div>
                     <div>
-                        <div id="successAssignedTeamText" class="ticket-card-text" style="font-size: 1.05rem; color: #111; font-weight: 600;">Maintenance Control</div>
+                        <div class="ticket-card-text" style="font-size: 1.05rem; color: #111; font-weight: 600;">Maintenance Control</div>
                         <div class="ticket-card-subtext" style="font-size: 1.1rem; color: #777; margin-top: 2px;">Will review shortly</div>
                     </div>
                 </div>
@@ -7354,30 +7307,7 @@ html.dark-mode .status-mini-card:hover {
                 });
         };
 
-                function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
-            const presenceUsernames = [];
-            Object.keys(presenceState || {}).forEach(key => {
-                const presences = presenceState[key];
-                if (presences && presences.length > 0 && presences[0].username) {
-                    presenceUsernames.push(presences[0].username);
-                }
-            });
-            const uniqueUsers = [...new Set(presenceUsernames)];
-            
-            // Add local user to the front
-            let userListToRender = [...uniqueUsers];
-            if (window.localUsername) {
-                const localIdx = userListToRender.indexOf(window.localUsername);
-                if (localIdx > -1) {
-                    userListToRender.splice(localIdx, 1);
-                }
-                userListToRender.unshift(window.localUsername);
-            }
-            window.currentOnlineUsers = userListToRender;
-            if (typeof renderActiveUsers === 'function') {
-                renderActiveUsers(userListToRender);
-            }
-            
+        function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
             const badgeEl = document.getElementById('onlineUsersBadge');
             const countEl = document.getElementById('onlineUsersCount');
             if (!badgeEl || !countEl) return;
@@ -7390,7 +7320,7 @@ html.dark-mode .status-mini-card:hover {
                 if (presences && presences.length > 0) {
                     const role = presences[0].role || 'User';
                     const countStr = presences.length > 1 ? ` (${presences.length} tabs)` : '';
-                    usersList.push(`\u2022 ${userKey} (${role})${countStr}`);
+                    usersList.push(`• ${userKey} (${role})${countStr}`);
                 }
             });
             
@@ -8682,7 +8612,6 @@ function renderActiveUsers(users) {
     if (!container) return;
     container.innerHTML = '';
     
-    // Remove duplicates
     const uniqueList = [...new Set(users)];
     
     uniqueList.slice(0, 5).forEach((u, index) => {
@@ -8696,16 +8625,16 @@ function renderActiveUsers(users) {
         
         const avatar = document.createElement('div');
         avatar.title = u;
-        avatar.style.cssText = "min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: " + bgColor + "; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; text-transform: uppercase; box-sizing: border-box; padding: 0; line-height: 1; border: 2px solid var(--bg-card); margin-left: " + (index > 0 ? "-12px" : "0") + "; z-index: " + (10 - index) + "; box-shadow: 0 1px 3px rgba(0,0,0,0.1);";
+        avatar.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; text-transform: uppercase; box-sizing: border-box; padding: 0; line-height: 1; border: 2px solid var(--bg-card); margin-left: ${index > 0 ? '-12px' : '0'}; z-index: ${10 - index}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);`;
         avatar.textContent = letter;
         container.appendChild(avatar);
     });
     
     if (uniqueList.length > 5) {
         const more = document.createElement('div');
-        more.title = "+" + (uniqueList.length - 5) + " more users";
-        more.style.cssText = "min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card-hover); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; box-sizing: border-box; border: 2px solid var(--bg-card); margin-left: -12px; z-index: 1;";
-        more.textContent = "+" + (uniqueList.length - 5);
+        more.title = `+${uniqueList.length - 5} more users`;
+        more.style.cssText = `min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card-hover); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--font-body); cursor: default; flex-shrink: 0; box-sizing: border-box; border: 2px solid var(--bg-card); margin-left: -12px; z-index: 1;`;
+        more.textContent = `+${uniqueList.length - 5}`;
         container.appendChild(more);
     }
 }
@@ -8714,10 +8643,6 @@ function updateUserAvatar(username) {
     window.localUsername = username;
     if (!window.currentOnlineUsers || window.currentOnlineUsers.length === 0) {
         renderActiveUsers([username]);
-    }
-    const sidebarNameEl = document.getElementById('sidebarUserNameDisplay');
-    if (sidebarNameEl) {
-        sidebarNameEl.textContent = username;
     }
 }
 
@@ -9101,7 +9026,7 @@ function showLoadingIndicator(show, message) {
         if (!loader) {
             loader = document.createElement('div');
             loader.id = 'gas-loader-overlay';
-            loader.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.7);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999999;font-family:var(--font-heading);font-weight:600;color:var(--text-secondary);gap:1rem;';
+            loader.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.7);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;font-family:var(--font-heading);font-weight:600;color:var(--text-secondary);gap:1rem;';
             loader.innerHTML = `
                 <div style="width: 40px; height: 40px; border: 4px solid var(--border-color); border-top: 4px solid var(--team-avionics); border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 <div id="gas-loader-text" style="font-size: 1rem;">Syncing...</div>
@@ -9384,7 +9309,7 @@ function getFilteredTasks() {
             task.taskDescription.toLowerCase().includes(searchLower) ||
             (task.customId || task.id || '').toLowerCase().includes(searchLower);
 
-        // Team filter matches Ã¢â‚¬â€ supports comma-separated multi-team values
+        // Team filter matches — supports comma-separated multi-team values
         const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
         const matchesTeam = activeFilters.team === 'All' || assignedTeams.includes(activeFilters.team);
 
@@ -9458,17 +9383,6 @@ function renderKanban(filteredTasks) {
         colContainer.innerHTML = '';
         const statusTasks = filteredTasks.filter(t => t.currentStatus === status);
         countBadge.textContent = statusTasks.length;
-
-        const aogBadge = document.getElementById('aog-count-' + status.replace(' ', ''));
-        if (aogBadge) {
-            const aogCount = statusTasks.filter(t => t.priorityLevel === 'AOG').length;
-            if (aogCount > 0) {
-                aogBadge.textContent = aogCount + ' AOG';
-                aogBadge.style.display = 'inline-block';
-            } else {
-                aogBadge.style.display = 'none';
-            }
-        }
 
         statusTasks.forEach(task => {
             const card = createTaskCard(task);
@@ -9798,7 +9712,7 @@ function createTaskCard(task) {
             <div class="card-topic" style="font-weight: 700; font-size: 0.92rem; margin-top: 0.25rem; margin-bottom: 0.15rem; color: var(--text-primary); font-family: var(--font-heading);">${task.topic || 'No Topic'}</div>
             <div class="card-desc" style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 3.4em; margin-bottom: 0.75rem;">${task.taskDescription}</div>
             
-            <div class="card-metadata" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; padding: 0.5rem 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); margin-bottom: 0.75rem; font-size: 0.75rem;">
+            <div class="card-metadata" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; padding: 0.5rem 0; border-top: 1px dashed rgba(0,0,0,0.05); border-bottom: 1px dashed rgba(0,0,0,0.05); margin-bottom: 0.75rem; font-size: 0.75rem;">
                 <div class="meta-item" title="Requestor" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px; color: var(--text-muted);">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -10008,7 +9922,7 @@ function handleDragEnd() {
     });
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬ Multi-Select Dropdown Helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// ── Multi-Select Dropdown Helpers ──────────────────────────────────────────
 
 /**
  * Initialise a custom multiselect dropdown.
@@ -11213,7 +11127,7 @@ async function trackRequestStatus() {
     }
 }
 
-function showSuccessModal(trackingCode, requestorName, priorityLevel, assignedTeam) {
+function showSuccessModal(trackingCode, requestorName, priorityLevel) {
     document.getElementById('successTrackingCode').innerText = trackingCode;
     if (document.getElementById('successRequestorText')) {
         document.getElementById('successRequestorText').innerText = requestorName || 'Unknown';
@@ -11221,16 +11135,13 @@ function showSuccessModal(trackingCode, requestorName, priorityLevel, assignedTe
     if (document.getElementById('successPriorityText')) {
         document.getElementById('successPriorityText').innerText = priorityLevel || 'Routine';
     }
-    if (document.getElementById('successAssignedTeamText')) {
-        document.getElementById('successAssignedTeamText').innerText = assignedTeam || 'Maintenance Control';
-    }
     
     // Set current date and time
     const now = new Date();
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const dateStr = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
     const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('successDateText').innerHTML = dateStr + ' &bull; ' + timeStr;
+    document.getElementById('successDateText').innerText = dateStr + ' • ' + timeStr;
 
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -11622,7 +11533,7 @@ function openDetailsModal(id) {
         }
     }
     
-    // Team badges Ã¢â‚¬â€ supports multiple teams (comma-separated)
+    // Team badges — supports multiple teams (comma-separated)
     function getTeamClassDetail(t) {
         if (t.includes('Avionic')) return 'avionics';
         if (t.includes('Structure')) return 'struct';
@@ -12005,7 +11916,7 @@ function saveTaskWithUploads(taskToSave, wasExternal) {
         renderApp();
         if (wasExternal) {
             const trackingCode = taskToSave.customId || taskToSave.id;
-            showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel, taskToSave.assignedTeam);
+            showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel);
         }
         return;
     }
@@ -12051,7 +11962,7 @@ function saveTaskWithUploads(taskToSave, wasExternal) {
             renderApp();
             if (wasExternal) {
                 const trackingCode = taskToSave.customId || taskToSave.id;
-                showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel, taskToSave.assignedTeam);
+                showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel);
             }
         })
         .catch(err => {
@@ -12067,7 +11978,7 @@ function saveTaskWithUploads(taskToSave, wasExternal) {
             renderApp();
             if (wasExternal) {
                 const trackingCode = taskToSave.customId || taskToSave.id;
-                showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel, taskToSave.assignedTeam);
+                showSuccessModal(trackingCode, taskToSave.requestor, taskToSave.priorityLevel);
             }
         });
 }
@@ -13572,24 +13483,10 @@ function renderWeeklySummaryTab() {
             if (!matchesTeam) return false;
         }
 
-        // 2. Date range filtering (Active during the week: createdDate <= endDateStr AND (not completed OR completedDate >= startDateStr))
+        // 2. Date range filtering: Only include tasks created in the selected date interval
         const created = t.createdDate || '';
-        const completed = t.completedDate || '';
-        const rts = t.rtsDate || '';
-
-        // If created date is after end date, it wasn't created yet
-        if (created && created > endDateStr) return false;
-
-        // If completed date is before start date, it was already completed before this week
-        if (completed && completed < startDateStr) return false;
-
-        // Fallback: If RTS date is within range, always include it
-        if (rts && rts !== 'N/A' && rts >= startDateStr && rts <= endDateStr) {
-            return true;
-        }
-
-        // Otherwise, check if it was active during this week
-        return (!created || created <= endDateStr) && (!completed || completed >= startDateStr);
+        if (!created) return false;
+        return created >= startDateStr && created <= endDateStr;
     });
 
     // 1. KPI Calculations
@@ -13830,7 +13727,7 @@ function renderWeeklySummaryTab() {
         narrativeContainer.innerHTML += narrativeHtml;
     });
 
-    // 3. Team Workload Analysis Ã¢â‚¬â€ count each team a task is assigned to
+    // 3. Team Workload Analysis — count each team a task is assigned to
     const teamCounts = {};
     filteredTasks.forEach(t => {
         const teamNames = (t.assignedTeam || 'Unassigned').split(',').map(s => s.trim()).filter(Boolean);
@@ -14008,11 +13905,13 @@ function renderWeeklySummaryTab() {
                 // Render tasks under this team
                 teamTasks.forEach(task => {
                     const itemDiv = document.createElement('div');
-                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
                     
                     let statusClass = 'open';
                     if (task.currentStatus === 'In Progress') statusClass = 'progress';
                     const prioClass = task.priorityLevel.toLowerCase();
+
+                    itemDiv.className = `backlog-card status-${statusClass}`;
+                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
 
                     itemDiv.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -15403,7 +15302,7 @@ function showUpdateLogModal(taskId) {
             }).join('')}
            </div>`;
 
-    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} Ã¢â‚¬â€œ Status Log`;
+    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} – Status Log`;
     document.getElementById('updateLogModalSubtitle').innerHTML =
         `<span class="badge-status ${statusClass}" style="font-size:0.72rem;">${task.currentStatus}</span>
          <span style="font-size:0.8rem;color:var(--text-muted);">${task.topic || task.taskDescription.substring(0,60)}</span>
@@ -15439,7 +15338,7 @@ window.toggleWeeklyLogRow = toggleWeeklyLogRow;
 
 
 function handleSettingsBtnClick() {
-    // Show the password prompt first Ã¢â‚¬â€ settings are admin-only
+    // Show the password prompt first — settings are admin-only
     const passwordInput = document.getElementById('settingsPasswordInput');
     const errorMsg = document.getElementById('settingsPasswordError');
     if (passwordInput) passwordInput.value = '';
@@ -15462,7 +15361,7 @@ function verifySettingsPassword() {
         return;
     }
 
-    // Correct password Ã¢â‚¬â€ close the prompt and open settings
+    // Correct password — close the prompt and open settings
     closeModal('settingsPasswordModal');
 
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && typeof google.script.run.getFolderUrl === 'function';
@@ -15648,7 +15547,7 @@ function renderNotifications() {
             contentStr = split.slice(1).join(': ');
         }
         if (!authorStr && act.title) authorStr = act.title;
-        const subtitle = authorStr ? `${authorStr} \u2022 ${dateFormatted}` : dateFormatted;
+        const subtitle = authorStr ? `${authorStr} • ${dateFormatted}` : dateFormatted;
 
         const firstLetter = (authorStr || act.title || 'S').charAt(0).toUpperCase();
         let hash = 0;
@@ -15814,7 +15713,7 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
             else if (firstTeam === 'Engines Team') teamClass = 'eng-team';
             else if (firstTeam === 'IERA Shop') teamClass = 'iera-team';
 
-            const priorityText = task.priorityLevel === 'AOG' ? 'ðŸš¨ ' : '';
+            const priorityText = task.priorityLevel === 'AOG' ? '⚠️ ' : '';
             const statusText = '';
             tasksHtml += `
                 <div class="calendar-task-badge ${teamClass}" 
@@ -15974,21 +15873,15 @@ function renderRequestsTab() {
         <div class="task-card" id="request-card-${task.id}" style="cursor: pointer;" onclick="openDetailsModal('${task.id}')">
             <div class="card-priority-banner ${prioClass}">${bannerText}</div>
             <div class="card-content-wrapper">
-                <div class="card-header" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
-                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
-                        <span class="ac-reg" style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.35rem; color: var(--text-primary);">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--text-muted);">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                            </svg>
-                            ${task.aircraftReg || 'N/A'} <span class="ac-type-muted" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-left: 0.15rem;">(${task.aircraftType || 'N/A'})</span>
-                        </span>
-                        <span title="Copy Task ID" class="copy-task-id-btn" style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 3px;" onclick="window.copyTaskId(event, '${task.customId || task.id}', this)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px;"><rect x="9" y="9" width="13" height="13" rx="3" ry="3"></rect><path d="M5 15H4a3 3 0 0 1-3-3V4a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v1"></path></svg>
-                            ${task.customId || task.id}
-                        </span>
-                    </div>
-                    <span class="ata-badge" style="background: var(--bg-secondary); color: var(--text-secondary); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap; margin-top: 2px;">ATA ${task.ataChapter || 'N/A'}</span>
+                <div class="card-header" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+                    <span class="ac-reg" style="font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.35rem; color: var(--text-primary);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--text-muted);">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        </svg>
+                        ${task.aircraftReg || 'N/A'} <span class="ac-type-muted" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-left: 0.15rem;">(${task.aircraftType || 'N/A'})</span>
+                    </span>
+                    <span class="ata-badge" style="background: var(--bg-secondary); color: var(--text-secondary); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">ATA ${task.ataChapter || 'N/A'}</span>
                 </div>
                 
                 <div class="card-topic" style="font-weight: 700; font-size: 0.92rem; margin-top: 0.5rem; margin-bottom: 0.15rem; color: var(--text-primary); font-family: var(--font-heading);">${topic}</div>
@@ -16117,25 +16010,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
