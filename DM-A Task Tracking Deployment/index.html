@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -139,6 +139,125 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Header & Logo Section */
+
+/* Premium Header Icon */
+.header-icon-wrapper {
+    width: 60px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(168, 85, 247, 0.08) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.header-icon-wrapper:hover {
+    transform: translateY(-1px) scale(1.04);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(168, 85, 247, 0.14) 100%);
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 16px -2px rgba(124, 58, 237, 0.2);
+}
+.header-icon {
+    width: 26px;
+    height: 26px;
+}
+
+/* DM-A Text Logo */
+.header-dma-logo {
+    font-family: var(--font-heading, 'Inter', sans-serif);
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 40%, #a855f7 70%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    user-select: none;
+    text-shadow: none;
+}
+html.dark-mode .header-dma-logo {
+    background: linear-gradient(135deg, #a855f7 0%, #c084fc 40%, #d8b4fe 70%, #e9d5ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Header Title Group */
+.header-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+/* Gradient text for h1 */
+.logo-section h1 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--text-primary) 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+/* Subtitle badge row */
+.header-subtitle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.header-badge-primary {
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+}
+.header-badge-separator {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+.header-badge-secondary {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* Dark mode adjustments for header */
+html.dark-mode .header-icon-wrapper {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border-color: rgba(147, 51, 234, 0.25);
+}
+html.dark-mode .header-icon-wrapper:hover {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(168, 85, 247, 0.18) 100%);
+    border-color: rgba(147, 51, 234, 0.4);
+    box-shadow: 0 4px 20px -2px rgba(147, 51, 234, 0.3);
+}
+html.dark-mode .logo-section h1 {
+    background: linear-gradient(135deg, #e2e8f0 0%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+html.dark-mode .header-badge-primary {
+    background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+}
+
 header {
     display: flex;
     justify-content: space-between;
@@ -152,25 +271,6 @@ header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-}
-
-.logo-section .app-logo {
-    height: 3.5rem;
-    width: auto;
-    object-fit: contain;
-}
-
-.logo-section h1 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.logo-section p {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
 }
 
 .header-actions {
@@ -3810,7 +3910,7 @@ html.dark-mode body.force-mobile .tab-item.active {
 
 .details-middle #detailUpdatesList {
     flex: 1;
-    max-height: 450px; /* Increased to touch the log input box */
+    max-height: none; /* Let flex 1 take over */
 }
 
 .details-middle .comment-input-area {
@@ -5140,11 +5240,15 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
         <!-- Header -->
         <header>
             <div class="logo-section">
-                <img src="Thai_Airways_International_logo_PNG1.png" alt="Thai Airways International Logo" class="app-logo" />
-                <div class="logo-divider"></div>
-                <div>
+                <!-- Premium Header Icon -->
+                <div class="header-icon-wrapper">
+                    <span class="header-dma-logo">DM-A</span>
+                </div>
+                <div class="header-title-group">
                     <h1>Task Tracking</h1>
-                    <p><span class="wingspan">DM-A</span> &nbsp;|&nbsp; Engineering Support System</p>
+                    <div class="header-subtitle-row">
+                        <span class="header-badge-secondary">Production Engineer Supporting System</span>
+                    </div>
                 </div>
             </div>
             
@@ -5896,7 +6000,6 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
             <div class="print-only-summary-header">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 1rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; flex-wrap: nowrap; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 16px;">
-                        <img id="printSummaryLogo" src="" alt="Logo" style="height: 38px; width: auto; display: block;" />
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; justify-content: center;">
                             <div style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; text-transform: uppercase; line-height: 1.1;">Weekly Engineering Summary</div>
                             <div style="font-size: 0.8rem; font-weight: 700; color: #7c3aed; background: rgba(124, 58, 237, 0.06); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid rgba(124, 58, 237, 0.15); display: inline-block;">
@@ -6180,8 +6283,11 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                         </div>
                     </div>
 
-                    <!-- Active Backlog Box -->
-                    <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); margin-top: 1.5rem;">
+</div>
+            </div>
+
+            <!-- Active Backlog Box -->
+            <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 1.5rem;">
                         <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #a855f7;">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -6194,8 +6300,6 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                             <!-- Active backlog tasks insert here -->
                         </div>
                     </div>
-                </div>
-            </div>
 
             <!-- Weekly Report -->
             <div id="summaryReportTableContainer" class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 1rem;">
@@ -6654,7 +6758,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
 
     <!-- View Details Modal -->
     <div id="detailsModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 1120px;">
+        <div class="modal-content" style="max-width: 1600px;">
             <div class="modal-header">
                 <h2>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -6714,7 +6818,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                                     <input type="text" id="commentAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
                                 <div style="display: flex; gap: 0.5rem;">
-                                    <textarea id="commentText" placeholder="Write a comment..." required style="flex: 1; min-height: 50px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                    <textarea id="commentText" placeholder="Write a comment..." required style="flex: 1; min-height: 100px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <button type="button" id="addCommentBtn" class="btn btn-primary" style="height: 50px; padding: 0 1rem; font-size: 0.85rem;">Post</button>
                                 </div>
                             </div>
@@ -6732,8 +6836,8 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
                                     <input type="text" id="updateAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 50px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <input type="file" id="detailLogUpdateFile" style="display: none;" />
                                     <button type="button" id="detailLogUpdateFileBtn" class="btn btn-secondary" style="height: 50px; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Attach File">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
@@ -7034,11 +7138,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
             </div>
             <!-- Right panel: form input -->
             <div class="login-right-panel">
-                <!-- Thai Airways International Logo -->
-                <div style="text-align: left; margin-bottom: 1rem; margin-left: -8px;">
-                    <img id="loginCardLogo" src="Thai_Airways_International_logo_PNG1.png" alt="Thai Airways Logo" style="height: 95px; width: auto; display: block; object-fit: contain;" />
-                </div>
-                
+
                 <h2 style="font-family: var(--font-heading); color: var(--text-primary); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; text-align: left;">DM-A</h2>
                 <p style="font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-body); margin-bottom: 1.75rem; line-height: 1.5; text-align: left;">Production Engineer Task Management System</p>
                 
@@ -7308,23 +7408,45 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
         };
 
         function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
+            const actualUsernames = [];
+            const usersList = [];
+            
+            Object.keys(presenceState || {}).forEach(userKey => {
+                const presences = presenceState[userKey];
+                if (presences && presences.length > 0) {
+                    const uname = presences[0].username || userKey;
+                    actualUsernames.push(uname);
+                    const role = presences[0].role || 'User';
+                    const countStr = presences.length > 1 ? " (" + presences.length + " tabs)" : "";
+                    usersList.push("â€¢ " + uname + " (" + role + ")" + countStr);
+                }
+            });
+
+            // Remove duplicates
+            let uniqueUsers = [...new Set(actualUsernames)];
+            
+            // Add local user to the front
+            let userListToRender = [...uniqueUsers];
+            if (window.localUsername) {
+                const localIdx = userListToRender.indexOf(window.localUsername);
+                if (localIdx > -1) {
+                    userListToRender.splice(localIdx, 1);
+                }
+                userListToRender.unshift(window.localUsername);
+            }
+            window.currentOnlineUsers = userListToRender;
+            if (typeof renderActiveUsers === 'function') {
+                renderActiveUsers(userListToRender);
+            } else if (window.renderActiveUsers) {
+                window.renderActiveUsers(userListToRender);
+            }
+
             const badgeEl = document.getElementById('onlineUsersBadge');
             const countEl = document.getElementById('onlineUsersCount');
             if (!badgeEl || !countEl) return;
             
-            countEl.textContent = `${userCount} Active`;
-            
-            const usersList = [];
-            Object.keys(presenceState).forEach(userKey => {
-                const presences = presenceState[userKey];
-                if (presences && presences.length > 0) {
-                    const role = presences[0].role || 'User';
-                    const countStr = presences.length > 1 ? ` (${presences.length} tabs)` : '';
-                    usersList.push(`• ${userKey} (${role})${countStr}`);
-                }
-            });
-            
-            badgeEl.title = `Active sessions connected in real-time:\n${usersList.join('\n')}`;
+            countEl.textContent = userCount + " Active";
+            badgeEl.title = "Active sessions connected in real-time:\n" + usersList.join("\n");
         }
         window.updateOnlineUserCountUI = updateOnlineUserCountUI;
 
@@ -7349,7 +7471,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 this.successHandler = () => {};
                 this.failureHandler = (err) => {
                     console.error('Supabase operation failed:', err);
-                    alert('Supabase Database Error: ' + (err.message || err));
+                    if(typeof showToast === 'function') { showToast('Database Error: ' + (err.message || err), 'error'); } else { console.error('Supabase Database Error: ' + (err.message || err)); }
                 };
             }
             withSuccessHandler(handler) {
@@ -14153,7 +14275,7 @@ function loadFYIs() {
                 }
             })
             .getFYIs();
-    } else if (supabaseClient) {
+    } else if (window.supabaseClient) {
         refreshFYIsSilently();
     }
 }
@@ -14663,7 +14785,7 @@ function loadSAPCodes() {
                 }
             })
             .getSAPCodes();
-    } else if (supabaseClient) {
+    } else if (window.supabaseClient) {
         refreshSAPCodesSilently();
     }
 }
@@ -16010,5 +16132,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 

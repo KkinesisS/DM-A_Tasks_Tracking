@@ -72,11 +72,15 @@
         <!-- Header -->
         <header>
             <div class="logo-section">
-                <img src="Thai_Airways_International_logo_PNG1.png" alt="Thai Airways International Logo" class="app-logo" />
-                <div class="logo-divider"></div>
-                <div>
+                <!-- Premium Header Icon -->
+                <div class="header-icon-wrapper">
+                    <span class="header-dma-logo">DM-A</span>
+                </div>
+                <div class="header-title-group">
                     <h1>Task Tracking</h1>
-                    <p><span class="wingspan">DM-A</span> &nbsp;|&nbsp; Engineering Support System</p>
+                    <div class="header-subtitle-row">
+                        <span class="header-badge-secondary">Production Engineer Supporting System</span>
+                    </div>
                 </div>
             </div>
             
@@ -828,7 +832,7 @@
             <div class="print-only-summary-header">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 1rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; flex-wrap: nowrap; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 16px;">
-                        <img id="printSummaryLogo" src="" alt="Logo" style="height: 38px; width: auto; display: block;" />
+
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; justify-content: center;">
                             <div style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; text-transform: uppercase; line-height: 1.1;">Weekly Engineering Summary</div>
                             <div style="font-size: 0.8rem; font-weight: 700; color: #7c3aed; background: rgba(124, 58, 237, 0.06); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid rgba(124, 58, 237, 0.15); display: inline-block;">
@@ -1112,8 +1116,11 @@
                         </div>
                     </div>
 
-                    <!-- Active Backlog Box -->
-                    <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); margin-top: 1.5rem;">
+</div>
+            </div>
+
+            <!-- Active Backlog Box -->
+            <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 1.5rem;">
                         <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #a855f7;">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -1126,8 +1133,6 @@
                             <!-- Active backlog tasks insert here -->
                         </div>
                     </div>
-                </div>
-            </div>
 
             <!-- Weekly Report -->
             <div id="summaryReportTableContainer" class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 1rem;">
@@ -1646,7 +1651,7 @@
                                     <input type="text" id="commentAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
                                 <div style="display: flex; gap: 0.5rem;">
-                                    <textarea id="commentText" placeholder="Write a comment..." required style="flex: 1; min-height: 50px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                    <textarea id="commentText" placeholder="Write a comment..." required style="flex: 1; min-height: 100px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <button type="button" id="addCommentBtn" class="btn btn-primary" style="height: 50px; padding: 0 1rem; font-size: 0.85rem;">Post</button>
                                 </div>
                             </div>
@@ -1664,8 +1669,8 @@
                                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
                                     <input type="text" id="updateAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 50px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 100px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <input type="file" id="detailLogUpdateFile" style="display: none;" />
                                     <button type="button" id="detailLogUpdateFileBtn" class="btn btn-secondary" style="height: 50px; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Attach File">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
@@ -1966,11 +1971,7 @@
             </div>
             <!-- Right panel: form input -->
             <div class="login-right-panel">
-                <!-- Thai Airways International Logo -->
-                <div style="text-align: left; margin-bottom: 1rem; margin-left: -8px;">
-                    <img id="loginCardLogo" src="Thai_Airways_International_logo_PNG1.png" alt="Thai Airways Logo" style="height: 95px; width: auto; display: block; object-fit: contain;" />
-                </div>
-                
+
                 <h2 style="font-family: var(--font-heading); color: var(--text-primary); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; text-align: left;">DM-A</h2>
                 <p style="font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-body); margin-bottom: 1.75rem; line-height: 1.5; text-align: left;">Production Engineer Task Management System</p>
                 
@@ -2076,7 +2077,7 @@
         <div class="ticket-wrapper ticket-wrapper-animated" style="position: relative; width: 480px; background: #ffffff; border-radius: 32px; overflow: hidden; font-family: 'Inter', 'Segoe UI', sans-serif;">
             
             <div class="ticket-header" style="text-align: center; padding: 30px 20px 20px 20px;">
-                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">🎉</div>
+                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">??</div>
                 <h2 style="margin: 0 0 8px 0; font-size: 1.8rem; color: #111; font-weight: 800; letter-spacing: -0.5px;">Thank you!</h2>
                 <p style="margin: 0; font-size: 1.1rem; color: #666; line-height: 1.4;">Your ticket has been issued<br>successfully</p>
             </div>
@@ -2100,7 +2101,7 @@
                 <div class="ticket-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <div>
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">DATE & TIME</div>
-                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 • 10:15</div>
+                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 � 10:15</div>
                     </div>
                     <div style="text-align: right;">
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">REQUESTOR</div>
@@ -2116,7 +2117,7 @@
                 </div>
                 
                 <div class="ticket-card-info" style="background: #f8f9fb; border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; margin-top: 24px; border: 1px solid #f0f0f0;">
-                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">👤</div>
+                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">??</div>
                     <div>
                         <div class="ticket-card-text" style="font-size: 1.05rem; color: #111; font-weight: 600;">Maintenance Control</div>
                         <div class="ticket-card-subtext" style="font-size: 1.1rem; color: #777; margin-top: 2px;">Will review shortly</div>
@@ -2240,23 +2241,45 @@
         };
 
         function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
+            const actualUsernames = [];
+            const usersList = [];
+            
+            Object.keys(presenceState || {}).forEach(userKey => {
+                const presences = presenceState[userKey];
+                if (presences && presences.length > 0) {
+                    const uname = presences[0].username || userKey;
+                    actualUsernames.push(uname);
+                    const role = presences[0].role || 'User';
+                    const countStr = presences.length > 1 ? " (" + presences.length + " tabs)" : "";
+                    usersList.push("• " + uname + " (" + role + ")" + countStr);
+                }
+            });
+
+            // Remove duplicates
+            let uniqueUsers = [...new Set(actualUsernames)];
+            
+            // Add local user to the front
+            let userListToRender = [...uniqueUsers];
+            if (window.localUsername) {
+                const localIdx = userListToRender.indexOf(window.localUsername);
+                if (localIdx > -1) {
+                    userListToRender.splice(localIdx, 1);
+                }
+                userListToRender.unshift(window.localUsername);
+            }
+            window.currentOnlineUsers = userListToRender;
+            if (typeof renderActiveUsers === 'function') {
+                renderActiveUsers(userListToRender);
+            } else if (window.renderActiveUsers) {
+                window.renderActiveUsers(userListToRender);
+            }
+
             const badgeEl = document.getElementById('onlineUsersBadge');
             const countEl = document.getElementById('onlineUsersCount');
             if (!badgeEl || !countEl) return;
             
-            countEl.textContent = `${userCount} Active`;
-            
-            const usersList = [];
-            Object.keys(presenceState).forEach(userKey => {
-                const presences = presenceState[userKey];
-                if (presences && presences.length > 0) {
-                    const role = presences[0].role || 'User';
-                    const countStr = presences.length > 1 ? ` (${presences.length} tabs)` : '';
-                    usersList.push(`• ${userKey} (${role})${countStr}`);
-                }
-            });
-            
-            badgeEl.title = `Active sessions connected in real-time:\n${usersList.join('\n')}`;
+            countEl.textContent = userCount + " Active";
+            badgeEl.title = "Active sessions connected in real-time:\n" + usersList.join("\n");
         }
         window.updateOnlineUserCountUI = updateOnlineUserCountUI;
 
@@ -2281,7 +2304,7 @@
                 this.successHandler = () => {};
                 this.failureHandler = (err) => {
                     console.error('Supabase operation failed:', err);
-                    alert('Supabase Database Error: ' + (err.message || err));
+                    if(typeof showToast === 'function') { showToast('Database Error: ' + (err.message || err), 'error'); } else { console.error('Supabase Database Error: ' + (err.message || err)); }
                 };
             }
             withSuccessHandler(handler) {
@@ -2663,4 +2686,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 

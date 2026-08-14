@@ -5527,6 +5527,10 @@ function renderWeeklySummaryTab() {
                 `;
                 backlogContainer.appendChild(headerDiv);
 
+                const taskGridDiv = document.createElement('div');
+                taskGridDiv.style = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;';
+                backlogContainer.appendChild(taskGridDiv);
+
                 // Render tasks under this team
                 teamTasks.forEach(task => {
                     const itemDiv = document.createElement('div');
@@ -5543,9 +5547,6 @@ function renderWeeklySummaryTab() {
                             <span style="font-weight: 700; color: var(--text-primary);">${task.aircraftReg} (${task.aircraftType || 'A320'})</span>
                             <span class="badge-priority ${prioClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.priorityLevel}</span>
                         </div>
-                        <div style="color: var(--text-secondary); line-height: 1.35; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.taskDescription || '')}">
-                            ${escapeHTMLApp(task.taskDescription || '')}
-                        </div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; font-size: 0.72rem; color: var(--text-muted); gap: 4px;">
                             <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1;">
                                 <span style="font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.assignedTeam || 'Unassigned')}">${escapeHTMLApp(task.assignedTeam || 'Unassigned')}</span>
@@ -5553,8 +5554,11 @@ function renderWeeklySummaryTab() {
                             </div>
                             <span class="badge-status ${statusClass}" style="font-size: 0.68rem; padding: 1px 6px; white-space: nowrap;">${task.currentStatus}</span>
                         </div>
+                        <div style="color: var(--text-secondary); line-height: 1.35; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; margin-top: 6px;" title="${escapeHTMLApp(task.taskDescription || '')}">
+                            ${escapeHTMLApp(task.taskDescription || '')}
+                        </div>
                     `;
-                    backlogContainer.appendChild(itemDiv);
+                    taskGridDiv.appendChild(itemDiv);
                 });
             });
         }
@@ -5569,7 +5573,35 @@ function renderWeeklySummaryTab() {
     // Remove dynamic task-group tbodys, preserving the container tbody
     rtsTable.querySelectorAll('tbody.task-group').forEach(tbody => tbody.remove());
     
-    const sortedTasks = [...filteredTasks].sort((a,b) => {
+    const reportTasks = weeklyTasks.filter(t => {
+        if (selectedTeams.length > 0) {
+            const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
+            if (!taskTeams.some(team => selectedTeams.includes(team))) return false;
+        }
+        
+        const createdDate = t.createdDate || '';
+        const createdInPeriod = createdDate >= startDateStr && createdDate <= endDateStr;
+        
+        const updates = (t.comments || []).filter(item => item.type === 'update');
+        const updatedInPeriod = updates.some(u => {
+            const uDate = u.timestamp ? u.timestamp.split('T')[0] : '';
+            return uDate >= startDateStr && uDate <= endDateStr;
+        });
+
+        // Always show tasks created or commented on this week
+        if (createdInPeriod || updatedInPeriod) {
+            return true;
+        }
+        
+        // Also always show tasks that are actively 'In Progress'
+        if (t.currentStatus === 'In Progress') {
+            return true;
+        }
+        
+        return false;
+    });
+    
+    const sortedTasks = reportTasks.sort((a,b) => {
         const statusOrder = { 'Open': 1, 'In Progress': 2, 'Completed': 3 };
         const orderA = statusOrder[a.currentStatus] || 99;
         const orderB = statusOrder[b.currentStatus] || 99;

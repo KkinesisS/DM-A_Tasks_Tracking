@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1194,7 +1194,7 @@ header {
     min-height: 100px;
 }
 
-/* ── Custom Multi-Select Dropdown ─────────────────────────────────── */
+/* -- Custom Multi-Select Dropdown ----------------------------------- */
 .multiselect-container {
     position: relative;
     width: 100%;
@@ -5047,7 +5047,7 @@ html.dark-mode .team-badge.component {
     border: 1px solid rgba(251, 191, 36, 0.25) !important;
 }
 
-/* ── Dark Mode: Custom Multi-Select Dropdown ───────────────────────── */
+/* -- Dark Mode: Custom Multi-Select Dropdown ------------------------- */
 html.dark-mode .multiselect-trigger {
     background-color: rgba(26, 14, 29, 0.85) !important;
     border: 1px solid rgba(147, 80, 115, 0.3) !important;
@@ -6714,7 +6714,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                                     <input type="text" id="commentAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
                                 <div style="display: flex; gap: 0.5rem;">
-                                    <textarea id="commentText" placeholder="Write a comment..." required style="flex: 1; min-height: 50px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                    <textarea id="commentText" placeholder="Write a comment..." required style="flex: 1; min-height: 100px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <button type="button" id="addCommentBtn" class="btn btn-primary" style="height: 50px; padding: 0 1rem; font-size: 0.85rem;">Post</button>
                                 </div>
                             </div>
@@ -6732,8 +6732,8 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
                                     <input type="text" id="updateAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 50px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 100px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <input type="file" id="detailLogUpdateFile" style="display: none;" />
                                     <button type="button" id="detailLogUpdateFileBtn" class="btn btn-secondary" style="height: 50px; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Attach File">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
@@ -7144,7 +7144,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
         <div class="ticket-wrapper ticket-wrapper-animated" style="position: relative; width: 480px; background: #ffffff; border-radius: 32px; overflow: hidden; font-family: 'Inter', 'Segoe UI', sans-serif;">
             
             <div class="ticket-header" style="text-align: center; padding: 30px 20px 20px 20px;">
-                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">🎉</div>
+                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">??</div>
                 <h2 style="margin: 0 0 8px 0; font-size: 1.8rem; color: #111; font-weight: 800; letter-spacing: -0.5px;">Thank you!</h2>
                 <p style="margin: 0; font-size: 1.1rem; color: #666; line-height: 1.4;">Your ticket has been issued<br>successfully</p>
             </div>
@@ -7168,7 +7168,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 <div class="ticket-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <div>
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">DATE & TIME</div>
-                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 • 10:15</div>
+                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 � 10:15</div>
                     </div>
                     <div style="text-align: right;">
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">REQUESTOR</div>
@@ -7184,7 +7184,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 </div>
                 
                 <div class="ticket-card-info" style="background: #f8f9fb; border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; margin-top: 24px; border: 1px solid #f0f0f0;">
-                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">👤</div>
+                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">??</div>
                     <div>
                         <div class="ticket-card-text" style="font-size: 1.05rem; color: #111; font-weight: 600;">Maintenance Control</div>
                         <div class="ticket-card-subtext" style="font-size: 1.1rem; color: #777; margin-top: 2px;">Will review shortly</div>
@@ -7320,7 +7320,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 if (presences && presences.length > 0) {
                     const role = presences[0].role || 'User';
                     const countStr = presences.length > 1 ? ` (${presences.length} tabs)` : '';
-                    usersList.push(`• ${userKey} (${role})${countStr}`);
+                    usersList.push(`� ${userKey} (${role})${countStr}`);
                 }
             });
             
@@ -9309,7 +9309,7 @@ function getFilteredTasks() {
             task.taskDescription.toLowerCase().includes(searchLower) ||
             (task.customId || task.id || '').toLowerCase().includes(searchLower);
 
-        // Team filter matches — supports comma-separated multi-team values
+        // Team filter matches � supports comma-separated multi-team values
         const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
         const matchesTeam = activeFilters.team === 'All' || assignedTeams.includes(activeFilters.team);
 
@@ -9922,7 +9922,7 @@ function handleDragEnd() {
     });
 }
 
-// ── Multi-Select Dropdown Helpers ──────────────────────────────────────────
+// -- Multi-Select Dropdown Helpers ------------------------------------------
 
 /**
  * Initialise a custom multiselect dropdown.
@@ -11141,7 +11141,7 @@ function showSuccessModal(trackingCode, requestorName, priorityLevel) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const dateStr = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
     const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('successDateText').innerText = dateStr + ' • ' + timeStr;
+    document.getElementById('successDateText').innerText = dateStr + ' � ' + timeStr;
 
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -11533,7 +11533,7 @@ function openDetailsModal(id) {
         }
     }
     
-    // Team badges — supports multiple teams (comma-separated)
+    // Team badges � supports multiple teams (comma-separated)
     function getTeamClassDetail(t) {
         if (t.includes('Avionic')) return 'avionics';
         if (t.includes('Structure')) return 'struct';
@@ -13727,7 +13727,7 @@ function renderWeeklySummaryTab() {
         narrativeContainer.innerHTML += narrativeHtml;
     });
 
-    // 3. Team Workload Analysis — count each team a task is assigned to
+    // 3. Team Workload Analysis � count each team a task is assigned to
     const teamCounts = {};
     filteredTasks.forEach(t => {
         const teamNames = (t.assignedTeam || 'Unassigned').split(',').map(s => s.trim()).filter(Boolean);
@@ -15302,7 +15302,7 @@ function showUpdateLogModal(taskId) {
             }).join('')}
            </div>`;
 
-    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} – Status Log`;
+    document.getElementById('updateLogModalTitle').textContent = `${task.aircraftReg} � Status Log`;
     document.getElementById('updateLogModalSubtitle').innerHTML =
         `<span class="badge-status ${statusClass}" style="font-size:0.72rem;">${task.currentStatus}</span>
          <span style="font-size:0.8rem;color:var(--text-muted);">${task.topic || task.taskDescription.substring(0,60)}</span>
@@ -15338,7 +15338,7 @@ window.toggleWeeklyLogRow = toggleWeeklyLogRow;
 
 
 function handleSettingsBtnClick() {
-    // Show the password prompt first — settings are admin-only
+    // Show the password prompt first � settings are admin-only
     const passwordInput = document.getElementById('settingsPasswordInput');
     const errorMsg = document.getElementById('settingsPasswordError');
     if (passwordInput) passwordInput.value = '';
@@ -15361,7 +15361,7 @@ function verifySettingsPassword() {
         return;
     }
 
-    // Correct password — close the prompt and open settings
+    // Correct password � close the prompt and open settings
     closeModal('settingsPasswordModal');
 
     const isGas = typeof google !== 'undefined' && google.script && google.script.run && typeof google.script.run.getFolderUrl === 'function';
@@ -15547,7 +15547,7 @@ function renderNotifications() {
             contentStr = split.slice(1).join(': ');
         }
         if (!authorStr && act.title) authorStr = act.title;
-        const subtitle = authorStr ? `${authorStr} • ${dateFormatted}` : dateFormatted;
+        const subtitle = authorStr ? `${authorStr} � ${dateFormatted}` : dateFormatted;
 
         const firstLetter = (authorStr || act.title || 'S').charAt(0).toUpperCase();
         let hash = 0;
@@ -15713,7 +15713,7 @@ function renderCalendarCell(day, month, year, dateStr, isOtherMonth) {
             else if (firstTeam === 'Engines Team') teamClass = 'eng-team';
             else if (firstTeam === 'IERA Shop') teamClass = 'iera-team';
 
-            const priorityText = task.priorityLevel === 'AOG' ? '⚠️ ' : '';
+            const priorityText = task.priorityLevel === 'AOG' ? '?? ' : '';
             const statusText = '';
             tasksHtml += `
                 <div class="calendar-task-badge ${teamClass}" 
@@ -16010,5 +16010,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 

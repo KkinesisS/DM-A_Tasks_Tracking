@@ -3,7 +3,7 @@ $content = [System.IO.File]::ReadAllText($path)
 
 $pattern = '(?s)function updateOnlineUserCountUI\(userCount, totalConnections, presenceState\) \{.*?window\.updateOnlineUserCountUI = updateOnlineUserCountUI;'
 
-$newFunc = @'
+$newFunc = @"
 function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
             const actualUsernames = [];
             const usersList = [];
@@ -14,8 +14,8 @@ function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
                     const uname = presences[0].username || userKey;
                     actualUsernames.push(uname);
                     const role = presences[0].role || 'User';
-                    const countStr = presences.length > 1 ? " (" + presences.length + " tabs)" : "";
-                    usersList.push("• " + uname + " (" + role + ")" + countStr);
+                    const countStr = presences.length > 1 ? ` (` + presences.length + ` tabs)` : '';
+                    usersList.push(`• ` + uname + ` (` + role + `)` + countStr);
                 }
             });
 
@@ -42,11 +42,11 @@ function updateOnlineUserCountUI(userCount, totalConnections, presenceState) {
             const countEl = document.getElementById('onlineUsersCount');
             if (!badgeEl || !countEl) return;
             
-            countEl.textContent = userCount + " Active";
-            badgeEl.title = "Active sessions connected in real-time:\n" + usersList.join("\n");
+            countEl.textContent = userCount + ` Active`;
+            badgeEl.title = `Active sessions connected in real-time:\n` + usersList.join('\n');
         }
         window.updateOnlineUserCountUI = updateOnlineUserCountUI;
-'@
+"@
 
 if ($content -match $pattern) {
     $content = $content -replace $pattern, $newFunc
@@ -63,5 +63,7 @@ if (Test-Path $path2) {
         $content2 = $content2 -replace $pattern, $newFunc
         [System.IO.File]::WriteAllText($path2, $content2)
         Write-Host "Successfully replaced updateOnlineUserCountUI in index2.html"
+    } else {
+        Write-Host "Failed to match pattern in index2.html"
     }
 }
