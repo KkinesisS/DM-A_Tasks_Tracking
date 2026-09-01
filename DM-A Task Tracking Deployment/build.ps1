@@ -30,6 +30,14 @@ if (Test-Path "THAI787.jpeg") {
     $stylesContent = $stylesContent -replace "url\(['`"]?<!-- THAI787_BG_BASE64 -->['`"]?\)", "url('$bgImageUrl')"
 }
 
+if (Test-Path "Thai_Airways_International_logo_PNG1.png") {
+    $bytes = [System.IO.File]::ReadAllBytes("Thai_Airways_International_logo_PNG1.png")
+    $base64 = [System.Convert]::ToBase64String($bytes)
+    $logoUrl = "data:image/png;base64,$base64"
+    $indexHtml = $indexHtml.Replace('src="Thai_Airways_International_logo_PNG1.png"', "src=""$logoUrl""")
+    $indexHtml = $indexHtml.Replace('src=''Thai_Airways_International_logo_PNG1.png''', "src=""$logoUrl""")
+}
+
 # Read script contents
 $tabsContent = Get-Content -Path "tabs.js" -Raw -Encoding UTF8
 $manualIssuesContent = Get-Content -Path "manualIssues.js" -Raw -Encoding UTF8

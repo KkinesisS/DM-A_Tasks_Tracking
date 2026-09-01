@@ -43,6 +43,11 @@ function initTabs() {
         renderSAPTab();
       }
 
+      // If we switched to the Alternate Parts tab, render its catalog
+      if (target === 'alternatePart' && typeof renderAlternatePartTab === 'function') {
+        renderAlternatePartTab();
+      }
+
       // If we switched to the History tab, render archived tasks
       if (target === 'history' && typeof renderHistoryTab === 'function') {
         renderHistoryTab();

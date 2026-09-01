@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -139,125 +139,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Header & Logo Section */
-
-/* Premium Header Icon */
-.header-icon-wrapper {
-    width: 60px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(168, 85, 247, 0.08) 100%);
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    flex-shrink: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.header-icon-wrapper:hover {
-    transform: translateY(-1px) scale(1.04);
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(168, 85, 247, 0.14) 100%);
-    border-color: rgba(124, 58, 237, 0.3);
-    box-shadow: 0 4px 16px -2px rgba(124, 58, 237, 0.2);
-}
-.header-icon {
-    width: 26px;
-    height: 26px;
-}
-
-/* DM-A Text Logo */
-.header-dma-logo {
-    font-family: var(--font-heading, 'Inter', sans-serif);
-    font-size: 1.1rem;
-    font-weight: 900;
-    letter-spacing: -0.03em;
-    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 40%, #a855f7 70%, #c084fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    user-select: none;
-    text-shadow: none;
-}
-html.dark-mode .header-dma-logo {
-    background: linear-gradient(135deg, #a855f7 0%, #c084fc 40%, #d8b4fe 70%, #e9d5ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Header Title Group */
-.header-title-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-/* Gradient text for h1 */
-.logo-section h1 {
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--text-primary) 0%, #7c3aed 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.2;
-}
-
-/* Subtitle badge row */
-.header-subtitle-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-.header-badge-primary {
-    font-family: var(--font-heading);
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #ffffff;
-    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
-    padding: 0.1rem 0.5rem;
-    border-radius: 4px;
-    letter-spacing: 0.04em;
-    line-height: 1.5;
-}
-.header-badge-separator {
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: var(--text-secondary);
-    opacity: 0.5;
-    flex-shrink: 0;
-}
-.header-badge-secondary {
-    font-family: var(--font-body);
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-}
-
-/* Dark mode adjustments for header */
-html.dark-mode .header-icon-wrapper {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
-    border-color: rgba(147, 51, 234, 0.25);
-}
-html.dark-mode .header-icon-wrapper:hover {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(168, 85, 247, 0.18) 100%);
-    border-color: rgba(147, 51, 234, 0.4);
-    box-shadow: 0 4px 20px -2px rgba(147, 51, 234, 0.3);
-}
-html.dark-mode .logo-section h1 {
-    background: linear-gradient(135deg, #e2e8f0 0%, #c084fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-html.dark-mode .header-badge-primary {
-    background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
-}
-
 header {
     display: flex;
     justify-content: space-between;
@@ -271,6 +152,34 @@ header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+}
+
+.logo-section .app-logo {
+    height: 3.5rem;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-section h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.logo-section p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.dma-brand-logo {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dma-brand-logo:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px -2px rgba(109, 40, 217, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
 }
 
 .header-actions {
@@ -1728,7 +1637,7 @@ header {
 /* Details Modal Specific Styles */
 .details-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1.1fr 0.9fr;
+    grid-template-columns: 1.0fr 2.0fr 0.8fr;
     gap: 1.5rem;
 }
 
@@ -3087,7 +2996,9 @@ header {
 
     /* Ensure badges render cleanly in print with pill style (fully rounded) */
     .mro-table td span.badge-priority,
-    .mro-table td span.badge-status {
+    .mro-table td span.badge-status,
+    .backlog-card span.badge-priority,
+    .backlog-card span.badge-status {
         display: inline-block !important;
         padding: 0.15rem 0.65rem !important;
         border-radius: 9999px !important; /* True pill shape */
@@ -3100,38 +3011,45 @@ header {
         print-color-adjust: exact !important;
     }
     
-    .mro-table tr.prio-aog span.badge-priority {
+    .mro-table tr.prio-aog span.badge-priority,
+    .backlog-card span.badge-priority.aog {
         background-color: #fee2e2 !important;
         color: #991b1b !important;
         border: 1px solid #fca5a5 !important;
     }
-    .mro-table tr.prio-high span.badge-priority {
+    .mro-table tr.prio-high span.badge-priority,
+    .backlog-card span.badge-priority.high {
         background-color: #ffedd5 !important;
         color: #9a3412 !important;
         border: 1px solid #fed7aa !important;
     }
-    .mro-table tr.prio-medium span.badge-priority {
+    .mro-table tr.prio-medium span.badge-priority,
+    .backlog-card span.badge-priority.medium {
         background-color: #fef9c3 !important;
         color: #854d0e !important;
         border: 1px solid #fef08a !important;
     }
-    .mro-table tr.prio-low span.badge-priority {
+    .mro-table tr.prio-low span.badge-priority,
+    .backlog-card span.badge-priority.low {
         background-color: #dbeafe !important;
         color: #1e40af !important;
         border: 1px solid #bfdbfe !important;
     }
 
-    .mro-table tr.status-completed span.badge-status {
+    .mro-table tr.status-completed span.badge-status,
+    .backlog-card span.badge-status.completed {
         background-color: #dcfce7 !important;
         color: #166534 !important;
         border: 1px solid #bbf7d0 !important;
     }
-    .mro-table tr.status-progress span.badge-status {
+    .mro-table tr.status-progress span.badge-status,
+    .backlog-card span.badge-status.progress {
         background-color: #f3e8ff !important;
         color: #6b21a8 !important;
         border: 1px solid #e9d5ff !important;
     }
-    .mro-table tr.status-open span.badge-status {
+    .mro-table tr.status-open span.badge-status,
+    .backlog-card span.badge-status.open {
         background-color: #f1f5f9 !important;
         color: #475569 !important;
         border: 1px solid #e2e8f0 !important;
@@ -3777,7 +3695,7 @@ html.dark-mode body.force-mobile .tab-item.active {
     border-radius: 3px;
 }
 
-.timeline-scroll-content {
+.timeline-scroll-content { min-height: 100%;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -3910,7 +3828,7 @@ html.dark-mode body.force-mobile .tab-item.active {
 
 .details-middle #detailUpdatesList {
     flex: 1;
-    max-height: none; /* Let flex 1 take over */
+    max-height: 450px; /* Increased to touch the log input box */
 }
 
 .details-middle .comment-input-area {
@@ -4543,6 +4461,78 @@ html.dark-mode .login-card {
     #summaryBacklogList {
         max-height: none !important;
         overflow: visible !important;
+        width: 100% !important;
+    }
+    .backlog-task-grid,
+    #summaryBacklogList > div {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 1rem !important;
+        width: 100% !important;
+    }
+    .backlog-card {
+        padding: 1rem 1.2rem !important;
+        border-radius: 10px !important;
+        min-height: 120px !important;
+        font-size: 11pt !important;
+        box-sizing: border-box !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        margin-bottom: 0 !important;
+        background-color: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+    }
+    .backlog-card .backlog-card-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    .backlog-card .backlog-card-reg {
+        font-size: 13pt !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+    .backlog-card .backlog-card-meta {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-top: 2px !important;
+    }
+    .backlog-card .backlog-card-team {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        font-size: 10.5pt !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
+        line-height: 1.3 !important;
+    }
+    .backlog-card .backlog-card-created {
+        font-size: 9.5pt !important;
+        color: #64748b !important;
+    }
+    .backlog-card .backlog-card-topic {
+        font-size: 11pt !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+        line-height: 1.4 !important;
+        -webkit-line-clamp: 3 !important;
+        display: -webkit-box !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        margin-top: 4px !important;
+    }
+    .backlog-card span.badge-priority,
+    .backlog-card span.badge-status {
+        font-size: 9.5pt !important;
+        padding: 0.18rem 0.65rem !important;
+        border-radius: 9999px !important;
     }
 }
 @media print {
@@ -5239,15 +5229,14 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
 
         <!-- Header -->
         <header>
-            <div class="logo-section">
-                <!-- Premium Header Icon -->
-                <div class="header-icon-wrapper">
-                    <span class="header-dma-logo">DM-A</span>
+            <div class="logo-section" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="dma-brand-logo" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; user-select: none; transition: transform 0.2s ease, box-shadow 0.2s ease; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(3, 17, 56, 0.45); border: 1px solid rgba(255, 255, 255, 0.25);">
+                    <img src="dma_logo_official.jpg" alt="DM-A DMK Base Maintenance Logo" style="height: 52px; width: auto; object-fit: contain; display: block; border-radius: 9px;">
                 </div>
                 <div class="header-title-group">
-                    <h1>Task Tracking</h1>
-                    <div class="header-subtitle-row">
-                        <span class="header-badge-secondary">Production Engineer Supporting System</span>
+                    <h1 style="margin: 0; font-weight: 800; font-size: 1.65rem; color: var(--text-primary); line-height: 1.15; letter-spacing: -0.02em;">Task Tracking</h1>
+                    <div class="header-subtitle-row" style="margin-top: 3px;">
+                        <span class="header-badge-secondary" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">DMK Base Maintenance &nbsp;|&nbsp; Production Engineer Supporting System</span>
                     </div>
                 </div>
             </div>
@@ -5401,6 +5390,12 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                     <li class="tab-item" data-tab="sap" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
                         Material Catalog
+                    </li>
+                    <li class="tab-item" data-tab="alternatePart" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                        Alternate Parts
                     </li>
                     <li class="tab-item" data-tab="fyi" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -6000,6 +5995,9 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
             <div class="print-only-summary-header">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 1rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; flex-wrap: nowrap; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="dma-brand-logo" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; user-select: none; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(3, 17, 56, 0.35); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <img src="dma_logo_official.jpg" alt="DM-A DMK Base Maintenance Logo" style="height: 44px; width: auto; object-fit: contain; display: block; border-radius: 7px;">
+                        </div>
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; justify-content: center;">
                             <div style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; text-transform: uppercase; line-height: 1.1;">Weekly Engineering Summary</div>
                             <div style="font-size: 0.8rem; font-weight: 700; color: #7c3aed; background: rgba(124, 58, 237, 0.06); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid rgba(124, 58, 237, 0.15); display: inline-block;">
@@ -6410,6 +6408,181 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
             </div>
         </section>
 
+        <!-- Alternate Parts Tab -->
+        <section id="alternatePartTab" class="tab-content hidden">
+            <div class="sap-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 class="stats-header" style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #8b5cf6;">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                        Alternate Parts Management
+                    </h2>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Interchangeable and alternate aircraft part numbers, fleet effectivity, and engineering references</p>
+                </div>
+                <!-- Quick Summary Stats Badges -->
+                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.35rem 0.75rem; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                        <span style="color: var(--text-secondary); font-weight: 500;">Total:</span>
+                        <strong id="altPartTotalCount" style="color: var(--text-primary);">0</strong>
+                    </div>
+                    <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 8px; padding: 0.35rem 0.75rem; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                        <span style="color: #16a34a; font-weight: 600;">Active / Valid:</span>
+                        <strong id="altPartActiveCount" style="color: #16a34a;">0</strong>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 0.35rem 0.75rem; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                        <span style="color: #ef4444; font-weight: 600;">Expired:</span>
+                        <strong id="altPartExpiredCount" style="color: #ef4444;">0</strong>
+                    </div>
+                    <button class="btn btn-secondary" onclick="exportAlternatePartsCsv()" style="font-size: 0.82rem; padding: 0.35rem 0.75rem; height: 34px; min-height: auto; gap: 6px; display: inline-flex; align-items: center;" title="Export Alternate Parts to CSV">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; color: #15803d;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Area (Split Layout: List on Left, Form on Right) -->
+            <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start;">
+                
+                <!-- Left panel: Alternate Parts List -->
+                <div class="glass-panel" style="padding: 1.5rem; min-height: 450px; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.75rem;">
+                        <h3 style="font-size: 1.1rem; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: #8b5cf6;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                            Alternate Parts Database
+                        </h3>
+                        
+                        <!-- Search and Filters -->
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <!-- Fleet Filter -->
+                            <select id="altPartFleetFilter" onchange="renderAlternatePartTab()" style="padding: 0 1.5rem 0 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); outline: none; font-size: 0.82rem; height: 34px; cursor: pointer;">
+                                <option value="All">All Fleets</option>
+                                <option value="A320">A320</option>
+                                <option value="A330">A330</option>
+                                <option value="A350">A350</option>
+                                <option value="B777">B777</option>
+                                <option value="B787">B787</option>
+                            </select>
+
+                            <!-- Expiry Status Filter -->
+                            <select id="altPartStatusFilter" onchange="renderAlternatePartTab()" style="padding: 0 1.5rem 0 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); outline: none; font-size: 0.82rem; height: 34px; cursor: pointer;">
+                                <option value="All">All Status</option>
+                                <option value="Active">Active Only</option>
+                                <option value="NA">Permanent (N/A)</option>
+                                <option value="Expired">Expired</option>
+                            </select>
+
+                            <!-- Search Box -->
+                            <div class="search-box" style="margin: 0; width: 220px; max-width: 100%;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input id="altPartSearchInput" type="text" placeholder="Search Part, Alt Part, Ref...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper" style="overflow-x: auto; margin-top: 0.25rem;">
+                        <table class="mro-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 130px;">Part Number</th>
+                                    <th style="min-width: 130px;">Alternate Part No.</th>
+                                    <th style="min-width: 110px;">Aircraft Effective</th>
+                                    <th style="min-width: 140px;">Reference Data</th>
+                                    <th style="min-width: 100px;">Date Inserted</th>
+                                    <th style="min-width: 110px;">Expire Date</th>
+                                    <th class="no-print" style="text-align: right; width: 80px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="altPartTableBody">
+                                <!-- Alternate Part rows will insert here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right panel: Create / Edit Form (NO File Attachment!) -->
+                <div class="glass-panel" style="padding: 1.5rem;">
+                    <h3 id="altPartFormTitle" style="margin-bottom: 1.25rem; font-size: 1.1rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: #8b5cf6;">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Alternate Part
+                    </h3>
+                    <form id="altPartForm" onsubmit="event.preventDefault(); saveAlternatePartItem();">
+                        <input type="hidden" id="altPartId" />
+                        
+                        <!-- Part Number -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartNumberMain" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Part Number *</label>
+                            <input type="text" id="altPartNumberMain" required placeholder="e.g. 332A31-0020-00 or MS21042-3" style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: monospace, var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <!-- Alternate Part Number -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartNumberAlt" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Alternate Part Number *</label>
+                            <input type="text" id="altPartNumberAlt" required placeholder="e.g. 332A31-0020-01 or NAS1291-3" style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: monospace, var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <!-- Aircraft Effective -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartAircraftEffective" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Aircraft Effective *</label>
+                            <input type="text" id="altPartAircraftEffective" list="aircraftFleetSuggestions" required placeholder="e.g. A350, B787, All Fleets, or MSN / Tail" style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); box-sizing: border-box;" />
+                            <datalist id="aircraftFleetSuggestions">
+                                <option value="All Fleets"></option>
+                                <option value="A320"></option>
+                                <option value="A320-200"></option>
+                                <option value="A330-300"></option>
+                                <option value="A350-900"></option>
+                                <option value="B777-300ER"></option>
+                                <option value="B787-8"></option>
+                                <option value="B787-9"></option>
+                            </datalist>
+                        </div>
+
+                        <!-- Reference Data -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartReferenceData" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Reference Data *</label>
+                            <textarea id="altPartReferenceData" required placeholder="e.g. IPC 32-11-01 Fig 02, SB A350-32-0012, EO 2026-05, CMM 24-30-01..." style="width: 100%; min-height: 70px; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); resize: vertical; box-sizing: border-box;"></textarea>
+                        </div>
+
+                        <!-- Date (Refer to date that insert the data) -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartInsertDate" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Date (Inserted Date) *</label>
+                            <input type="date" id="altPartInsertDate" required style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <!-- Expire Date (with N/A Selection) -->
+                        <div class="form-group" style="margin-bottom: 1.25rem; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                                <label for="altPartExpireDate" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Expire Date *</label>
+                                <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; color: #8b5cf6; font-weight: 600; cursor: pointer; user-select: none;">
+                                    <input type="checkbox" id="altPartExpireNa" onchange="toggleAltPartExpireNa(this.checked)" style="cursor: pointer;" />
+                                    <span>N/A (Permanent)</span>
+                                </label>
+                            </div>
+                            <input type="date" id="altPartExpireDate" required style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.6rem; font-weight: 600; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">Save Alternate Part</button>
+                        <button type="button" id="altPartCancelBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.6rem; margin-top: 0.5rem; display: none;" onclick="clearAlternatePartForm()">Cancel Edit</button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
         <!-- Calendar Tab -->
         <section id="calendarTab" class="tab-content hidden">
             <div class="calendar-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem;">
@@ -6758,7 +6931,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
 
     <!-- View Details Modal -->
     <div id="detailsModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 1600px;">
+        <div class="modal-content" style="max-width: 1120px;">
             <div class="modal-header">
                 <h2>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -6837,7 +7010,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                                     <input type="text" id="updateAuthor" placeholder="Your Name" value="DMA Staff" required style="width: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-family: var(--font-body);" />
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
-                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 150px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
+                                    <textarea id="updateText" placeholder="Log status update or progress detail..." required style="flex: 1; min-height: 100px; font-size: 0.85rem; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); resize: vertical; font-family: var(--font-body);"></textarea>
                                     <input type="file" id="detailLogUpdateFile" style="display: none;" />
                                     <button type="button" id="detailLogUpdateFileBtn" class="btn btn-secondary" style="height: 50px; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Attach File">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
@@ -7139,7 +7312,9 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
             <!-- Right panel: form input -->
             <div class="login-right-panel">
 
-                <h2 style="font-family: var(--font-heading); color: var(--text-primary); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; text-align: left;">DM-A</h2>
+                <div style="margin-bottom: 1rem; text-align: left;">
+                    <img src="dma_logo_official.jpg" alt="DM-A DMK Base Maintenance Logo" style="height: 56px; width: auto; object-fit: contain; display: block; border-radius: 9px; box-shadow: 0 4px 12px rgba(3, 17, 56, 0.4); border: 1px solid rgba(255, 255, 255, 0.25);">
+                </div>
                 <p style="font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-body); margin-bottom: 1.75rem; line-height: 1.5; text-align: left;">Production Engineer Task Management System</p>
                 
                 <div id="loginError" class="login-error-msg hidden" style="margin-bottom: 1.25rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.2); color: var(--priority-aog); font-size: 0.8rem; text-align: center;">
@@ -7244,7 +7419,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
         <div class="ticket-wrapper ticket-wrapper-animated" style="position: relative; width: 480px; background: #ffffff; border-radius: 32px; overflow: hidden; font-family: 'Inter', 'Segoe UI', sans-serif;">
             
             <div class="ticket-header" style="text-align: center; padding: 30px 20px 20px 20px;">
-                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">🎉</div>
+                <div style="font-size: 42px; margin-bottom: 12px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">??</div>
                 <h2 style="margin: 0 0 8px 0; font-size: 1.8rem; color: #111; font-weight: 800; letter-spacing: -0.5px;">Thank you!</h2>
                 <p style="margin: 0; font-size: 1.1rem; color: #666; line-height: 1.4;">Your ticket has been issued<br>successfully</p>
             </div>
@@ -7268,7 +7443,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 <div class="ticket-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <div>
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">DATE & TIME</div>
-                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 • 10:15</div>
+                        <div class="ticket-value" id="successDateText" style="font-size: 1.2rem; color: #111; font-weight: 700;">19 Jun 2025 � 10:15</div>
                     </div>
                     <div style="text-align: right;">
                         <div class="ticket-label" style="font-size: 0.85rem; text-transform: uppercase; color: #999; margin-bottom: 6px; letter-spacing: 0.5px;">REQUESTOR</div>
@@ -7284,7 +7459,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 </div>
                 
                 <div class="ticket-card-info" style="background: #f8f9fb; border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; margin-top: 24px; border: 1px solid #f0f0f0;">
-                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">👤</div>
+                    <div style="width: 32px; height: 32px; background: #e0e4f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">??</div>
                     <div>
                         <div class="ticket-card-text" style="font-size: 1.05rem; color: #111; font-weight: 600;">Maintenance Control</div>
                         <div class="ticket-card-subtext" style="font-size: 1.1rem; color: #777; margin-top: 2px;">Will review shortly</div>
@@ -7418,7 +7593,7 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                     actualUsernames.push(uname);
                     const role = presences[0].role || 'User';
                     const countStr = presences.length > 1 ? " (" + presences.length + " tabs)" : "";
-                    usersList.push("â€¢ " + uname + " (" + role + ")" + countStr);
+                    usersList.push("• " + uname + " (" + role + ")" + countStr);
                 }
             });
 
@@ -7594,11 +7769,63 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                 } catch(e) { this.failureHandler(e); }
             }
             
+            async getAlternateParts() {
+                try {
+                    if (!window.supabaseClient) { this.successHandler([]); return; }
+                    const { data, error } = await window.supabaseClient.from('alternate_parts').select('*');
+                    if (error) {
+                        console.warn('Supabase alternate_parts query warning:', error.message);
+                        this.successHandler(null);
+                        return;
+                    }
+                    this.successHandler(data);
+                } catch(e) { 
+                    console.warn('Supabase getAlternateParts fallback:', e);
+                    this.successHandler(null); 
+                }
+            }
+            
+            async saveAlternatePart(partItem) {
+                try {
+                    if (!window.supabaseClient) return;
+                    const { error } = await window.supabaseClient.from('alternate_parts').upsert(partItem);
+                    if (error) {
+                        console.warn('Supabase saveAlternatePart warning:', error.message);
+                        this.successHandler(false);
+                        return;
+                    }
+                    this.successHandler(true);
+                } catch(e) { 
+                    console.warn('Supabase saveAlternatePart error:', e);
+                    this.successHandler(false);
+                }
+            }
+            
+            async deleteAlternatePart(id) {
+                try {
+                    if (!window.supabaseClient) return;
+                    const { error } = await window.supabaseClient.from('alternate_parts').delete().eq('id', id);
+                    if (error) {
+                        console.warn('Supabase deleteAlternatePart warning:', error.message);
+                        this.successHandler(false);
+                        return;
+                    }
+                    this.successHandler(true);
+                } catch(e) { 
+                    console.warn('Supabase deleteAlternatePart error:', e);
+                    this.successHandler(false);
+                }
+            }
+            
             async getManualIssues() {
                 try {
                     if (!window.supabaseClient) { this.successHandler([]); return; }
                     const { data, error } = await window.supabaseClient.from('manual_issues').select('*');
-                    if (error) throw error;
+                    if (error) {
+                        console.warn('Supabase manual_issues query warning:', error.message);
+                        this.successHandler([]);
+                        return;
+                    }
                     const parsedData = (data || []).map(i => {
                         if (typeof i.aircraft === 'string') {
                             try { i.aircraft = JSON.parse(i.aircraft); } catch(e) { i.aircraft = []; }
@@ -7606,7 +7833,10 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                         return i;
                     });
                     this.successHandler(parsedData);
-                } catch(e) { this.failureHandler(e); }
+                } catch(e) { 
+                    console.warn('Supabase getManualIssues fallback:', e);
+                    this.successHandler([]); 
+                }
             }
             
             async saveAllManualIssues(issuesList) {
@@ -7622,10 +7852,17 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                             return copy;
                         });
                         const { error } = await window.supabaseClient.from('manual_issues').insert(payload);
-                        if (error) throw error;
+                        if (error) {
+                            console.warn('Supabase saveAllManualIssues warning:', error.message);
+                            this.successHandler(false);
+                            return;
+                        }
                     }
                     this.successHandler(true);
-                } catch(e) { this.failureHandler(e); }
+                } catch(e) { 
+                    console.warn('Supabase saveAllManualIssues error:', e);
+                    this.successHandler(false);
+                }
             }
             
             async getBlacklist() {
@@ -7693,6 +7930,9 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
                                             getSAPCodes: () => s([]),
                                             saveSAPCode: () => s(true),
                                             deleteSAPCode: () => s(true),
+                                            getAlternateParts: () => s([]),
+                                            saveAlternatePart: () => s(true),
+                                            deleteAlternatePart: () => s(true),
                                             getManualIssues: () => s([]),
                                             saveAllManualIssues: () => s(true),
                                             getBlacklist: () => s([]),
@@ -7862,6 +8102,11 @@ function initTabs() {
       // If we switched to the Material Catalog tab, render its catalog
       if (target === 'sap' && typeof renderSAPTab === 'function') {
         renderSAPTab();
+      }
+
+      // If we switched to the Alternate Parts tab, render its catalog
+      if (target === 'alternatePart' && typeof renderAlternatePartTab === 'function') {
+        renderAlternatePartTab();
       }
 
       // If we switched to the History tab, render archived tasks
@@ -8502,6 +8747,7 @@ let tasks = [];
 let fyiItems = [];
 let activeFyiTeam = 'All Teams';
 let sapCodes = [];
+let alternateParts = [];
 let isExternalRequest = false;
 let eventListenersSet = false;
 function initSupabase() {
@@ -8967,6 +9213,14 @@ function initApp() {
 
     // Load SAP codes
     loadSAPCodes();
+
+    // Load Alternate Parts
+    loadAlternateParts();
+
+    const insertDateEl = document.getElementById('altPartInsertDate');
+    if (insertDateEl && !insertDateEl.value) {
+        insertDateEl.value = new Date().toISOString().split('T')[0];
+    }
 }
 
 function refreshTasksSilently() {
@@ -9069,6 +9323,39 @@ function refreshSAPCodesSilently() {
         .getSAPCodes();
 }
 window.refreshSAPCodesSilently = refreshSAPCodesSilently;
+
+function refreshAlternatePartsSilently() {
+    const isGas = typeof google !== 'undefined' && google.script && google.script.run;
+    const hasSupabase = typeof window.supabaseClient !== 'undefined' && window.supabaseClient !== null;
+    if (!isGas && !hasSupabase) return;
+
+    if (isGas && typeof google.script.run.getAlternateParts === 'function') {
+        google.script.run
+            .withSuccessHandler(data => {
+                const localData = localStorage.getItem('mro_alternate_parts');
+                if (data && Array.isArray(data)) {
+                    if (data.length > 0) {
+                        alternateParts = data;
+                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                        if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
+                            renderAlternatePartTab();
+                        }
+                    } else if (data.length === 0 && (!localData || localData === 'null' || localData === 'undefined')) {
+                        alternateParts = typeof DEMO_ALTERNATE_PARTS !== 'undefined' ? [...DEMO_ALTERNATE_PARTS] : [];
+                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                        if (typeof google.script.run.saveAlternatePart === 'function') {
+                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
+                        }
+                        if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
+                            renderAlternatePartTab();
+                        }
+                    }
+                }
+            })
+            .getAlternateParts();
+    }
+}
+window.refreshAlternatePartsSilently = refreshAlternatePartsSilently;
 
 function loadLocalApp() {
     const localData = localStorage.getItem('mro_tasks');
@@ -10350,6 +10637,14 @@ function setupEventListeners() {
         });
     }
 
+    // Alternate Parts Search Filter
+    const altPartSearchInput = document.getElementById('altPartSearchInput');
+    if (altPartSearchInput) {
+        altPartSearchInput.addEventListener('input', () => {
+            renderAlternatePartTab();
+        });
+    }
+
     // View Mode Switches
     document.getElementById('kanbanViewBtn').addEventListener('click', () => {
         setViewMode('kanban');
@@ -10581,12 +10876,23 @@ function setupEventListeners() {
             
             const task = tasks.find(t => t.id === id);
             if (task && task.currentStatus !== targetStatus) {
+                const oldStatus = task.currentStatus;
                 task.currentStatus = targetStatus;
                 if (targetStatus === 'Completed') {
                     task.completedDate = new Date().toISOString().split('T')[0];
                 } else {
                     task.completedDate = null;
                 }
+                task.comments = task.comments || [];
+                const authorName = (typeof activeUser !== 'undefined' && activeUser && activeUser.name) ? activeUser.name : 'DMA Staff';
+                task.comments.push({
+                    author: authorName,
+                    text: `Status updated to ${targetStatus}`,
+                    timestamp: new Date().toISOString(),
+                    type: 'update',
+                    oldStatus: oldStatus,
+                    newStatus: targetStatus
+                });
                 saveTaskData(task);
                 renderApp();
             }
@@ -12195,6 +12501,18 @@ function handleFormSubmit(e) {
             } else {
                 tasks[taskIndex].completedDate = null;
             }
+            if (oldStatus !== currentStatus) {
+                tasks[taskIndex].comments = tasks[taskIndex].comments || [];
+                const authorName = (typeof activeUser !== 'undefined' && activeUser && activeUser.name) ? activeUser.name : 'DMA Staff';
+                tasks[taskIndex].comments.push({
+                    author: authorName,
+                    text: `Status updated to ${currentStatus}`,
+                    timestamp: new Date().toISOString(),
+                    type: 'update',
+                    oldStatus: oldStatus,
+                    newStatus: currentStatus
+                });
+            }
             if (!isExternalRequest) {
                 tasks[taskIndex].isExternal = false;
             }
@@ -12264,6 +12582,7 @@ function toggleTaskCompletion(id, event) {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
+    const oldStatus = task.currentStatus;
     if (task.currentStatus === 'Completed') {
         task.currentStatus = 'In Progress';
         task.completedDate = null;
@@ -12271,6 +12590,17 @@ function toggleTaskCompletion(id, event) {
         task.currentStatus = 'Completed';
         task.completedDate = new Date().toISOString().split('T')[0];
     }
+
+    task.comments = task.comments || [];
+    const authorName = (typeof activeUser !== 'undefined' && activeUser && activeUser.name) ? activeUser.name : 'DMA Staff';
+    task.comments.push({
+        author: authorName,
+        text: `Status updated to ${task.currentStatus}`,
+        timestamp: new Date().toISOString(),
+        type: 'update',
+        oldStatus: oldStatus,
+        newStatus: task.currentStatus
+    });
 
     saveTaskData(task);
     renderApp();
@@ -12282,14 +12612,27 @@ function updateTaskStatus(id, status) {
     if (!task) return;
 
     const oldStatus = task.currentStatus;
-    task.currentStatus = status;
+    if (oldStatus !== status) {
+        task.currentStatus = status;
 
-    if (status === 'Completed') {
-        if (oldStatus !== 'Completed' || !task.completedDate) {
-            task.completedDate = new Date().toISOString().split('T')[0];
+        if (status === 'Completed') {
+            if (oldStatus !== 'Completed' || !task.completedDate) {
+                task.completedDate = new Date().toISOString().split('T')[0];
+            }
+        } else {
+            task.completedDate = null;
         }
-    } else {
-        task.completedDate = null;
+
+        task.comments = task.comments || [];
+        const authorName = (typeof activeUser !== 'undefined' && activeUser && activeUser.name) ? activeUser.name : 'DMA Staff';
+        task.comments.push({
+            author: authorName,
+            text: `Status updated to ${status}`,
+            timestamp: new Date().toISOString(),
+            type: 'update',
+            oldStatus: oldStatus,
+            newStatus: status
+        });
     }
 
     if (isExternalTask(task)) {
@@ -12329,11 +12672,31 @@ function exportToExcel() {
         const teamHidden = document.getElementById('summaryTeamHidden');
         const selectedTeams = teamHidden && teamHidden.value ? teamHidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
         
-        // Filter by selected team exactly like the Weekly Summary tab
+        const startSelector = document.getElementById('summaryStartDateSelector');
+        const endSelector = document.getElementById('summaryEndDateSelector');
+        const defaults = typeof getWeeklySummaryDefaultDates === 'function' ? getWeeklySummaryDefaultDates() : { start: '2026-06-15', end: '2026-06-21' };
+        const startDateStr = (startSelector && startSelector.value) ? startSelector.value : defaults.start;
+        const endDateStr = (endSelector && endSelector.value) ? endSelector.value : defaults.end;
+
+        // Filter by selected team & date/update activity exactly like the Weekly Summary tab
         tasksToExport = tasks.filter(t => {
-            if (selectedTeams.length === 0) return true;
-            const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
-            return taskTeams.some(team => selectedTeams.includes(team));
+            if (isExternalTask(t)) return false;
+            if (selectedTeams.length > 0) {
+                const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
+                if (!taskTeams.some(team => selectedTeams.includes(team))) return false;
+            }
+            const createdDate = t.createdDate || '';
+            const createdInPeriod = createdDate >= startDateStr && createdDate <= endDateStr;
+            const completedDate = t.completedDate || '';
+            const completedInPeriod = completedDate >= startDateStr && completedDate <= endDateStr;
+            const updates = (t.comments || []).filter(item => item.type === 'update' || item.type === 'status_change' || item.type === 'comment' || !item.type);
+            const updatedInPeriod = updates.some(u => {
+                const uDate = u.timestamp ? u.timestamp.split('T')[0] : (u.createdDate ? u.createdDate.split('T')[0] : '');
+                return uDate >= startDateStr && uDate <= endDateStr;
+            });
+            if (createdInPeriod || updatedInPeriod || completedInPeriod) return true;
+            if (t.currentStatus === 'In Progress') return true;
+            return false;
         });
 
         // Sort identical to the Weekly Report table
@@ -13596,7 +13959,7 @@ function renderWeeklySummaryTab() {
     const teamHidden = document.getElementById('summaryTeamHidden');
     const selectedTeams = teamHidden && teamHidden.value ? teamHidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
 
-    // Filter tasks by selected teams & date range
+    // Filter tasks by selected teams & date range (including tasks with status updates/logs in the period)
     const filteredTasks = weeklyTasks.filter(t => {
         // 1. Team filtering
         if (selectedTeams.length > 0) {
@@ -13605,10 +13968,21 @@ function renderWeeklySummaryTab() {
             if (!matchesTeam) return false;
         }
 
-        // 2. Date range filtering: Only include tasks created in the selected date interval
-        const created = t.createdDate || '';
-        if (!created) return false;
-        return created >= startDateStr && created <= endDateStr;
+        // 2. Date range filtering & status update/log filtering
+        const createdDate = t.createdDate || '';
+        const createdInPeriod = createdDate >= startDateStr && createdDate <= endDateStr;
+
+        const completedDate = t.completedDate || '';
+        const completedInPeriod = completedDate >= startDateStr && completedDate <= endDateStr;
+
+        const updates = (t.comments || []).filter(item => item.type === 'update' || item.type === 'status_change' || item.type === 'comment' || !item.type);
+        const updatedInPeriod = updates.some(u => {
+            const uDate = u.timestamp ? u.timestamp.split('T')[0] : (u.createdDate ? u.createdDate.split('T')[0] : '');
+            return uDate >= startDateStr && uDate <= endDateStr;
+        });
+
+        // Only include tasks that have recent status update/log, creation, or completion in this report period
+        return createdInPeriod || updatedInPeriod || completedInPeriod;
     });
 
     // 1. KPI Calculations
@@ -13953,106 +14327,52 @@ function renderWeeklySummaryTab() {
                 </div>
             `;
         } else {
-            // Group active backlog tasks by team name
-            const backlogGroups = {}; // key: team name, value: [tasks]
-            activeBacklogTasks.forEach(task => {
-                let teams = (task.assignedTeam || '').split(',').map(s => s.trim()).filter(Boolean);
-                if (teams.length === 0) {
-                    teams = ['Unassigned'];
-                }
-                
-                teams.forEach(teamName => {
-                    if (selectedTeams.length > 0 && !selectedTeams.includes(teamName)) return;
-                    
-                    if (!backlogGroups[teamName]) {
-                        backlogGroups[teamName] = [];
-                    }
-                    backlogGroups[teamName].push(task);
-                });
-            });
-
-            // Sort team names
-            const teamOrder = [
-                'Mechanical System Team',
-                'Avionic Systems Team',
-                'Structure Team',
-                'Engines Team',
-                'IERA Shop',
-                'Component Team',
-                'Unassigned'
-            ];
-            
-            const sortedTeamNames = Object.keys(backlogGroups).sort((a, b) => {
-                let idxA = teamOrder.indexOf(a);
-                let idxB = teamOrder.indexOf(b);
-                if (idxA === -1) idxA = 99;
-                if (idxB === -1) idxB = 99;
-                if (idxA !== idxB) return idxA - idxB;
-                return a.localeCompare(b);
-            });
-
+            // Sort all active backlog tasks by priority then RTS date (no team grouping)
             const priorityOrder = { 'AOG': 1, 'High': 2, 'Normal': 3, 'Low': 4 };
-            function getTeamColor(teamName) {
-                if (teamName.includes('Mechanical')) return 'var(--team-mech, #10b981)';
-                if (teamName.includes('Avionic')) return 'var(--team-avionics, #0ea5e9)';
-                if (teamName.includes('Structure')) return 'var(--team-struct, #a855f7)';
-                if (teamName.includes('Engines')) return 'var(--team-engines, #ec4899)';
-                if (teamName.includes('IERA')) return 'var(--team-iera, #6366f1)';
-                if (teamName.includes('Component')) return 'var(--team-component, #f59e0b)';
-                return '#64748b';
-            }
+            activeBacklogTasks.sort((a, b) => {
+                const pA = priorityOrder[a.priorityLevel] || 99;
+                const pB = priorityOrder[b.priorityLevel] || 99;
+                if (pA !== pB) return pA - pB;
+                
+                if (a.rtsDate === 'N/A' && b.rtsDate === 'N/A') return 0;
+                if (a.rtsDate === 'N/A') return 1;
+                if (b.rtsDate === 'N/A') return -1;
+                return new Date(a.rtsDate) - new Date(b.rtsDate);
+            });
 
-            sortedTeamNames.forEach(teamName => {
-                const teamTasks = backlogGroups[teamName].sort((a, b) => {
-                    const pA = priorityOrder[a.priorityLevel] || 99;
-                    const pB = priorityOrder[b.priorityLevel] || 99;
-                    if (pA !== pB) return pA - pB;
-                    
-                    if (a.rtsDate === 'N/A' && b.rtsDate === 'N/A') return 0;
-                    if (a.rtsDate === 'N/A') return 1;
-                    if (b.rtsDate === 'N/A') return -1;
-                    return new Date(a.rtsDate) - new Date(b.rtsDate);
-                });
+            const taskGridDiv = document.createElement('div');
+            taskGridDiv.className = 'backlog-task-grid';
+            taskGridDiv.style = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1rem; margin-top: 0.5rem;';
+            backlogContainer.appendChild(taskGridDiv);
 
-                // Render Team Sub-header
-                const headerDiv = document.createElement('div');
-                headerDiv.style = 'margin-top: 0.65rem; margin-bottom: 0.35rem; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; letter-spacing: 0.03em;';
-                headerDiv.innerHTML = `
-                    <span style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: ${getTeamColor(teamName)};"></span>
-                    ${teamName}
-                    <span style="font-size: 0.68rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 0 4px; border-radius: 6px; font-weight: 600; margin-left: 2px;">${teamTasks.length}</span>
+            // Render all tasks in a single flat list
+            activeBacklogTasks.forEach(task => {
+                const itemDiv = document.createElement('div');
+                
+                let statusClass = 'open';
+                if (task.currentStatus === 'In Progress') statusClass = 'progress';
+                const prioClass = task.priorityLevel.toLowerCase();
+
+                itemDiv.className = `backlog-card status-${statusClass}`;
+                itemDiv.style = 'padding: 0.9rem 1rem; border-radius: 10px; font-size: 0.88rem; display: flex; flex-direction: column; gap: 6px;';
+
+                itemDiv.innerHTML = `
+                    <div class="backlog-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="backlog-card-reg" style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">${task.aircraftReg} (${task.aircraftType || 'A320'})</span>
+                        <span class="badge-priority ${prioClass}" style="font-size: 0.72rem; padding: 2px 8px;">${task.priorityLevel}</span>
+                    </div>
+                    <div class="backlog-card-meta" style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 0.75rem; color: var(--text-muted); gap: 8px;">
+                        <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1;">
+                            <span class="backlog-card-team" style="font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.assignedTeam || 'Unassigned')}">${escapeHTMLApp(task.assignedTeam || 'Unassigned')}</span>
+                            <span class="backlog-card-created" style="font-size: 0.7rem; opacity: 0.85;">Created: ${task.createdDate || 'N/A'}</span>
+                        </div>
+                        <span class="badge-status ${statusClass}" style="font-size: 0.7rem; padding: 2px 8px; white-space: nowrap; flex-shrink: 0;">${task.currentStatus}</span>
+                    </div>
+                    <div class="backlog-card-topic" style="color: var(--text-secondary); font-weight: 600; line-height: 1.4; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;" title="${escapeHTMLApp(task.topic || task.taskDescription || '')}">
+                        ${escapeHTMLApp(task.topic || task.taskDescription || '')}
+                    </div>
                 `;
-                backlogContainer.appendChild(headerDiv);
-
-                // Render tasks under this team
-                teamTasks.forEach(task => {
-                    const itemDiv = document.createElement('div');
-                    
-                    let statusClass = 'open';
-                    if (task.currentStatus === 'In Progress') statusClass = 'progress';
-                    const prioClass = task.priorityLevel.toLowerCase();
-
-                    itemDiv.className = `backlog-card status-${statusClass}`;
-                    itemDiv.style = 'padding: 0.7rem; border-radius: 8px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.5rem;';
-
-                    itemDiv.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 700; color: var(--text-primary);">${task.aircraftReg} (${task.aircraftType || 'A320'})</span>
-                            <span class="badge-priority ${prioClass}" style="font-size: 0.7rem; padding: 1px 6px;">${task.priorityLevel}</span>
-                        </div>
-                        <div style="color: var(--text-secondary); line-height: 1.35; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.taskDescription || '')}">
-                            ${escapeHTMLApp(task.taskDescription || '')}
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; font-size: 0.72rem; color: var(--text-muted); gap: 4px;">
-                            <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1;">
-                                <span style="font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTMLApp(task.assignedTeam || 'Unassigned')}">${escapeHTMLApp(task.assignedTeam || 'Unassigned')}</span>
-                                <span style="font-size: 0.68rem; opacity: 0.85;">Created: ${task.createdDate || 'N/A'}</span>
-                            </div>
-                            <span class="badge-status ${statusClass}" style="font-size: 0.68rem; padding: 1px 6px; white-space: nowrap;">${task.currentStatus}</span>
-                        </div>
-                    `;
-                    backlogContainer.appendChild(itemDiv);
-                });
+                taskGridDiv.appendChild(itemDiv);
             });
         }
     }
@@ -14066,7 +14386,9 @@ function renderWeeklySummaryTab() {
     // Remove dynamic task-group tbodys, preserving the container tbody
     rtsTable.querySelectorAll('tbody.task-group').forEach(tbody => tbody.remove());
     
-    const sortedTasks = [...filteredTasks].sort((a,b) => {
+    const reportTasks = filteredTasks;
+    
+    const sortedTasks = reportTasks.sort((a,b) => {
         const statusOrder = { 'Open': 1, 'In Progress': 2, 'Completed': 3 };
         const orderA = statusOrder[a.currentStatus] || 99;
         const orderB = statusOrder[b.currentStatus] || 99;
@@ -14275,7 +14597,7 @@ function loadFYIs() {
                 }
             })
             .getFYIs();
-    } else if (window.supabaseClient) {
+    } else if (supabaseClient) {
         refreshFYIsSilently();
     }
 }
@@ -14785,7 +15107,7 @@ function loadSAPCodes() {
                 }
             })
             .getSAPCodes();
-    } else if (window.supabaseClient) {
+    } else if (supabaseClient) {
         refreshSAPCodesSilently();
     }
 }
@@ -14953,6 +15275,480 @@ function clearSapForm() {
     document.getElementById('sapId').value = '';
     document.getElementById('sapFormTitle').textContent = 'Add New Material';
     document.getElementById('sapCancelBtn').style.display = 'none';
+}
+
+// ==========================================
+// Alternate Parts Management Functions
+// ==========================================
+
+const DEMO_ALTERNATE_PARTS = [
+    {
+        id: 'alt-1',
+        partNumber: '332A31-0020-00',
+        altPartNumber: '332A31-0020-01',
+        aircraftEffective: 'A350-900',
+        referenceData: 'IPC 32-11-01-01 Fig 02, SB A350-32-0012',
+        insertDate: '2026-06-10',
+        expireDate: 'N/A',
+        createdDate: '2026-06-10'
+    },
+    {
+        id: 'alt-2',
+        partNumber: 'MS21042-3',
+        altPartNumber: 'NAS1291-3',
+        aircraftEffective: 'All Fleets',
+        referenceData: 'SRM 51-40-00 Fastener Interchangeability Table 4',
+        insertDate: '2026-06-12',
+        expireDate: 'N/A',
+        createdDate: '2026-06-12'
+    },
+    {
+        id: 'alt-3',
+        partNumber: '2282000-11',
+        altPartNumber: '2282000-12',
+        aircraftEffective: 'B787-8, B787-9',
+        referenceData: 'IPC 34-11-05 Fig 01, Service Letter B787-SL-34-02',
+        insertDate: '2026-06-15',
+        expireDate: '2026-12-31',
+        createdDate: '2026-06-15'
+    },
+    {
+        id: 'alt-4',
+        partNumber: 'D28570000',
+        altPartNumber: 'D28570000-1',
+        aircraftEffective: 'A320-200',
+        referenceData: 'IPC 25-11-01, EO-2026-A320-088',
+        insertDate: '2026-05-20',
+        expireDate: '2026-06-01',
+        createdDate: '2026-05-20'
+    },
+    {
+        id: 'alt-5',
+        partNumber: '4500-A22',
+        altPartNumber: '4500-A22M',
+        aircraftEffective: 'B777-300ER',
+        referenceData: 'CMM 73-10-02, SB GE90-73-0104',
+        insertDate: '2026-06-16',
+        expireDate: 'N/A',
+        createdDate: '2026-06-16'
+    }
+];
+
+function loadAlternateParts() {
+    const isGas = typeof google !== 'undefined' && google.script && google.script.run;
+    const localData = localStorage.getItem('mro_alternate_parts');
+    let loaded = false;
+    
+    if (localData && localData !== 'null' && localData !== 'undefined') {
+        try {
+            alternateParts = JSON.parse(localData);
+            if (Array.isArray(alternateParts)) {
+                if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
+                    renderAlternatePartTab();
+                }
+                loaded = true;
+            }
+        } catch(e) {
+            alternateParts = [];
+        }
+    }
+    
+    if (!loaded) {
+        alternateParts = [...DEMO_ALTERNATE_PARTS];
+        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+    }
+
+    if (isGas && typeof google.script.run.getAlternateParts === 'function') {
+        google.script.run
+            .withSuccessHandler(data => {
+                if (data && Array.isArray(data)) {
+                    alternateParts = data;
+                    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                    if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
+                        renderAlternatePartTab();
+                    }
+                }
+            })
+            .getAlternateParts();
+    } else {
+        refreshAlternatePartsSilently();
+    }
+}
+
+function toggleAltPartExpireNa(isNa) {
+    const expireInput = document.getElementById('altPartExpireDate');
+    if (!expireInput) return;
+    
+    if (isNa) {
+        expireInput.value = '';
+        expireInput.disabled = true;
+        expireInput.required = false;
+        expireInput.style.opacity = '0.5';
+        expireInput.style.cursor = 'not-allowed';
+    } else {
+        expireInput.disabled = false;
+        expireInput.required = true;
+        expireInput.style.opacity = '1';
+        expireInput.style.cursor = 'text';
+    }
+}
+
+function renderAlternatePartTab() {
+    const listContainer = document.getElementById('altPartTableBody');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '';
+    
+    const searchVal = document.getElementById('altPartSearchInput')?.value.trim().toLowerCase() || '';
+    const fleetFilter = document.getElementById('altPartFleetFilter')?.value || 'All';
+    const statusFilter = document.getElementById('altPartStatusFilter')?.value || 'All';
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    
+    // Calculate global stats
+    let totalCount = alternateParts.length;
+    let activeCount = 0;
+    let expiredCount = 0;
+    
+    alternateParts.forEach(item => {
+        const isNa = !item.expireDate || item.expireDate.toUpperCase() === 'N/A';
+        if (isNa) {
+            activeCount++;
+        } else {
+            if (item.expireDate < todayStr) {
+                expiredCount++;
+            } else {
+                activeCount++;
+            }
+        }
+    });
+    
+    const totalEl = document.getElementById('altPartTotalCount');
+    const activeEl = document.getElementById('altPartActiveCount');
+    const expiredEl = document.getElementById('altPartExpiredCount');
+    if (totalEl) totalEl.textContent = totalCount;
+    if (activeEl) activeEl.textContent = activeCount;
+    if (expiredEl) expiredEl.textContent = expiredCount;
+    
+    // Filter items
+    const filtered = alternateParts.filter(item => {
+        // Search text matching
+        const matchSearch = !searchVal || 
+            (item.partNumber && item.partNumber.toLowerCase().includes(searchVal)) ||
+            (item.altPartNumber && item.altPartNumber.toLowerCase().includes(searchVal)) ||
+            (item.aircraftEffective && item.aircraftEffective.toLowerCase().includes(searchVal)) ||
+            (item.referenceData && item.referenceData.toLowerCase().includes(searchVal)) ||
+            (item.insertDate && item.insertDate.toLowerCase().includes(searchVal));
+            
+        if (!matchSearch) return false;
+        
+        // Fleet matching
+        if (fleetFilter !== 'All') {
+            const eff = (item.aircraftEffective || '').toLowerCase();
+            if (!eff.includes(fleetFilter.toLowerCase()) && !eff.includes('all')) {
+                return false;
+            }
+        }
+        
+        // Status matching
+        const isNa = !item.expireDate || item.expireDate.toUpperCase() === 'N/A';
+        const isExpired = !isNa && item.expireDate < todayStr;
+        
+        if (statusFilter === 'Active' && isExpired) return false;
+        if (statusFilter === 'Expired' && !isExpired) return false;
+        if (statusFilter === 'NA' && !isNa) return false;
+        
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width: 32px; height: 32px; color: var(--text-muted); opacity: 0.7;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <span style="font-size: 0.95rem; font-weight: 500;">No alternate parts found matching criteria.</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    filtered.forEach(item => {
+        const isNa = !item.expireDate || item.expireDate.toUpperCase() === 'N/A';
+        const isExpired = !isNa && item.expireDate < todayStr;
+        
+        let expireHtml = '';
+        if (isNa) {
+            expireHtml = `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(100, 116, 139, 0.12); color: var(--text-secondary); border: 1px solid rgba(100, 116, 139, 0.2);">N/A (Permanent)</span>`;
+        } else if (isExpired) {
+            expireHtml = `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">${item.expireDate} <strong style="font-size: 0.7rem;">(Expired)</strong></span>`;
+        } else {
+            expireHtml = `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(34, 197, 94, 0.12); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.25);">${item.expireDate}</span>`;
+        }
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-family: monospace; font-size: 0.88rem; font-weight: 700; color: var(--text-primary);">${item.partNumber}</span>
+                    <button class="btn btn-secondary" onclick="copyAltPartText('${item.partNumber}', this)" style="padding: 2px 5px; min-height: auto; height: 22px; width: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--border-color);" title="Copy Part Number">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 11px; height: 11px;">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2" style="width: 13px; height: 13px; flex-shrink: 0;">
+                        <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                    </svg>
+                    <span style="font-family: monospace; font-size: 0.88rem; font-weight: 700; color: #7c3aed;">${item.altPartNumber}</span>
+                    <button class="btn btn-secondary" onclick="copyAltPartText('${item.altPartNumber}', this)" style="padding: 2px 5px; min-height: auto; height: 22px; width: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid var(--border-color);" title="Copy Alternate Part Number">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 11px; height: 11px;">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+            <td>
+                <span class="team-badge avionics" style="font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; display: inline-block;">${item.aircraftEffective || 'All Fleets'}</span>
+            </td>
+            <td>
+                <div style="font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; white-space: normal; max-width: 250px;">${item.referenceData || '-'}</div>
+            </td>
+            <td>
+                <span style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">${item.insertDate || '-'}</span>
+            </td>
+            <td>
+                ${expireHtml}
+            </td>
+            <td class="no-print" style="text-align: right;">
+                <div style="display: inline-flex; gap: 0.35rem; justify-content: flex-end;">
+                    <div class="action-icon" title="Edit Entry" onclick="editAlternatePartItem('${item.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </div>
+                    <div class="action-icon" title="Delete Entry" onclick="deleteAlternatePartItem('${item.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--priority-aog);">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </div>
+                </div>
+            </td>
+        `;
+        listContainer.appendChild(row);
+    });
+}
+
+function saveAlternatePartItem() {
+    const idEl = document.getElementById('altPartId');
+    const partNumEl = document.getElementById('altPartNumberMain');
+    const altPartNumEl = document.getElementById('altPartNumberAlt');
+    const fleetEl = document.getElementById('altPartAircraftEffective');
+    const refEl = document.getElementById('altPartReferenceData');
+    const insertDateEl = document.getElementById('altPartInsertDate');
+    const expireDateEl = document.getElementById('altPartExpireDate');
+    const expireNaEl = document.getElementById('altPartExpireNa');
+    
+    if (!partNumEl || !altPartNumEl || !fleetEl || !refEl || !insertDateEl) return;
+    
+    const partNumber = partNumEl.value.trim().toUpperCase();
+    const altPartNumber = altPartNumEl.value.trim().toUpperCase();
+    const aircraftEffective = fleetEl.value.trim();
+    const referenceData = refEl.value.trim();
+    const insertDate = insertDateEl.value.trim() || new Date().toISOString().split('T')[0];
+    
+    let expireDate = 'N/A';
+    if (expireNaEl && expireNaEl.checked) {
+        expireDate = 'N/A';
+    } else if (expireDateEl && expireDateEl.value.trim()) {
+        expireDate = expireDateEl.value.trim();
+    } else {
+        expireDate = 'N/A';
+    }
+    
+    if (!partNumber || !altPartNumber || !aircraftEffective || !referenceData) {
+        alert('Please fill out all required fields.');
+        return;
+    }
+    
+    const id = idEl && idEl.value ? idEl.value.trim() : '';
+    const isEdit = (id !== '');
+    
+    const newItem = {
+        id: isEdit ? id : 'alt_' + Date.now().toString(),
+        partNumber: partNumber,
+        altPartNumber: altPartNumber,
+        aircraftEffective: aircraftEffective,
+        referenceData: referenceData,
+        insertDate: insertDate,
+        expireDate: expireDate,
+        createdDate: isEdit ? (alternateParts.find(p => p.id === id)?.createdDate || insertDate) : insertDate
+    };
+    
+    finishSaveAlternatePartItem(newItem, isEdit);
+}
+
+function finishSaveAlternatePartItem(newItem, isEdit) {
+    if (isEdit) {
+        alternateParts = alternateParts.map(item => String(item.id) === String(newItem.id) ? newItem : item);
+    } else {
+        alternateParts.unshift(newItem);
+    }
+    
+    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+    
+    const isGas = typeof google !== 'undefined' && google.script && google.script.run;
+    const hasSupabase = typeof window.supabaseClient !== 'undefined' && window.supabaseClient !== null;
+    if (isGas || hasSupabase) {
+        if (isGas && typeof google.script.run.saveAlternatePart === 'function') {
+            google.script.run.saveAlternatePart(newItem);
+        }
+    }
+    
+    clearAlternatePartForm();
+    renderAlternatePartTab();
+}
+
+function editAlternatePartItem(id) {
+    const item = alternateParts.find(item => String(item.id) === String(id));
+    if (!item) return;
+    
+    document.getElementById('altPartId').value = item.id;
+    document.getElementById('altPartNumberMain').value = item.partNumber || '';
+    document.getElementById('altPartNumberAlt').value = item.altPartNumber || '';
+    document.getElementById('altPartAircraftEffective').value = item.aircraftEffective || '';
+    document.getElementById('altPartReferenceData').value = item.referenceData || '';
+    document.getElementById('altPartInsertDate').value = item.insertDate || '';
+    
+    const isNa = !item.expireDate || item.expireDate.toUpperCase() === 'N/A';
+    const expireNaEl = document.getElementById('altPartExpireNa');
+    const expireDateEl = document.getElementById('altPartExpireDate');
+    
+    if (expireNaEl) {
+        expireNaEl.checked = isNa;
+        toggleAltPartExpireNa(isNa);
+    }
+    if (!isNa && expireDateEl) {
+        expireDateEl.value = item.expireDate;
+    }
+    
+    const formTitle = document.getElementById('altPartFormTitle');
+    if (formTitle) formTitle.textContent = 'Edit Alternate Part';
+    const cancelBtn = document.getElementById('altPartCancelBtn');
+    if (cancelBtn) cancelBtn.style.display = 'block';
+}
+
+function deleteAlternatePartItem(id) {
+    const item = alternateParts.find(item => String(item.id) === String(id));
+    const title = item ? `${item.partNumber} ↔ ${item.altPartNumber}` : 'this entry';
+    
+    if (confirm(`Are you sure you want to permanently delete alternate part record: "${title}"?`)) {
+        alternateParts = alternateParts.filter(item => String(item.id) !== String(id));
+        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+        
+        const isGas = typeof google !== 'undefined' && google.script && google.script.run;
+        const hasSupabase = typeof window.supabaseClient !== 'undefined' && window.supabaseClient !== null;
+        if (isGas || hasSupabase) {
+            if (isGas && typeof google.script.run.deleteAlternatePart === 'function') {
+                google.script.run.deleteAlternatePart(id);
+            }
+        }
+        
+        if (String(document.getElementById('altPartId').value) === String(id)) {
+            clearAlternatePartForm();
+        }
+        
+        renderAlternatePartTab();
+    }
+}
+
+function clearAlternatePartForm() {
+    const form = document.getElementById('altPartForm');
+    if (form) form.reset();
+    
+    const idEl = document.getElementById('altPartId');
+    if (idEl) idEl.value = '';
+    
+    const titleEl = document.getElementById('altPartFormTitle');
+    if (titleEl) titleEl.textContent = 'Add Alternate Part';
+    
+    const cancelBtn = document.getElementById('altPartCancelBtn');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    
+    const insertDateEl = document.getElementById('altPartInsertDate');
+    if (insertDateEl) {
+        insertDateEl.value = new Date().toISOString().split('T')[0];
+    }
+    
+    const expireNaEl = document.getElementById('altPartExpireNa');
+    if (expireNaEl) {
+        expireNaEl.checked = false;
+        toggleAltPartExpireNa(false);
+    }
+}
+
+function copyAltPartText(text, btnElement) {
+    if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    } else {
+        navigator.clipboard.writeText(text);
+    }
+    
+    if (btnElement) {
+        const originalHtml = btnElement.innerHTML;
+        btnElement.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" style="width: 11px; height: 11px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        `;
+        setTimeout(() => {
+            btnElement.innerHTML = originalHtml;
+        }, 1200);
+    }
+}
+
+function exportAlternatePartsCsv() {
+    if (!alternateParts || alternateParts.length === 0) {
+        alert('No alternate parts to export.');
+        return;
+    }
+    
+    const headers = ['Part Number', 'Alternate Part Number', 'Aircraft Effective', 'Reference Data', 'Insert Date', 'Expire Date'];
+    const rows = alternateParts.map(item => [
+        `"${(item.partNumber || '').replace(/"/g, '""')}"`,
+        `"${(item.altPartNumber || '').replace(/"/g, '""')}"`,
+        `"${(item.aircraftEffective || '').replace(/"/g, '""')}"`,
+        `"${(item.referenceData || '').replace(/"/g, '""')}"`,
+        `"${(item.insertDate || '').replace(/"/g, '""')}"`,
+        `"${(item.expireDate || '').replace(/"/g, '""')}"`
+    ]);
+    
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `DM-A_Alternate_Parts_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Select file from FYI bulletin form (stages for upload on save)
@@ -16095,6 +16891,20 @@ window.renderRequestsTab = renderRequestsTab;
 window.approveRequestDirect = approveRequestDirect;
 window.rejectRequestDirect = rejectRequestDirect;
 window.editRequestDirect = editRequestDirect;
+
+// Alternate Parts window exports
+window.loadAlternateParts = loadAlternateParts;
+window.renderAlternatePartTab = renderAlternatePartTab;
+window.saveAlternatePartItem = saveAlternatePartItem;
+window.finishSaveAlternatePartItem = finishSaveAlternatePartItem;
+window.editAlternatePartItem = editAlternatePartItem;
+window.deleteAlternatePartItem = deleteAlternatePartItem;
+window.clearAlternatePartForm = clearAlternatePartForm;
+window.toggleAltPartExpireNa = toggleAltPartExpireNa;
+window.copyAltPartText = copyAltPartText;
+window.exportAlternatePartsCsv = exportAlternatePartsCsv;
+window.refreshAlternatePartsSilently = refreshAlternatePartsSilently;
+
 
 
 

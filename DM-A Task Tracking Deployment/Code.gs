@@ -195,6 +195,10 @@ function initSheet() {
   // 5. Get or Create SAPCodes Sheet
   const sapHeaders = ['id', 'description', 'sourceFile'];
   getOrCreateSheet(ss, 'SAPCodes', sapHeaders);
+
+  // 6. Get or Create AlternateParts Sheet
+  const altPartsHeaders = ['id', 'partNumber', 'altPartNumber', 'aircraftEffective', 'referenceData', 'insertDate', 'expireDate', 'createdDate'];
+  getOrCreateSheet(ss, 'AlternateParts', altPartsHeaders);
 }
 
 // Authenticate user against access code 'DMA'
@@ -666,6 +670,64 @@ function saveSAPCode(codeItem) {
 function deleteSAPCode(id) {
   initSheet();
   const sheet = getSpreadsheet().getSheetByName('SAPCodes');
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(id)) {
+      sheet.deleteRow(i + 1);
+      break;
+    }
+  }
+  return true;
+}
+
+// Alternate Parts CRUD
+function getAlternateParts() {
+  initSheet();
+  const sheet = getSpreadsheet().getSheetByName('AlternateParts');
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+  
+  const headers = data[0];
+  const list = [];
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const item = {};
+    headers.forEach((header, idx) => {
+      item[header] = row[idx];
+    });
+    list.push(item);
+  }
+  return list;
+}
+
+function saveAlternatePart(partItem) {
+  initSheet();
+  const sheet = getSpreadsheet().getSheetByName('AlternateParts');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const rowValues = headers.map(header => partItem[header] !== undefined && partItem[header] !== null ? String(partItem[header]) : '');
+  
+  // Check if item already exists (by id)
+  let existingRowIdx = -1;
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(partItem.id)) {
+      existingRowIdx = i + 1; // 1-indexed row number
+      break;
+    }
+  }
+  
+  if (existingRowIdx !== -1) {
+    sheet.getRange(existingRowIdx, 1, 1, rowValues.length).setValues([rowValues]);
+  } else {
+    sheet.appendRow(rowValues);
+  }
+  return true;
+}
+
+function deleteAlternatePart(id) {
+  initSheet();
+  const sheet = getSpreadsheet().getSheetByName('AlternateParts');
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(id)) {

@@ -36,6 +36,12 @@ if (fs.existsSync('THAI787.jpeg')) {
     stylesContent = stylesContent.replace(/url\(['"]?<!-- THAI787_BG_BASE64 -->['"]?\)/g, `url('${bgImageUrl}')`);
 }
 
+if (fs.existsSync('Thai_Airways_International_logo_PNG1.png')) {
+    const logoBase64 = fs.readFileSync('Thai_Airways_International_logo_PNG1.png').toString('base64');
+    const logoUrl = `data:image/png;base64,${logoBase64}`;
+    indexHtml = indexHtml.replace(/src=["']Thai_Airways_International_logo_PNG1\.png["']/g, `src="${logoUrl}"`);
+}
+
 // Inline script contents
 const tabsContent = fs.readFileSync('tabs.js', 'utf8');
 const manualIssuesContent = fs.readFileSync('manualIssues.js', 'utf8');

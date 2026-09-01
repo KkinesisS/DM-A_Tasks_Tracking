@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DMK BASE MAINTENANCE Logo Verification</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,800;1,900&family=Inter:wght@700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #031138; font-family: 'Inter', sans-serif; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; gap: 2rem; }
+  .card { background: #071744; border-radius: 16px; padding: 2.5rem; border: 1px solid #1e293b; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; width: 100%; max-width: 680px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  h2 { font-size: 1.1rem; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.1em; }
+  .img-wrap { width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #2563eb; }
+  .img-wrap img { width: 100%; display: block; }
+  .svg-box { background: #031138; padding: 2rem 2.5rem; border-radius: 12px; border: 1px solid #1e40af; width: 100%; display: flex; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Uploaded Reference Image</h2>
+  <div class="img-wrap">
+    <img src="dma_logo_official.jpg" alt="Official DM-A Logo">
+  </div>
+
+  <h2>Vector SVG Implementation</h2>
+  <div class="svg-box">
+    <svg width="440" height="130" viewBox="0 0 440 130" style="display: block; max-width: 100%;">
+      <defs>
+        <style>
+          .dma-main-text { font-family: 'Montserrat', 'Arial Black', sans-serif; font-style: italic; font-weight: 900; font-size: 64px; fill: #ffffff; letter-spacing: 1px; }
+          .dma-sub-text { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 12.5px; fill: #ffffff; letter-spacing: 4.5px; }
+        </style>
+      </defs>
+      
+      <!-- Horizontal Speedline cutting through text -->
+      <line x1="30" y1="41" x2="350" y2="41" stroke="#ffffff" stroke-width="2.5"/>
+      
+      <!-- DM-A Main Slanted Text -->
+      <text x="45" y="68" class="dma-main-text">DM-A</text>
+      
+      <!-- Airplane Silhouette flying right, sitting on the line -->
+      <g transform="translate(340, 31) scale(0.65)">
+        <!-- Tail fin -->
+        <path d="M -50,-24 L -36,-24 L -22,0 L -50,0 Z" fill="#ffffff"/>
+        <!-- Main Fuselage & Nose -->
+        <path d="M -40,-4 C -20,-4 20,-3 45,-1 C 55,0 62,3 65,5 C 60,7 50,8 35,8 L -45,8 C -52,8 -58,4 -58,-1 C -58,-3 -50,-4 -40,-4 Z" fill="#ffffff"/>
+        <!-- Main Wing -->
+        <path d="M -15,5 L 12,22 L 2,22 L -22,5 Z" fill="#ffffff"/>
+        <!-- Elevator Tail Wing -->
+        <path d="M -42,-1 L -32,-8 L -26,-8 L -36,-1 Z" fill="#ffffff"/>
+      </g>
+      
+      <!-- Subtitle Row: — DMK BASE MAINTENANCE — -->
+      <g transform="translate(220, 104)">
+        <line x1="-185" y1="-4" x2="-160" y2="-4" stroke="#ffffff" stroke-width="2"/>
+        <text x="0" y="0" text-anchor="middle" class="dma-sub-text">DMK BASE MAINTENANCE</text>
+        <line x1="160" y1="-4" x2="185" y2="-4" stroke="#ffffff" stroke-width="2"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+</body>
+</html>

@@ -71,15 +71,14 @@
 
         <!-- Header -->
         <header>
-            <div class="logo-section">
-                <!-- Premium Header Icon -->
-                <div class="header-icon-wrapper">
-                    <span class="header-dma-logo">DM-A</span>
+            <div class="logo-section" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="dma-brand-logo" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; user-select: none; transition: transform 0.2s ease, box-shadow 0.2s ease; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(3, 17, 56, 0.45); border: 1px solid rgba(255, 255, 255, 0.25);">
+                    <img src="dma_logo_official.jpg" alt="DM-A DMK Base Maintenance Logo" style="height: 52px; width: auto; object-fit: contain; display: block; border-radius: 9px;">
                 </div>
                 <div class="header-title-group">
-                    <h1>Task Tracking</h1>
-                    <div class="header-subtitle-row">
-                        <span class="header-badge-secondary">Production Engineer Supporting System</span>
+                    <h1 style="margin: 0; font-weight: 800; font-size: 1.65rem; color: var(--text-primary); line-height: 1.15; letter-spacing: -0.02em;">Task Tracking</h1>
+                    <div class="header-subtitle-row" style="margin-top: 3px;">
+                        <span class="header-badge-secondary" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">DMK Base Maintenance &nbsp;|&nbsp; Production Engineer Supporting System</span>
                     </div>
                 </div>
             </div>
@@ -233,6 +232,12 @@
                     <li class="tab-item" data-tab="sap" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
                         Material Catalog
+                    </li>
+                    <li class="tab-item" data-tab="alternatePart" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                        Alternate Parts
                     </li>
                     <li class="tab-item" data-tab="fyi" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -832,7 +837,9 @@
             <div class="print-only-summary-header">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 1rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; flex-wrap: nowrap; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 16px;">
-
+                        <div class="dma-brand-logo" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; user-select: none; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(3, 17, 56, 0.35); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <img src="dma_logo_official.jpg" alt="DM-A DMK Base Maintenance Logo" style="height: 44px; width: auto; object-fit: contain; display: block; border-radius: 7px;">
+                        </div>
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; justify-content: center;">
                             <div style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; text-transform: uppercase; line-height: 1.1;">Weekly Engineering Summary</div>
                             <div style="font-size: 0.8rem; font-weight: 700; color: #7c3aed; background: rgba(124, 58, 237, 0.06); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid rgba(124, 58, 237, 0.15); display: inline-block;">
@@ -1237,6 +1244,181 @@
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.6rem;">Save Part</button>
                         <button type="button" id="sapCancelBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.6rem; margin-top: 0.5rem; display: none;" onclick="clearSapForm()">Cancel Edit</button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Alternate Parts Tab -->
+        <section id="alternatePartTab" class="tab-content hidden">
+            <div class="sap-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 class="stats-header" style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #8b5cf6;">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                        Alternate Parts Management
+                    </h2>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Interchangeable and alternate aircraft part numbers, fleet effectivity, and engineering references</p>
+                </div>
+                <!-- Quick Summary Stats Badges -->
+                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.35rem 0.75rem; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                        <span style="color: var(--text-secondary); font-weight: 500;">Total:</span>
+                        <strong id="altPartTotalCount" style="color: var(--text-primary);">0</strong>
+                    </div>
+                    <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 8px; padding: 0.35rem 0.75rem; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                        <span style="color: #16a34a; font-weight: 600;">Active / Valid:</span>
+                        <strong id="altPartActiveCount" style="color: #16a34a;">0</strong>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 0.35rem 0.75rem; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                        <span style="color: #ef4444; font-weight: 600;">Expired:</span>
+                        <strong id="altPartExpiredCount" style="color: #ef4444;">0</strong>
+                    </div>
+                    <button class="btn btn-secondary" onclick="exportAlternatePartsCsv()" style="font-size: 0.82rem; padding: 0.35rem 0.75rem; height: 34px; min-height: auto; gap: 6px; display: inline-flex; align-items: center;" title="Export Alternate Parts to CSV">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; color: #15803d;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Area (Split Layout: List on Left, Form on Right) -->
+            <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start;">
+                
+                <!-- Left panel: Alternate Parts List -->
+                <div class="glass-panel" style="padding: 1.5rem; min-height: 450px; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.75rem;">
+                        <h3 style="font-size: 1.1rem; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: #8b5cf6;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                            Alternate Parts Database
+                        </h3>
+                        
+                        <!-- Search and Filters -->
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <!-- Fleet Filter -->
+                            <select id="altPartFleetFilter" onchange="renderAlternatePartTab()" style="padding: 0 1.5rem 0 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); outline: none; font-size: 0.82rem; height: 34px; cursor: pointer;">
+                                <option value="All">All Fleets</option>
+                                <option value="A320">A320</option>
+                                <option value="A330">A330</option>
+                                <option value="A350">A350</option>
+                                <option value="B777">B777</option>
+                                <option value="B787">B787</option>
+                            </select>
+
+                            <!-- Expiry Status Filter -->
+                            <select id="altPartStatusFilter" onchange="renderAlternatePartTab()" style="padding: 0 1.5rem 0 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); outline: none; font-size: 0.82rem; height: 34px; cursor: pointer;">
+                                <option value="All">All Status</option>
+                                <option value="Active">Active Only</option>
+                                <option value="NA">Permanent (N/A)</option>
+                                <option value="Expired">Expired</option>
+                            </select>
+
+                            <!-- Search Box -->
+                            <div class="search-box" style="margin: 0; width: 220px; max-width: 100%;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input id="altPartSearchInput" type="text" placeholder="Search Part, Alt Part, Ref...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper" style="overflow-x: auto; margin-top: 0.25rem;">
+                        <table class="mro-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 130px;">Part Number</th>
+                                    <th style="min-width: 130px;">Alternate Part No.</th>
+                                    <th style="min-width: 110px;">Aircraft Effective</th>
+                                    <th style="min-width: 140px;">Reference Data</th>
+                                    <th style="min-width: 100px;">Date Inserted</th>
+                                    <th style="min-width: 110px;">Expire Date</th>
+                                    <th class="no-print" style="text-align: right; width: 80px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="altPartTableBody">
+                                <!-- Alternate Part rows will insert here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right panel: Create / Edit Form (NO File Attachment!) -->
+                <div class="glass-panel" style="padding: 1.5rem;">
+                    <h3 id="altPartFormTitle" style="margin-bottom: 1.25rem; font-size: 1.1rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: #8b5cf6;">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Alternate Part
+                    </h3>
+                    <form id="altPartForm" onsubmit="event.preventDefault(); saveAlternatePartItem();">
+                        <input type="hidden" id="altPartId" />
+                        
+                        <!-- Part Number -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartNumberMain" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Part Number *</label>
+                            <input type="text" id="altPartNumberMain" required placeholder="e.g. 332A31-0020-00 or MS21042-3" style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: monospace, var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <!-- Alternate Part Number -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartNumberAlt" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Alternate Part Number *</label>
+                            <input type="text" id="altPartNumberAlt" required placeholder="e.g. 332A31-0020-01 or NAS1291-3" style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: monospace, var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <!-- Aircraft Effective -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartAircraftEffective" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Aircraft Effective *</label>
+                            <input type="text" id="altPartAircraftEffective" list="aircraftFleetSuggestions" required placeholder="e.g. A350, B787, All Fleets, or MSN / Tail" style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); box-sizing: border-box;" />
+                            <datalist id="aircraftFleetSuggestions">
+                                <option value="All Fleets"></option>
+                                <option value="A320"></option>
+                                <option value="A320-200"></option>
+                                <option value="A330-300"></option>
+                                <option value="A350-900"></option>
+                                <option value="B777-300ER"></option>
+                                <option value="B787-8"></option>
+                                <option value="B787-9"></option>
+                            </datalist>
+                        </div>
+
+                        <!-- Reference Data -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartReferenceData" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Reference Data *</label>
+                            <textarea id="altPartReferenceData" required placeholder="e.g. IPC 32-11-01 Fig 02, SB A350-32-0012, EO 2026-05, CMM 24-30-01..." style="width: 100%; min-height: 70px; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); resize: vertical; box-sizing: border-box;"></textarea>
+                        </div>
+
+                        <!-- Date (Refer to date that insert the data) -->
+                        <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+                            <label for="altPartInsertDate" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Date (Inserted Date) *</label>
+                            <input type="date" id="altPartInsertDate" required style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <!-- Expire Date (with N/A Selection) -->
+                        <div class="form-group" style="margin-bottom: 1.25rem; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                                <label for="altPartExpireDate" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Expire Date *</label>
+                                <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; color: #8b5cf6; font-weight: 600; cursor: pointer; user-select: none;">
+                                    <input type="checkbox" id="altPartExpireNa" onchange="toggleAltPartExpireNa(this.checked)" style="cursor: pointer;" />
+                                    <span>N/A (Permanent)</span>
+                                </label>
+                            </div>
+                            <input type="date" id="altPartExpireDate" required style="width: 100%; padding: 0.5rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; font-family: var(--font-body); box-sizing: border-box;" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.6rem; font-weight: 600; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">Save Alternate Part</button>
+                        <button type="button" id="altPartCancelBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.6rem; margin-top: 0.5rem; display: none;" onclick="clearAlternatePartForm()">Cancel Edit</button>
                     </form>
                 </div>
 
@@ -1972,7 +2154,9 @@
             <!-- Right panel: form input -->
             <div class="login-right-panel">
 
-                <h2 style="font-family: var(--font-heading); color: var(--text-primary); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; text-align: left;">DM-A</h2>
+                <div style="margin-bottom: 1rem; text-align: left;">
+                    <img src="dma_logo_official.jpg" alt="DM-A DMK Base Maintenance Logo" style="height: 56px; width: auto; object-fit: contain; display: block; border-radius: 9px; box-shadow: 0 4px 12px rgba(3, 17, 56, 0.4); border: 1px solid rgba(255, 255, 255, 0.25);">
+                </div>
                 <p style="font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-body); margin-bottom: 1.75rem; line-height: 1.5; text-align: left;">Production Engineer Task Management System</p>
                 
                 <div id="loginError" class="login-error-msg hidden" style="margin-bottom: 1.25rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.2); color: var(--priority-aog); font-size: 0.8rem; text-align: center;">
@@ -2427,11 +2611,63 @@
                 } catch(e) { this.failureHandler(e); }
             }
             
+            async getAlternateParts() {
+                try {
+                    if (!window.supabaseClient) { this.successHandler([]); return; }
+                    const { data, error } = await window.supabaseClient.from('alternate_parts').select('*');
+                    if (error) {
+                        console.warn('Supabase alternate_parts query warning:', error.message);
+                        this.successHandler(null);
+                        return;
+                    }
+                    this.successHandler(data);
+                } catch(e) { 
+                    console.warn('Supabase getAlternateParts fallback:', e);
+                    this.successHandler(null); 
+                }
+            }
+            
+            async saveAlternatePart(partItem) {
+                try {
+                    if (!window.supabaseClient) return;
+                    const { error } = await window.supabaseClient.from('alternate_parts').upsert(partItem);
+                    if (error) {
+                        console.warn('Supabase saveAlternatePart warning:', error.message);
+                        this.successHandler(false);
+                        return;
+                    }
+                    this.successHandler(true);
+                } catch(e) { 
+                    console.warn('Supabase saveAlternatePart error:', e);
+                    this.successHandler(false);
+                }
+            }
+            
+            async deleteAlternatePart(id) {
+                try {
+                    if (!window.supabaseClient) return;
+                    const { error } = await window.supabaseClient.from('alternate_parts').delete().eq('id', id);
+                    if (error) {
+                        console.warn('Supabase deleteAlternatePart warning:', error.message);
+                        this.successHandler(false);
+                        return;
+                    }
+                    this.successHandler(true);
+                } catch(e) { 
+                    console.warn('Supabase deleteAlternatePart error:', e);
+                    this.successHandler(false);
+                }
+            }
+            
             async getManualIssues() {
                 try {
                     if (!window.supabaseClient) { this.successHandler([]); return; }
                     const { data, error } = await window.supabaseClient.from('manual_issues').select('*');
-                    if (error) throw error;
+                    if (error) {
+                        console.warn('Supabase manual_issues query warning:', error.message);
+                        this.successHandler([]);
+                        return;
+                    }
                     const parsedData = (data || []).map(i => {
                         if (typeof i.aircraft === 'string') {
                             try { i.aircraft = JSON.parse(i.aircraft); } catch(e) { i.aircraft = []; }
@@ -2439,7 +2675,10 @@
                         return i;
                     });
                     this.successHandler(parsedData);
-                } catch(e) { this.failureHandler(e); }
+                } catch(e) { 
+                    console.warn('Supabase getManualIssues fallback:', e);
+                    this.successHandler([]); 
+                }
             }
             
             async saveAllManualIssues(issuesList) {
@@ -2455,10 +2694,17 @@
                             return copy;
                         });
                         const { error } = await window.supabaseClient.from('manual_issues').insert(payload);
-                        if (error) throw error;
+                        if (error) {
+                            console.warn('Supabase saveAllManualIssues warning:', error.message);
+                            this.successHandler(false);
+                            return;
+                        }
                     }
                     this.successHandler(true);
-                } catch(e) { this.failureHandler(e); }
+                } catch(e) { 
+                    console.warn('Supabase saveAllManualIssues error:', e);
+                    this.successHandler(false);
+                }
             }
             
             async getBlacklist() {
@@ -2526,6 +2772,9 @@
                                             getSAPCodes: () => s([]),
                                             saveSAPCode: () => s(true),
                                             deleteSAPCode: () => s(true),
+                                            getAlternateParts: () => s([]),
+                                            saveAlternatePart: () => s(true),
+                                            deleteAlternatePart: () => s(true),
                                             getManualIssues: () => s([]),
                                             saveAllManualIssues: () => s(true),
                                             getBlacklist: () => s([]),
