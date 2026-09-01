@@ -1,0 +1,186 @@
+﻿[
+    {
+        "LineNumber":  173,
+        "Line":  "    // Copy main logo to login logo dynamically to avoid duplicate base64 string"
+    },
+    {
+        "LineNumber":  175,
+        "Line":  "    const loginLogo = document.getElementById(\u0027loginCardLogo\u0027);"
+    },
+    {
+        "LineNumber":  176,
+        "Line":  "    if (mainLogo \u0026\u0026 loginLogo) {"
+    },
+    {
+        "LineNumber":  177,
+        "Line":  "        loginLogo.src = mainLogo.src;"
+    },
+    {
+        "LineNumber":  184,
+        "Line":  "    // Bind login form submit"
+    },
+    {
+        "LineNumber":  185,
+        "Line":  "    document.getElementById(\u0027loginSubmitBtn\u0027)?.addEventListener(\u0027click\u0027, handleLogin);"
+    },
+    {
+        "LineNumber":  187,
+        "Line":  "    // Enter key support for login form"
+    },
+    {
+        "LineNumber":  188,
+        "Line":  "    const triggerLoginOnEnter = (e) =\u003e {"
+    },
+    {
+        "LineNumber":  190,
+        "Line":  "            handleLogin();"
+    },
+    {
+        "LineNumber":  193,
+        "Line":  "    document.getElementById(\u0027loginCode\u0027)?.addEventListener(\u0027keydown\u0027, triggerLoginOnEnter);"
+    },
+    {
+        "LineNumber":  194,
+        "Line":  "    document.getElementById(\u0027loginName\u0027)?.addEventListener(\u0027keydown\u0027, triggerLoginOnEnter);"
+    },
+    {
+        "LineNumber":  215,
+        "Line":  "        document.getElementById(\u0027loginOverlay\u0027).style.display = \u0027none\u0027;"
+    },
+    {
+        "LineNumber":  228,
+        "Line":  "        document.getElementById(\u0027loginOverlay\u0027).style.display = \u0027flex\u0027;"
+    },
+    {
+        "LineNumber":  233,
+        "Line":  "// Handle login submission"
+    },
+    {
+        "LineNumber":  234,
+        "Line":  "function handleLogin() {"
+    },
+    {
+        "LineNumber":  235,
+        "Line":  "    const nameEl = document.getElementById(\u0027loginName\u0027);"
+    },
+    {
+        "LineNumber":  236,
+        "Line":  "    const codeEl = document.getElementById(\u0027loginCode\u0027);"
+    },
+    {
+        "LineNumber":  237,
+        "Line":  "    const rememberMeEl = document.getElementById(\u0027loginRememberMe\u0027);"
+    },
+    {
+        "LineNumber":  238,
+        "Line":  "    const errorEl = document.getElementById(\u0027loginError\u0027);"
+    },
+    {
+        "LineNumber":  239,
+        "Line":  "    const btnTextEl = document.getElementById(\u0027loginBtnText\u0027);"
+    },
+    {
+        "LineNumber":  240,
+        "Line":  "    const spinnerEl = document.getElementById(\u0027loginSpinner\u0027);"
+    },
+    {
+        "LineNumber":  248,
+        "Line":  "        showLoginError(\u0027Please enter your name.\u0027);"
+    },
+    {
+        "LineNumber":  253,
+        "Line":  "        showLoginError(\u0027Please enter access code.\u0027);"
+    },
+    {
+        "LineNumber":  284,
+        "Line":  "                    document.getElementById(\u0027loginOverlay\u0027).style.display = \u0027none\u0027;"
+    },
+    {
+        "LineNumber":  289,
+        "Line":  "                    showLoginError(authResult.message || \u0027Invalid access code.\u0027);"
+    },
+    {
+        "LineNumber":  295,
+        "Line":  "                showLoginError(\u0027Connection error: \u0027 + err.message);"
+    },
+    {
+        "LineNumber":  320,
+        "Line":  "                document.getElementById(\u0027loginOverlay\u0027).style.display = \u0027none\u0027;"
+    },
+    {
+        "LineNumber":  325,
+        "Line":  "                showLoginError(\u0027Invalid access code.\u0027);"
+    },
+    {
+        "LineNumber":  331,
+        "Line":  "// Show login error messages"
+    },
+    {
+        "LineNumber":  332,
+        "Line":  "function showLoginError(msg) {"
+    },
+    {
+        "LineNumber":  333,
+        "Line":  "    const errorEl = document.getElementById(\u0027loginError\u0027);"
+    },
+    {
+        "LineNumber":  2507,
+        "Line":  "            // Restore default taskModal z-index and show login card"
+    },
+    {
+        "LineNumber":  2511,
+        "Line":  "            const loginCard = document.getElementById(\u0027loginCard\u0027);"
+    },
+    {
+        "LineNumber":  2512,
+        "Line":  "            if (loginCard) loginCard.style.display = \u0027\u0027;"
+    },
+    {
+        "LineNumber":  2520,
+        "Line":  "    // Hide the login card box, but keep the blurred background active"
+    },
+    {
+        "LineNumber":  2521,
+        "Line":  "    const loginCard = document.getElementById(\u0027loginCard\u0027);"
+    },
+    {
+        "LineNumber":  2522,
+        "Line":  "    if (loginCard) loginCard.style.display = \u0027none\u0027;"
+    },
+    {
+        "LineNumber":  2524,
+        "Line":  "    // Elevate taskModal z-index to show on top of loginOverlay (which is z-index: 99999)"
+    },
+    {
+        "LineNumber":  2533,
+        "Line":  "    // Hide login card box"
+    },
+    {
+        "LineNumber":  2534,
+        "Line":  "    const loginCard = document.getElementById(\u0027loginCard\u0027);"
+    },
+    {
+        "LineNumber":  2535,
+        "Line":  "    if (loginCard) loginCard.style.display = \u0027none\u0027;"
+    },
+    {
+        "LineNumber":  2558,
+        "Line":  "    // Show login card box"
+    },
+    {
+        "LineNumber":  2559,
+        "Line":  "    const loginCard = document.getElementById(\u0027loginCard\u0027);"
+    },
+    {
+        "LineNumber":  2560,
+        "Line":  "    if (loginCard) loginCard.style.display = \u0027\u0027;"
+    },
+    {
+        "LineNumber":  6769,
+        "Line":  "window.handleLogin = handleLogin;"
+    },
+    {
+        "LineNumber":  7417,
+        "Line":  "            : \"Requests submitted by other departments via the login page will appear here for verification and team assignment.\";"
+    }
+]
