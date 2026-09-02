@@ -7379,9 +7379,215 @@ html.dark-mode .dma-brand-logo-img {
                     </svg>
                     Track Request
                 </button>
+                <button type="button" onclick="openMobileDashboard()" class="btn btn-secondary" style="width: 100%; padding: 0.75rem; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; border: 1.5px solid rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.08); color: #6366f1; cursor: pointer; transition: var(--transition); margin-top: 0.75rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                    Mobile Overview Dashboard
+                </button>
                 <p style="text-align: center; margin-top: 1.25rem; font-size: 0.7rem; color: var(--text-muted);">
                     Authorized Personnel and Internal Use Only
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Overview Dashboard Overlay (Read-Only) -->
+    <div id="mobileDashboardOverlay" class="login-overlay" style="display: none; background: var(--bg-body); overflow-y: auto; z-index: 999999; padding: 1rem 0;">
+        <div style="max-width: 900px; width: 92%; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; gap: 1rem;">
+            
+            <!-- Mobile Header Bar -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #6366f1;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 22px; height: 22px;">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                            DM-A Mobile Overview
+                            <span style="font-size: 0.68rem; background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); padding: 2px 8px; border-radius: 20px; font-weight: 600;">LIVE</span>
+                        </h2>
+                        <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: var(--text-secondary);">Read-Only Task Tracking Dashboard</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" onclick="closeMobileDashboard()" class="btn btn-primary" style="padding: 0.55rem 1rem; font-size: 0.82rem; font-weight: 600; border-radius: 10px; background: #4f46e5; color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 15px; height: 15px;">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Sign In / Staff Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overview Metrics Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                <div onclick="setMobileStatusFilter('All')" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.85rem 1rem; text-align: center; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                    <div id="mobTotalTasks" style="font-size: 1.6rem; font-weight: 800; color: #6366f1;">0</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">Total Tasks</div>
+                </div>
+                <div onclick="setMobileStatusFilter('In Progress')" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.85rem 1rem; text-align: center; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                    <div id="mobInProgressTasks" style="font-size: 1.6rem; font-weight: 800; color: #3b82f6;">0</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">In Progress</div>
+                </div>
+                <div onclick="setMobileStatusFilter('RTS')" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.85rem 1rem; text-align: center; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                    <div id="mobRtsTasks" style="font-size: 1.6rem; font-weight: 800; color: #22c55e;">0</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">RTS Completed</div>
+                </div>
+                <div onclick="setMobileStatusFilter('AOG')" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.85rem 1rem; text-align: center; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                    <div id="mobAogTasks" style="font-size: 1.6rem; font-weight: 800; color: #ef4444;">0</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px;">AOG / Urgent</div>
+                </div>
+            </div>
+
+            <!-- Team Workload Overview -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.25rem;">
+                <h3 style="margin: 0 0 0.75rem 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px; color: #6366f1;">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Team Workload Breakdown
+                </h3>
+                <div id="mobTeamWorkloadContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Read-Only Task Feed Section -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.25rem; flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 0.85rem;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: #3b82f6;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="9" x2="15" y2="9"></line>
+                                <line x1="9" y1="13" x2="15" y2="13"></line>
+                                <line x1="9" y1="17" x2="13" y2="17"></line>
+                            </svg>
+                            Active Tasks Overview
+                        </h3>
+                        <p style="margin: 2px 0 0 0; font-size: 0.72rem; color: var(--text-secondary);">Tap any task to view full read-only details</p>
+                    </div>
+
+                    <!-- Read-Only Info Tag -->
+                    <span style="font-size: 0.7rem; background: rgba(148, 163, 184, 0.12); color: var(--text-secondary); border: 1px solid rgba(148, 163, 184, 0.25); padding: 3px 10px; border-radius: 6px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Read-Only View
+                    </span>
+                </div>
+
+                <!-- Filters Bar -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 1rem;">
+                    <input type="text" id="mobTaskSearchInput" oninput="renderMobileDashboardTasks()" placeholder="Search Reg, Task, ATA..." style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; box-sizing: border-box;" />
+                    <select id="mobTeamFilterSelect" onchange="renderMobileDashboardTasks()" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; box-sizing: border-box;">
+                        <option value="All" style="background: var(--bg-card); color: var(--text-primary);">All Teams</option>
+                        <option value="Mechanical System Team" style="background: var(--bg-card); color: var(--text-primary);">Mechanical</option>
+                        <option value="Avionics System Team" style="background: var(--bg-card); color: var(--text-primary);">Avionics</option>
+                        <option value="Cabin & Safety System Team" style="background: var(--bg-card); color: var(--text-primary);">Cabin & Safety</option>
+                        <option value="Structure & Composite Team" style="background: var(--bg-card); color: var(--text-primary);">Structure</option>
+                    </select>
+                    <select id="mobStatusFilterSelect" onchange="renderMobileDashboardTasks()" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; box-sizing: border-box;">
+                        <option value="All" style="background: var(--bg-card); color: var(--text-primary);">All Statuses</option>
+                        <option value="Open" style="background: var(--bg-card); color: var(--text-primary);">Open</option>
+                        <option value="In Progress" style="background: var(--bg-card); color: var(--text-primary);">In Progress</option>
+                        <option value="RTS" style="background: var(--bg-card); color: var(--text-primary);">RTS / Completed</option>
+                        <option value="AOG" style="background: var(--bg-card); color: var(--text-primary);">AOG / Urgent</option>
+                    </select>
+                </div>
+
+                <!-- Mobile Task Cards List -->
+                <div id="mobTaskListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 550px; overflow-y: auto; padding-right: 2px;">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="text-align: center; padding: 0.5rem 0 1.5rem 0; font-size: 0.72rem; color: var(--text-secondary);">
+                DM-A Production Engineer Task Tracking • Mobile Read-Only View
+            </div>
+        </div>
+    </div>
+
+    <!-- Read-Only Task Details Modal for Mobile Overview -->
+    <div id="mobileTaskDetailsModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 1000000;">
+        <div class="modal-content" style="max-width: 580px; width: 92%; margin: 1rem auto; max-height: 85vh; overflow-y: auto; border-radius: 16px; border: 1px solid var(--border-color);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color);">
+                <h2 style="margin: 0; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <span id="mobModalRegBadge" style="font-size: 0.82rem; padding: 2px 8px; border-radius: 6px; background: rgba(99,102,241,0.15); color: #6366f1; font-weight: 700;">HS-TBA</span>
+                    Task Details
+                </h2>
+                <button class="modal-close" onclick="closeMobileTaskDetailsModal()" style="background: none; border: none; cursor: pointer; color: var(--text-secondary);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div id="mobileTaskDetailsBody" class="modal-body" style="padding: 1.25rem;">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="modal-footer" style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Read-Only Mode
+                </span>
+                <button type="button" class="btn btn-secondary" onclick="closeMobileTaskDetailsModal()" style="padding: 0.45rem 1rem; font-size: 0.82rem;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Access Code Modal -->
+    <div id="mobileAuthModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 1000005;">
+        <div class="modal-content" style="max-width: 420px; width: 90%; margin: 1.5rem auto; border-radius: 16px; position: relative;">
+            <div class="modal-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-primary);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" style="width: 18px; height: 18px;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Mobile Dashboard Access
+                </h2>
+                <button class="modal-close" onclick="closeMobileAuthModal()" style="background: none; border: none; cursor: pointer; color: var(--text-secondary);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem;">
+                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.4;">
+                    Please enter the system access code (same passcode used for staff login) to view the Mobile Dashboard Overview.
+                </p>
+
+                <div id="mobileAuthError" class="hidden" style="margin-bottom: 1rem; padding: 0.65rem 0.85rem; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-size: 0.8rem; text-align: center; font-weight: 600;">
+                    Invalid access code. Please try again.
+                </div>
+
+                <form onsubmit="event.preventDefault(); submitMobileAuth();">
+                    <div style="margin-bottom: 1.25rem;">
+                        <label for="mobileAuthPasscode" style="display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Access Code</label>
+                        <input type="password" id="mobileAuthPasscode" placeholder="Enter Access Code" required style="width: 100%; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.9rem; outline: none; box-sizing: border-box;" />
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="closeMobileAuthModal()" style="padding: 0.55rem 1rem; font-size: 0.85rem;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.2rem; font-size: 0.85rem; font-weight: 600; background: #4f46e5; border: none; border-radius: 8px; color: #ffffff; cursor: pointer;">Unlock Overview</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -7780,7 +7986,17 @@ html.dark-mode .dma-brand-logo-img {
                         this.successHandler(null);
                         return;
                     }
-                    this.successHandler(data);
+                    const normalized = (data || []).map(item => ({
+                        id: String(item.id),
+                        partNumber: item.partNumber || item.part_number || '',
+                        altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                        aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                        referenceData: item.referenceData || item.reference_data || '',
+                        insertDate: item.insertDate || item.insert_date || '',
+                        expireDate: item.expireDate || item.expire_date || 'N/A',
+                        createdDate: item.createdDate || item.created_date || ''
+                    }));
+                    this.successHandler(normalized);
                 } catch(e) { 
                     console.warn('Supabase getAlternateParts fallback:', e);
                     this.successHandler(null); 
@@ -7790,11 +8006,34 @@ html.dark-mode .dma-brand-logo-img {
             async saveAlternatePart(partItem) {
                 try {
                     if (!window.supabaseClient) return;
-                    const { error } = await window.supabaseClient.from('alternate_parts').upsert(partItem);
+                    const snakePayload = {
+                        id: String(partItem.id),
+                        part_number: partItem.partNumber || partItem.part_number || '',
+                        alt_part_number: partItem.altPartNumber || partItem.alt_part_number || '',
+                        aircraft_effective: partItem.aircraftEffective || partItem.aircraft_effective || '',
+                        reference_data: partItem.referenceData || partItem.reference_data || '',
+                        insert_date: partItem.insertDate || partItem.insert_date || '',
+                        expire_date: partItem.expireDate || partItem.expire_date || 'N/A',
+                        created_date: partItem.createdDate || partItem.created_date || ''
+                    };
+                    let { error } = await window.supabaseClient.from('alternate_parts').upsert(snakePayload);
                     if (error) {
-                        console.warn('Supabase saveAlternatePart warning:', error.message);
-                        this.successHandler(false);
-                        return;
+                        const camelPayload = {
+                            id: String(partItem.id),
+                            partNumber: partItem.partNumber || partItem.part_number || '',
+                            altPartNumber: partItem.altPartNumber || partItem.alt_part_number || '',
+                            aircraftEffective: partItem.aircraftEffective || partItem.aircraft_effective || '',
+                            referenceData: partItem.referenceData || partItem.reference_data || '',
+                            insertDate: partItem.insertDate || partItem.insert_date || '',
+                            expireDate: partItem.expireDate || partItem.expire_date || 'N/A',
+                            createdDate: partItem.createdDate || partItem.created_date || ''
+                        };
+                        const res2 = await window.supabaseClient.from('alternate_parts').upsert(camelPayload);
+                        if (res2.error) {
+                            console.warn('Supabase saveAlternatePart warning:', res2.error.message);
+                            this.successHandler(false);
+                            return;
+                        }
                     }
                     this.successHandler(true);
                 } catch(e) { 
@@ -9337,19 +9576,28 @@ function refreshAlternatePartsSilently() {
                 const localData = localStorage.getItem('mro_alternate_parts');
                 if (data && Array.isArray(data)) {
                     if (data.length > 0) {
-                        alternateParts = data;
+                        alternateParts = data.map(item => ({
+                            id: String(item.id),
+                            partNumber: item.partNumber || item.part_number || '',
+                            altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                            aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                            referenceData: item.referenceData || item.reference_data || '',
+                            insertDate: item.insertDate || item.insert_date || '',
+                            expireDate: item.expireDate || item.expire_date || 'N/A',
+                            createdDate: item.createdDate || item.created_date || ''
+                        }));
                         localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
-                            renderAlternatePartTab();
-                        }
+                        renderAlternatePartTab();
                     } else if (data.length === 0 && (!localData || localData === 'null' || localData === 'undefined')) {
                         alternateParts = typeof DEMO_ALTERNATE_PARTS !== 'undefined' ? [...DEMO_ALTERNATE_PARTS] : [];
                         localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
                         if (typeof google.script.run.saveAlternatePart === 'function') {
                             alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
                         }
-                        if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
-                            renderAlternatePartTab();
+                        renderAlternatePartTab();
+                    } else if (data.length === 0 && alternateParts.length > 0) {
+                        if (typeof google.script.run.saveAlternatePart === 'function') {
+                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
                         }
                     }
                 }
@@ -15344,10 +15592,7 @@ function loadAlternateParts() {
     if (localData && localData !== 'null' && localData !== 'undefined') {
         try {
             alternateParts = JSON.parse(localData);
-            if (Array.isArray(alternateParts)) {
-                if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
-                    renderAlternatePartTab();
-                }
+            if (Array.isArray(alternateParts) && alternateParts.length > 0) {
                 loaded = true;
             }
         } catch(e) {
@@ -15360,14 +15605,29 @@ function loadAlternateParts() {
         localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
     }
 
+    renderAlternatePartTab();
+
     if (isGas && typeof google.script.run.getAlternateParts === 'function') {
         google.script.run
             .withSuccessHandler(data => {
                 if (data && Array.isArray(data)) {
-                    alternateParts = data;
-                    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                    if (document.getElementById('alternatePartTab') && !document.getElementById('alternatePartTab').classList.contains('hidden')) {
+                    if (data.length > 0) {
+                        alternateParts = data.map(item => ({
+                            id: String(item.id),
+                            partNumber: item.partNumber || item.part_number || '',
+                            altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                            aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                            referenceData: item.referenceData || item.reference_data || '',
+                            insertDate: item.insertDate || item.insert_date || '',
+                            expireDate: item.expireDate || item.expire_date || 'N/A',
+                            createdDate: item.createdDate || item.created_date || ''
+                        }));
+                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
                         renderAlternatePartTab();
+                    } else if (data.length === 0 && alternateParts.length > 0) {
+                        if (typeof google.script.run.saveAlternatePart === 'function') {
+                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
+                        }
                     }
                 }
             })
@@ -15611,12 +15871,8 @@ function finishSaveAlternatePartItem(newItem, isEdit) {
     
     localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
     
-    const isGas = typeof google !== 'undefined' && google.script && google.script.run;
-    const hasSupabase = typeof window.supabaseClient !== 'undefined' && window.supabaseClient !== null;
-    if (isGas || hasSupabase) {
-        if (isGas && typeof google.script.run.saveAlternatePart === 'function') {
-            google.script.run.saveAlternatePart(newItem);
-        }
+    if (typeof google !== 'undefined' && google.script && google.script.run && typeof google.script.run.saveAlternatePart === 'function') {
+        google.script.run.saveAlternatePart(newItem);
     }
     
     clearAlternatePartForm();
@@ -16906,6 +17162,348 @@ window.toggleAltPartExpireNa = toggleAltPartExpireNa;
 window.copyAltPartText = copyAltPartText;
 window.exportAlternatePartsCsv = exportAlternatePartsCsv;
 window.refreshAlternatePartsSilently = refreshAlternatePartsSilently;
+
+// ==========================================
+// Mobile Overview Dashboard (Read-Only)
+// ==========================================
+
+function openMobileDashboard() {
+    const isAuth = sessionStorage.getItem('mro_authenticated') === 'true' || localStorage.getItem('mro_authenticated') === 'true';
+    if (isAuth) {
+        const loginOverlay = document.getElementById('loginOverlay');
+        if (loginOverlay) loginOverlay.style.display = 'none';
+        
+        const mobOverlay = document.getElementById('mobileDashboardOverlay');
+        if (mobOverlay) {
+            mobOverlay.style.display = 'flex';
+            mobOverlay.style.opacity = '1';
+            mobOverlay.style.pointerEvents = 'auto';
+            mobOverlay.classList.add('active');
+            renderMobileDashboard();
+        }
+    } else {
+        openMobileAuthModal();
+    }
+}
+
+function openMobileAuthModal() {
+    const modal = document.getElementById('mobileAuthModal');
+    const input = document.getElementById('mobileAuthPasscode');
+    const err = document.getElementById('mobileAuthError');
+    
+    if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 150);
+    }
+    if (err) err.classList.add('hidden');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+        modal.classList.add('active');
+    }
+}
+
+function closeMobileAuthModal() {
+    const modal = document.getElementById('mobileAuthModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.pointerEvents = 'none';
+        modal.classList.remove('active');
+    }
+}
+
+function submitMobileAuth() {
+    const input = document.getElementById('mobileAuthPasscode');
+    const err = document.getElementById('mobileAuthError');
+    if (!input) return;
+
+    const passcode = input.value.trim();
+    if (!passcode) {
+        if (err) {
+            err.textContent = 'Please enter access code.';
+            err.classList.remove('hidden');
+        }
+        return;
+    }
+
+    const isGas = typeof google !== 'undefined' && google.script && google.script.run;
+    if (isGas) {
+        google.script.run
+            .withSuccessHandler((authResult) => {
+                if (authResult.success) {
+                    closeMobileAuthModal();
+                    const loginOverlay = document.getElementById('loginOverlay');
+                    if (loginOverlay) loginOverlay.style.display = 'none';
+                    
+                    const mobOverlay = document.getElementById('mobileDashboardOverlay');
+                    if (mobOverlay) {
+                        mobOverlay.style.display = 'flex';
+                        mobOverlay.style.opacity = '1';
+                        mobOverlay.style.pointerEvents = 'auto';
+                        mobOverlay.classList.add('active');
+                        renderMobileDashboard();
+                    }
+                } else {
+                    if (err) {
+                        err.textContent = 'Invalid access code. Please use the correct password.';
+                        err.classList.remove('hidden');
+                    }
+                }
+            })
+            .withFailureHandler((errObj) => {
+                if (err) {
+                    err.textContent = 'Connection error: ' + errObj.message;
+                    err.classList.remove('hidden');
+                }
+            })
+            .authenticateUser(passcode);
+    } else {
+        if (passcode.toUpperCase() === 'DMA') {
+            closeMobileAuthModal();
+            const loginOverlay = document.getElementById('loginOverlay');
+            if (loginOverlay) loginOverlay.style.display = 'none';
+            
+            const mobOverlay = document.getElementById('mobileDashboardOverlay');
+            if (mobOverlay) {
+                mobOverlay.style.display = 'flex';
+                mobOverlay.style.opacity = '1';
+                mobOverlay.style.pointerEvents = 'auto';
+                mobOverlay.classList.add('active');
+                renderMobileDashboard();
+            }
+        } else {
+            if (err) {
+                err.textContent = 'Invalid access code. Please use the correct password.';
+                err.classList.remove('hidden');
+            }
+        }
+    }
+}
+
+function closeMobileDashboard() {
+    const mobOverlay = document.getElementById('mobileDashboardOverlay');
+    if (mobOverlay) mobOverlay.style.display = 'none';
+    
+    const loginOverlay = document.getElementById('loginOverlay');
+    if (loginOverlay) loginOverlay.style.display = 'flex';
+}
+
+function renderMobileDashboard() {
+    if (!tasks || !Array.isArray(tasks)) return;
+
+    // 1. Calculate overall metrics
+    const totalCount = tasks.length;
+    const inProgressCount = tasks.filter(t => t.currentStatus === 'In Progress' || t.currentStatus === 'Open').length;
+    const rtsCount = tasks.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed').length;
+    const aogCount = tasks.filter(t => t.priorityLevel === 'AOG' || t.priorityLevel === 'High').length;
+
+    const mobTotalEl = document.getElementById('mobTotalTasks');
+    const mobInProgressEl = document.getElementById('mobInProgressTasks');
+    const mobRtsEl = document.getElementById('mobRtsTasks');
+    const mobAogEl = document.getElementById('mobAogTasks');
+
+    if (mobTotalEl) mobTotalEl.textContent = totalCount;
+    if (mobInProgressEl) mobInProgressEl.textContent = inProgressCount;
+    if (mobRtsEl) mobRtsEl.textContent = rtsCount;
+    if (mobAogEl) mobAogEl.textContent = aogCount;
+
+    // 2. Render Team Workload Breakdown
+    const teamWorkloadContainer = document.getElementById('mobTeamWorkloadContainer');
+    if (teamWorkloadContainer) {
+        const teamsList = [
+            { name: 'Mechanical System Team', color: '#3b82f6' },
+            { name: 'Avionics System Team', color: '#8b5cf6' },
+            { name: 'Cabin & Safety System Team', color: '#ec4899' },
+            { name: 'Structure & Composite Team', color: '#f59e0b' }
+        ];
+
+        teamWorkloadContainer.innerHTML = teamsList.map(tm => {
+            const teamTasks = tasks.filter(t => (t.assignedTeam || '').includes(tm.name));
+            const count = teamTasks.length;
+            const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+            
+            return `
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-primary, #ffffff); font-weight: 600;">
+                        <span>${tm.name.replace(' System Team', '').replace(' & Composite Team', '')}</span>
+                        <span>${count} tasks (${pct}%)</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${pct}%; height: 100%; background: ${tm.color}; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 3. Render active tasks list
+    renderMobileDashboardTasks();
+}
+
+function setMobileStatusFilter(status) {
+    const statusSelect = document.getElementById('mobStatusFilterSelect');
+    if (statusSelect) {
+        statusSelect.value = status;
+        renderMobileDashboardTasks();
+    }
+}
+
+function renderMobileDashboardTasks() {
+    const listContainer = document.getElementById('mobTaskListContainer');
+    if (!listContainer) return;
+
+    const searchVal = (document.getElementById('mobTaskSearchInput')?.value || '').trim().toLowerCase();
+    const teamVal = document.getElementById('mobTeamFilterSelect')?.value || 'All';
+    const statusVal = document.getElementById('mobStatusFilterSelect')?.value || 'All';
+
+    let filtered = tasks;
+
+    if (teamVal !== 'All') {
+        filtered = filtered.filter(t => (t.assignedTeam || '').includes(teamVal));
+    }
+
+    if (statusVal !== 'All') {
+        if (statusVal === 'RTS') {
+            filtered = filtered.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed');
+        } else if (statusVal === 'AOG') {
+            filtered = filtered.filter(t => t.priorityLevel === 'AOG');
+        } else {
+            filtered = filtered.filter(t => (t.currentStatus || 'Open') === statusVal);
+        }
+    }
+
+    if (searchVal) {
+        filtered = filtered.filter(t => 
+            (t.aircraftReg && t.aircraftReg.toLowerCase().includes(searchVal)) ||
+            (t.taskDescription && t.taskDescription.toLowerCase().includes(searchVal)) ||
+            (t.ataChapter && t.ataChapter.toLowerCase().includes(searchVal)) ||
+            (t.assignedTeam && t.assignedTeam.toLowerCase().includes(searchVal)) ||
+            (t.topic && t.topic.toLowerCase().includes(searchVal))
+        );
+    }
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `
+            <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-secondary); font-size: 0.85rem; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color);">
+                No matching active tasks found.
+            </div>
+        `;
+        return;
+    }
+
+    listContainer.innerHTML = filtered.map(t => {
+        const priorityColor = t.priorityLevel === 'AOG' ? '#ef4444' : t.priorityLevel === 'High' ? '#f59e0b' : t.priorityLevel === 'Medium' ? '#3b82f6' : '#10b981';
+        const statusColor = (t.currentStatus === 'RTS' || t.currentStatus === 'Completed') ? '#22c55e' : (t.currentStatus === 'In Progress') ? '#3b82f6' : '#8b5cf6';
+        
+        return `
+            <div onclick="viewMobileTaskReadOnly('${t.id}')" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem 1rem; cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.03);" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='var(--border-color)'">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); font-family: monospace;">${t.aircraftReg || 'N/A'}</span>
+                        <span style="font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: rgba(99, 102, 241, 0.1); color: var(--text-primary); border: 1px solid rgba(99, 102, 241, 0.2);">${t.aircraftType || 'Aircraft'}</span>
+                    </div>
+                    <span style="font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: ${priorityColor}18; color: ${priorityColor}; border: 1px solid ${priorityColor}33;">
+                        ${t.priorityLevel || 'NORMAL'}
+                    </span>
+                </div>
+
+                <div style="font-size: 0.84rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.35;">
+                    ${t.topic || t.taskDescription || 'Maintenance Task'}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; color: var(--text-secondary); margin-top: 6px;">
+                    <span>ATA ${t.ataChapter || 'General'} • RTS: ${t.rtsDate || 'TBD'}</span>
+                    <span style="font-weight: 600; color: ${statusColor};">${t.currentStatus || 'Open'}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function viewMobileTaskReadOnly(taskId) {
+    const task = tasks.find(t => String(t.id) === String(taskId));
+    if (!task) return;
+
+    const modal = document.getElementById('mobileTaskDetailsModal');
+    const regBadge = document.getElementById('mobModalRegBadge');
+    const body = document.getElementById('mobileTaskDetailsBody');
+
+    if (regBadge) regBadge.textContent = `${task.aircraftReg || 'N/A'} (${task.aircraftType || 'AC'})`;
+    
+    if (body) {
+        const priorityColor = task.priorityLevel === 'AOG' ? '#ef4444' : task.priorityLevel === 'High' ? '#f59e0b' : task.priorityLevel === 'Medium' ? '#3b82f6' : '#10b981';
+
+        body.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 12px; font-family: var(--font-body);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.78rem; font-weight: 700; color: ${priorityColor}; background: ${priorityColor}18; border: 1px solid ${priorityColor}33; padding: 3px 10px; border-radius: 6px;">
+                        Priority: ${task.priorityLevel || 'Normal'}
+                    </span>
+                    <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Status: ${task.currentStatus || 'Open'}</span>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 2px;">Topic / Summary</label>
+                    <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">${task.topic || task.taskDescription || '-'}</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); display: block;">Assigned Team</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">${task.assignedTeam || '-'}</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); display: block;">ATA Chapter</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">${task.ataChapter || '-'}</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); display: block;">RTS Target Date</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">${task.rtsDate || '-'}</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); display: block;">Requestor</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">${task.requestor || '-'} (${task.requestorContact || '-'})</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Task Description</label>
+                    <div style="font-size: 0.83rem; color: var(--text-primary); line-height: 1.5; white-space: pre-wrap; background: rgba(0,0,0,0.15); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);">${task.taskDescription || 'No description provided.'}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+        modal.classList.add('active');
+    }
+}
+
+function closeMobileTaskDetailsModal() {
+    const modal = document.getElementById('mobileTaskDetailsModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.pointerEvents = 'none';
+        modal.classList.remove('active');
+    }
+}
+
+window.openMobileDashboard = openMobileDashboard;
+window.closeMobileDashboard = closeMobileDashboard;
+window.renderMobileDashboard = renderMobileDashboard;
+window.renderMobileDashboardTasks = renderMobileDashboardTasks;
+window.viewMobileTaskReadOnly = viewMobileTaskReadOnly;
+window.closeMobileTaskDetailsModal = closeMobileTaskDetailsModal;
+window.openMobileAuthModal = openMobileAuthModal;
+window.closeMobileAuthModal = closeMobileAuthModal;
+window.submitMobileAuth = submitMobileAuth;
+window.setMobileStatusFilter = setMobileStatusFilter;
 
 
 
