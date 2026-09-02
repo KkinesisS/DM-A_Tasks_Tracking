@@ -8289,6 +8289,27 @@ function logoutMobileSession() {
     closeMobileDashboard();
 }
 
+function isTaskInTeam(taskTeam, targetTeam) {
+    if (!taskTeam || !targetTeam) return false;
+    const teamLower = String(taskTeam).toLowerCase();
+    const targetLower = String(targetTeam).toLowerCase();
+    
+    if (targetLower.includes('mechanical') || targetLower === 'mech') {
+        return teamLower.includes('mechanical') || teamLower.includes('mech');
+    }
+    if (targetLower.includes('avionics') || targetLower.includes('avionic') || targetLower === 'avio') {
+        return teamLower.includes('avionics') || teamLower.includes('avionic') || teamLower.includes('avio');
+    }
+    if (targetLower.includes('cabin') || targetLower.includes('safety')) {
+        return teamLower.includes('cabin') || teamLower.includes('safety');
+    }
+    if (targetLower.includes('structure') || targetLower.includes('composite') || targetLower.includes('engine')) {
+        return teamLower.includes('structure') || teamLower.includes('composite') || teamLower.includes('engine') || teamLower.includes('structures');
+    }
+    return teamLower.includes(targetLower);
+}
+window.isTaskInTeam = isTaskInTeam;
+
 function renderMobileDashboard() {
     if (!tasks || !Array.isArray(tasks)) return;
 
@@ -8319,12 +8340,12 @@ function renderMobileDashboard() {
         ];
 
         teamWorkloadContainer.innerHTML = teamsList.map(tm => {
-            const teamTasks = tasks.filter(t => (t.assignedTeam || '').includes(tm.name));
+            const teamTasks = tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name));
             const count = teamTasks.length;
             const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
             
             return `
-                <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div onclick="setMobileTeamFilter('${tm.name}')" style="display: flex; flex-direction: column; gap: 4px; cursor: pointer;" title="Click to filter by ${tm.name}">
                     <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-primary, #ffffff); font-weight: 600;">
                         <span>${tm.name.replace(' System Team', '').replace(' & Composite Team', '')}</span>
                         <span>${count} tasks (${pct}%)</span>
@@ -8349,12 +8370,56 @@ function setMobileStatusFilter(status) {
     }
 }
 
+function setMobileTeamFilter(teamName) {
+    const teamSelect = document.getElementById('mobTeamFilterSelect');
+    if (teamSelect) {
+        teamSelect.value = teamName;
+        renderMobileDashboardTasks();
+    }
+}
+
 function clearMobileDateFilter() {
     const dateFrom = document.getElementById('mobDateFrom');
     const dateTo = document.getElementById('mobDateTo');
     if (dateFrom) dateFrom.value = '';
     if (dateTo) dateTo.value = '';
     renderMobileDashboardTasks();
+}
+
+function normalizeDateToYMD(str) {
+    if (!str || typeof str !== 'string') return '';
+    const trimmed = str.trim();
+    if (!trimmed || trimmed.toUpperCase() === 'N/A' || trimmed.toUpperCase() === 'TBD' || trimmed === '-') return '';
+    
+    // YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+        return trimmed.substring(0, 10);
+    }
+    // DD/MM/YYYY or DD-MM-YYYY
+    const dmyMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if (dmyMatch) {
+        const day = dmyMatch[1].padStart(2, '0');
+        const month = dmyMatch[2].padStart(2, '0');
+        const year = dmyMatch[3];
+        return `${year}-${month}-${day}`;
+    }
+    // MM/DD/YYYY
+    const mdyMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (mdyMatch) {
+        const month = mdyMatch[1].padStart(2, '0');
+        const day = mdyMatch[2].padStart(2, '0');
+        const year = mdyMatch[3];
+        return `${year}-${month}-${day}`;
+    }
+    // Date.parse fallback
+    const d = new Date(trimmed);
+    if (!isNaN(d.getTime())) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return '';
 }
 
 function renderMobileDashboardTasks() {
@@ -8367,17 +8432,18 @@ function renderMobileDashboardTasks() {
     const dateFromVal = document.getElementById('mobDateFrom')?.value || '';
     const dateToVal = document.getElementById('mobDateTo')?.value || '';
 
-    let filtered = tasks;
+    let filtered = Array.isArray(tasks) ? tasks : [];
+    const totalOriginalCount = filtered.length;
 
     if (teamVal !== 'All') {
-        filtered = filtered.filter(t => (t.assignedTeam || '').includes(teamVal));
+        filtered = filtered.filter(t => isTaskInTeam(t.assignedTeam || '', teamVal));
     }
 
     if (statusVal !== 'All') {
         if (statusVal === 'RTS') {
             filtered = filtered.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed');
         } else if (statusVal === 'AOG') {
-            filtered = filtered.filter(t => t.priorityLevel === 'AOG');
+            filtered = filtered.filter(t => t.priorityLevel === 'AOG' || t.priorityLevel === 'High');
         } else {
             filtered = filtered.filter(t => (t.currentStatus || 'Open') === statusVal);
         }
@@ -8385,12 +8451,12 @@ function renderMobileDashboardTasks() {
 
     if (dateFromVal || dateToVal) {
         filtered = filtered.filter(t => {
-            const taskDateStr = t.rtsDate || t.completedDate || t.insertDate || t.date || t.createdDate || '';
-            if (!taskDateStr || taskDateStr === 'N/A' || taskDateStr === 'TBD') return false;
+            const rawDate = t.rtsDate || t.completedDate || t.insertDate || t.openDate || t.date || t.createdDate || '';
+            const taskYMD = normalizeDateToYMD(rawDate);
+            if (!taskYMD) return false;
             
-            const taskDate = taskDateStr.substring(0, 10);
-            if (dateFromVal && taskDate < dateFromVal) return false;
-            if (dateToVal && taskDate > dateToVal) return false;
+            if (dateFromVal && taskYMD < dateFromVal) return false;
+            if (dateToVal && taskYMD > dateToVal) return false;
             return true;
         });
     }
@@ -8398,11 +8464,20 @@ function renderMobileDashboardTasks() {
     if (searchVal) {
         filtered = filtered.filter(t => 
             (t.aircraftReg && t.aircraftReg.toLowerCase().includes(searchVal)) ||
+            (t.aircraftType && t.aircraftType.toLowerCase().includes(searchVal)) ||
             (t.taskDescription && t.taskDescription.toLowerCase().includes(searchVal)) ||
             (t.ataChapter && t.ataChapter.toLowerCase().includes(searchVal)) ||
             (t.assignedTeam && t.assignedTeam.toLowerCase().includes(searchVal)) ||
-            (t.topic && t.topic.toLowerCase().includes(searchVal))
+            (t.topic && t.topic.toLowerCase().includes(searchVal)) ||
+            (t.priorityLevel && t.priorityLevel.toLowerCase().includes(searchVal)) ||
+            (t.currentStatus && t.currentStatus.toLowerCase().includes(searchVal))
         );
+    }
+
+    // Update filter counter badge
+    const badgeEl = document.getElementById('mobFilteredCount');
+    if (badgeEl) {
+        badgeEl.textContent = `Showing ${filtered.length} of ${totalOriginalCount}`;
     }
 
     if (filtered.length === 0) {
@@ -8525,8 +8600,10 @@ window.openMobileAuthModal = openMobileAuthModal;
 window.closeMobileAuthModal = closeMobileAuthModal;
 window.submitMobileAuth = submitMobileAuth;
 window.setMobileStatusFilter = setMobileStatusFilter;
+window.setMobileTeamFilter = setMobileTeamFilter;
 window.clearMobileDateFilter = clearMobileDateFilter;
 window.logoutMobileSession = logoutMobileSession;
+window.normalizeDateToYMD = normalizeDateToYMD;
 
 
 
