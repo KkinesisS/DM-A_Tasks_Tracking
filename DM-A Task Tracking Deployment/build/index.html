@@ -8029,13 +8029,13 @@ html.dark-mode .dma-brand-logo-img {
                     }
                     const normalized = (data || []).map(item => ({
                         id: String(item.id),
-                        partNumber: item.partNumber || item.part_number || '',
-                        altPartNumber: item.altPartNumber || item.alt_part_number || '',
-                        aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
-                        referenceData: item.referenceData || item.reference_data || '',
-                        insertDate: item.insertDate || item.insert_date || '',
-                        expireDate: item.expireDate || item.expire_date || 'N/A',
-                        createdDate: item.createdDate || item.created_date || ''
+                        partNumber: item.partnumber || item.part_number || item.partNumber || '',
+                        altPartNumber: item.altpartnumber || item.alt_part_number || item.altPartNumber || '',
+                        aircraftEffective: item.aircrafteffective || item.aircraft_effective || item.aircraftEffective || '',
+                        referenceData: item.referencedata || item.reference_data || item.referenceData || '',
+                        insertDate: item.insertdate || item.insert_date || item.insertDate || '',
+                        expireDate: item.expiredate || item.expire_date || item.expireDate || 'N/A',
+                        createdDate: item.createddate || item.created_date || item.createdDate || ''
                     }));
                     this.successHandler(normalized);
                 } catch(e) { 
@@ -8047,38 +8047,48 @@ html.dark-mode .dma-brand-logo-img {
             async saveAlternatePart(partItem) {
                 try {
                     if (!window.supabaseClient) return;
-                    const snakePayload = {
-                        id: String(partItem.id),
-                        part_number: partItem.partNumber || partItem.part_number || '',
-                        alt_part_number: partItem.altPartNumber || partItem.alt_part_number || '',
-                        aircraft_effective: partItem.aircraftEffective || partItem.aircraft_effective || '',
-                        reference_data: partItem.referenceData || partItem.reference_data || '',
-                        insert_date: partItem.insertDate || partItem.insert_date || '',
-                        expire_date: partItem.expireDate || partItem.expire_date || 'N/A',
-                        created_date: partItem.createdDate || partItem.created_date || ''
+                    const cleanId = String(partItem.id || '').replace(/[^0-9]/g, '') || String(Date.now());
+                    
+                    const exact6Payload = {
+                        id: cleanId,
+                        partnumber: partItem.partNumber || partItem.part_number || partItem.partnumber || '',
+                        altpartnumber: partItem.altPartNumber || partItem.alt_part_number || partItem.altpartnumber || '',
+                        aircrafteffective: partItem.aircraftEffective || partItem.aircraft_effective || partItem.aircrafteffective || '',
+                        referencedata: partItem.referenceData || partItem.reference_data || partItem.referencedata || '',
+                        insertdate: partItem.insertDate || partItem.insert_date || partItem.insertdate || ''
                     };
-                    let { error } = await window.supabaseClient.from('alternate_parts').upsert(snakePayload);
+                    
+                    let { error } = await window.supabaseClient.from('alternate_parts').upsert(exact6Payload);
                     if (error) {
-                        const camelPayload = {
-                            id: String(partItem.id),
-                            partNumber: partItem.partNumber || partItem.part_number || '',
-                            altPartNumber: partItem.altPartNumber || partItem.alt_part_number || '',
-                            aircraftEffective: partItem.aircraftEffective || partItem.aircraft_effective || '',
-                            referenceData: partItem.referenceData || partItem.reference_data || '',
-                            insertDate: partItem.insertDate || partItem.insert_date || '',
-                            expireDate: partItem.expireDate || partItem.expire_date || 'N/A',
-                            createdDate: partItem.createdDate || partItem.created_date || ''
+                        console.warn('Supabase exact 6-column warning:', error.message);
+                        const flat8Payload = {
+                            ...exact6Payload,
+                            expiredate: partItem.expireDate || partItem.expire_date || 'N/A',
+                            createddate: partItem.createdDate || partItem.created_date || ''
                         };
-                        const res2 = await window.supabaseClient.from('alternate_parts').upsert(camelPayload);
+                        const res2 = await window.supabaseClient.from('alternate_parts').upsert(flat8Payload);
                         if (res2.error) {
-                            console.warn('Supabase saveAlternatePart warning:', res2.error.message);
-                            this.successHandler(false);
-                            return;
+                            console.warn('Supabase 8-column flat warning:', res2.error.message);
+                            const snake6Payload = {
+                                id: cleanId,
+                                part_number: partItem.partNumber || '',
+                                alt_part_number: partItem.altPartNumber || '',
+                                aircraft_effective: partItem.aircraftEffective || '',
+                                reference_data: partItem.referenceData || '',
+                                insert_date: partItem.insertDate || ''
+                            };
+                            const res3 = await window.supabaseClient.from('alternate_parts').upsert(snake6Payload);
+                            if (res3.error) {
+                                console.error('Supabase saveAlternatePart error across all schemas:', res3.error.message);
+                                this.successHandler(false);
+                                return;
+                            }
                         }
                     }
+                    console.log('Supabase saveAlternatePart success:', exact6Payload);
                     this.successHandler(true);
                 } catch(e) { 
-                    console.warn('Supabase saveAlternatePart error:', e);
+                    console.error('Supabase saveAlternatePart exception:', e);
                     this.successHandler(false);
                 }
             }
@@ -8086,7 +8096,8 @@ html.dark-mode .dma-brand-logo-img {
             async deleteAlternatePart(id) {
                 try {
                     if (!window.supabaseClient) return;
-                    const { error } = await window.supabaseClient.from('alternate_parts').delete().eq('id', id);
+                    const cleanId = String(id || '').replace(/[^0-9]/g, '');
+                    const { error } = await window.supabaseClient.from('alternate_parts').delete().or(`id.eq.${id},id.eq.${cleanId}`);
                     if (error) {
                         console.warn('Supabase deleteAlternatePart warning:', error.message);
                         this.successHandler(false);
@@ -9613,33 +9624,19 @@ function refreshAlternatePartsSilently() {
     if (typeof google.script.run.getAlternateParts === 'function') {
         google.script.run
             .withSuccessHandler(data => {
-                const localData = localStorage.getItem('mro_alternate_parts');
                 if (data && Array.isArray(data)) {
-                    if (data.length > 0) {
-                        alternateParts = data.map(item => ({
-                            id: String(item.id),
-                            partNumber: item.partNumber || item.part_number || '',
-                            altPartNumber: item.altPartNumber || item.alt_part_number || '',
-                            aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
-                            referenceData: item.referenceData || item.reference_data || '',
-                            insertDate: item.insertDate || item.insert_date || '',
-                            expireDate: item.expireDate || item.expire_date || 'N/A',
-                            createdDate: item.createdDate || item.created_date || ''
-                        }));
-                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        renderAlternatePartTab();
-                    } else if (data.length === 0 && (!localData || localData === 'null' || localData === 'undefined')) {
-                        alternateParts = typeof DEMO_ALTERNATE_PARTS !== 'undefined' ? [...DEMO_ALTERNATE_PARTS] : [];
-                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        if (typeof google.script.run.saveAlternatePart === 'function') {
-                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
-                        }
-                        renderAlternatePartTab();
-                    } else if (data.length === 0 && alternateParts.length > 0) {
-                        if (typeof google.script.run.saveAlternatePart === 'function') {
-                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
-                        }
-                    }
+                    alternateParts = data.map(item => ({
+                        id: String(item.id),
+                        partNumber: item.partNumber || item.part_number || '',
+                        altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                        aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                        referenceData: item.referenceData || item.reference_data || '',
+                        insertDate: item.insertDate || item.insert_date || '',
+                        expireDate: item.expireDate || item.expire_date || 'N/A',
+                        createdDate: item.createdDate || item.created_date || ''
+                    }));
+                    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                    renderAlternatePartTab();
                 }
             })
             .getAlternateParts();
@@ -15627,22 +15624,16 @@ const DEMO_ALTERNATE_PARTS = [
 function loadAlternateParts() {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run;
     const localData = localStorage.getItem('mro_alternate_parts');
-    let loaded = false;
     
     if (localData && localData !== 'null' && localData !== 'undefined') {
         try {
-            alternateParts = JSON.parse(localData);
-            if (Array.isArray(alternateParts) && alternateParts.length > 0) {
-                loaded = true;
+            const parsed = JSON.parse(localData);
+            if (Array.isArray(parsed)) {
+                alternateParts = parsed;
             }
         } catch(e) {
             alternateParts = [];
         }
-    }
-    
-    if (!loaded) {
-        alternateParts = [...DEMO_ALTERNATE_PARTS];
-        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
     }
 
     renderAlternatePartTab();
@@ -15651,24 +15642,18 @@ function loadAlternateParts() {
         google.script.run
             .withSuccessHandler(data => {
                 if (data && Array.isArray(data)) {
-                    if (data.length > 0) {
-                        alternateParts = data.map(item => ({
-                            id: String(item.id),
-                            partNumber: item.partNumber || item.part_number || '',
-                            altPartNumber: item.altPartNumber || item.alt_part_number || '',
-                            aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
-                            referenceData: item.referenceData || item.reference_data || '',
-                            insertDate: item.insertDate || item.insert_date || '',
-                            expireDate: item.expireDate || item.expire_date || 'N/A',
-                            createdDate: item.createdDate || item.created_date || ''
-                        }));
-                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        renderAlternatePartTab();
-                    } else if (data.length === 0 && alternateParts.length > 0) {
-                        if (typeof google.script.run.saveAlternatePart === 'function') {
-                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
-                        }
-                    }
+                    alternateParts = data.map(item => ({
+                        id: String(item.id),
+                        partNumber: item.partNumber || item.part_number || '',
+                        altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                        aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                        referenceData: item.referenceData || item.reference_data || '',
+                        insertDate: item.insertDate || item.insert_date || '',
+                        expireDate: item.expireDate || item.expire_date || 'N/A',
+                        createdDate: item.createdDate || item.created_date || ''
+                    }));
+                    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                    renderAlternatePartTab();
                 }
             })
             .getAlternateParts();
@@ -15889,7 +15874,7 @@ function saveAlternatePartItem() {
     const isEdit = (id !== '');
     
     const newItem = {
-        id: isEdit ? id : 'alt_' + Date.now().toString(),
+        id: isEdit ? id : Date.now().toString(),
         partNumber: partNumber,
         altPartNumber: altPartNumber,
         aircraftEffective: aircraftEffective,

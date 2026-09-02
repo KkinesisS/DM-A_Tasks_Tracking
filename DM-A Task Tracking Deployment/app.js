@@ -589,33 +589,19 @@ function refreshAlternatePartsSilently() {
     if (typeof google.script.run.getAlternateParts === 'function') {
         google.script.run
             .withSuccessHandler(data => {
-                const localData = localStorage.getItem('mro_alternate_parts');
                 if (data && Array.isArray(data)) {
-                    if (data.length > 0) {
-                        alternateParts = data.map(item => ({
-                            id: String(item.id),
-                            partNumber: item.partNumber || item.part_number || '',
-                            altPartNumber: item.altPartNumber || item.alt_part_number || '',
-                            aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
-                            referenceData: item.referenceData || item.reference_data || '',
-                            insertDate: item.insertDate || item.insert_date || '',
-                            expireDate: item.expireDate || item.expire_date || 'N/A',
-                            createdDate: item.createdDate || item.created_date || ''
-                        }));
-                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        renderAlternatePartTab();
-                    } else if (data.length === 0 && (!localData || localData === 'null' || localData === 'undefined')) {
-                        alternateParts = typeof DEMO_ALTERNATE_PARTS !== 'undefined' ? [...DEMO_ALTERNATE_PARTS] : [];
-                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        if (typeof google.script.run.saveAlternatePart === 'function') {
-                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
-                        }
-                        renderAlternatePartTab();
-                    } else if (data.length === 0 && alternateParts.length > 0) {
-                        if (typeof google.script.run.saveAlternatePart === 'function') {
-                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
-                        }
-                    }
+                    alternateParts = data.map(item => ({
+                        id: String(item.id),
+                        partNumber: item.partNumber || item.part_number || '',
+                        altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                        aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                        referenceData: item.referenceData || item.reference_data || '',
+                        insertDate: item.insertDate || item.insert_date || '',
+                        expireDate: item.expireDate || item.expire_date || 'N/A',
+                        createdDate: item.createdDate || item.created_date || ''
+                    }));
+                    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                    renderAlternatePartTab();
                 }
             })
             .getAlternateParts();
@@ -6603,22 +6589,16 @@ const DEMO_ALTERNATE_PARTS = [
 function loadAlternateParts() {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run;
     const localData = localStorage.getItem('mro_alternate_parts');
-    let loaded = false;
     
     if (localData && localData !== 'null' && localData !== 'undefined') {
         try {
-            alternateParts = JSON.parse(localData);
-            if (Array.isArray(alternateParts) && alternateParts.length > 0) {
-                loaded = true;
+            const parsed = JSON.parse(localData);
+            if (Array.isArray(parsed)) {
+                alternateParts = parsed;
             }
         } catch(e) {
             alternateParts = [];
         }
-    }
-    
-    if (!loaded) {
-        alternateParts = [...DEMO_ALTERNATE_PARTS];
-        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
     }
 
     renderAlternatePartTab();
@@ -6627,24 +6607,18 @@ function loadAlternateParts() {
         google.script.run
             .withSuccessHandler(data => {
                 if (data && Array.isArray(data)) {
-                    if (data.length > 0) {
-                        alternateParts = data.map(item => ({
-                            id: String(item.id),
-                            partNumber: item.partNumber || item.part_number || '',
-                            altPartNumber: item.altPartNumber || item.alt_part_number || '',
-                            aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
-                            referenceData: item.referenceData || item.reference_data || '',
-                            insertDate: item.insertDate || item.insert_date || '',
-                            expireDate: item.expireDate || item.expire_date || 'N/A',
-                            createdDate: item.createdDate || item.created_date || ''
-                        }));
-                        localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
-                        renderAlternatePartTab();
-                    } else if (data.length === 0 && alternateParts.length > 0) {
-                        if (typeof google.script.run.saveAlternatePart === 'function') {
-                            alternateParts.forEach(item => google.script.run.saveAlternatePart(item));
-                        }
-                    }
+                    alternateParts = data.map(item => ({
+                        id: String(item.id),
+                        partNumber: item.partNumber || item.part_number || '',
+                        altPartNumber: item.altPartNumber || item.alt_part_number || '',
+                        aircraftEffective: item.aircraftEffective || item.aircraft_effective || '',
+                        referenceData: item.referenceData || item.reference_data || '',
+                        insertDate: item.insertDate || item.insert_date || '',
+                        expireDate: item.expireDate || item.expire_date || 'N/A',
+                        createdDate: item.createdDate || item.created_date || ''
+                    }));
+                    localStorage.setItem('mro_alternate_parts', JSON.stringify(alternateParts));
+                    renderAlternatePartTab();
                 }
             })
             .getAlternateParts();
@@ -6865,7 +6839,7 @@ function saveAlternatePartItem() {
     const isEdit = (id !== '');
     
     const newItem = {
-        id: isEdit ? id : 'alt_' + Date.now().toString(),
+        id: isEdit ? id : Date.now().toString(),
         partNumber: partNumber,
         altPartNumber: altPartNumber,
         aircraftEffective: aircraftEffective,
