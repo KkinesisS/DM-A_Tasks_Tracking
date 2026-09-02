@@ -8301,10 +8301,19 @@ function submitMobileAuth() {
 
 function closeMobileDashboard() {
     const mobOverlay = document.getElementById('mobileDashboardOverlay');
-    if (mobOverlay) mobOverlay.style.display = 'none';
+    if (mobOverlay) {
+        mobOverlay.style.display = 'none';
+        mobOverlay.classList.remove('active');
+    }
     
     const loginOverlay = document.getElementById('loginOverlay');
     if (loginOverlay) loginOverlay.style.display = 'flex';
+}
+
+function logoutMobileSession() {
+    sessionStorage.removeItem('mro_authenticated');
+    localStorage.removeItem('mro_authenticated');
+    closeMobileDashboard();
 }
 
 function renderMobileDashboard() {
@@ -8367,6 +8376,14 @@ function setMobileStatusFilter(status) {
     }
 }
 
+function clearMobileDateFilter() {
+    const dateFrom = document.getElementById('mobDateFrom');
+    const dateTo = document.getElementById('mobDateTo');
+    if (dateFrom) dateFrom.value = '';
+    if (dateTo) dateTo.value = '';
+    renderMobileDashboardTasks();
+}
+
 function renderMobileDashboardTasks() {
     const listContainer = document.getElementById('mobTaskListContainer');
     if (!listContainer) return;
@@ -8374,6 +8391,8 @@ function renderMobileDashboardTasks() {
     const searchVal = (document.getElementById('mobTaskSearchInput')?.value || '').trim().toLowerCase();
     const teamVal = document.getElementById('mobTeamFilterSelect')?.value || 'All';
     const statusVal = document.getElementById('mobStatusFilterSelect')?.value || 'All';
+    const dateFromVal = document.getElementById('mobDateFrom')?.value || '';
+    const dateToVal = document.getElementById('mobDateTo')?.value || '';
 
     let filtered = tasks;
 
@@ -8389,6 +8408,18 @@ function renderMobileDashboardTasks() {
         } else {
             filtered = filtered.filter(t => (t.currentStatus || 'Open') === statusVal);
         }
+    }
+
+    if (dateFromVal || dateToVal) {
+        filtered = filtered.filter(t => {
+            const taskDateStr = t.rtsDate || t.completedDate || t.insertDate || t.date || t.createdDate || '';
+            if (!taskDateStr || taskDateStr === 'N/A' || taskDateStr === 'TBD') return false;
+            
+            const taskDate = taskDateStr.substring(0, 10);
+            if (dateFromVal && taskDate < dateFromVal) return false;
+            if (dateToVal && taskDate > dateToVal) return false;
+            return true;
+        });
     }
 
     if (searchVal) {
@@ -8521,6 +8552,8 @@ window.openMobileAuthModal = openMobileAuthModal;
 window.closeMobileAuthModal = closeMobileAuthModal;
 window.submitMobileAuth = submitMobileAuth;
 window.setMobileStatusFilter = setMobileStatusFilter;
+window.clearMobileDateFilter = clearMobileDateFilter;
+window.logoutMobileSession = logoutMobileSession;
 
 
 
