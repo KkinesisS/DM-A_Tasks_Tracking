@@ -585,10 +585,9 @@ window.refreshSAPCodesSilently = refreshSAPCodesSilently;
 
 function refreshAlternatePartsSilently() {
     const isGas = typeof google !== 'undefined' && google.script && google.script.run;
-    const hasSupabase = typeof window.supabaseClient !== 'undefined' && window.supabaseClient !== null;
-    if (!isGas && !hasSupabase) return;
+    if (!isGas) return;
 
-    if (isGas && typeof google.script.run.getAlternateParts === 'function') {
+    if (typeof google.script.run.getAlternateParts === 'function') {
         google.script.run
             .withSuccessHandler(data => {
                 const localData = localStorage.getItem('mro_alternate_parts');
