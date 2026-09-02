@@ -4203,7 +4203,9 @@ html.dark-mode .dhl-timeline-badge {
     top: 0;
     left: 0;
     width: 100vw;
+    width: 100dvw;
     height: 100vh;
+    height: 100dvh;
     background-image: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)), url('THAI787.jpeg') !important;
     background-size: cover !important;
     background-position: center !important;
@@ -4212,7 +4214,7 @@ html.dark-mode .dhl-timeline-badge {
     justify-content: center;
     align-items: center;
     z-index: 10000;
-    padding: 1.5rem;
+    padding: max(1.5rem, env(safe-area-inset-top));
 }
 
 html.dark-mode .login-overlay {
