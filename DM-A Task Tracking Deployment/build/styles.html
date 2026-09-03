@@ -1160,10 +1160,19 @@ header {
     border-radius: var(--radius-md);
     padding: 0.75rem;
     color: var(--text-primary);
+    caret-color: #2563eb;
+    opacity: 1 !important;
     font-family: var(--font-body);
     font-size: 0.9rem;
     outline: none;
     transition: var(--transition);
+}
+
+.form-group input:not([type="checkbox"]):not([type="radio"]):hover, 
+.form-group select:hover, 
+.form-group textarea:hover {
+    opacity: 1 !important;
+    background: #ffffff;
 }
 
 .form-group input:not([type="checkbox"]):not([type="radio"]):focus, 
@@ -1171,6 +1180,8 @@ header {
 .form-group textarea:focus {
     border-color: var(--team-avionics);
     background: #ffffff;
+    caret-color: #1d4ed8;
+    opacity: 1 !important;
     box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 

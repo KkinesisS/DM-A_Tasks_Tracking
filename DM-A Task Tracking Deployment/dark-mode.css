@@ -87,21 +87,42 @@ html.dark-mode .card-desc {
 /* Form Controls & Inputs */
 html.dark-mode input:not([type="checkbox"]):not([type="radio"]),
 html.dark-mode select,
-html.dark-mode textarea {
-    background-color: rgba(26, 14, 29, 0.85) !important;
-    border: 1px solid rgba(147, 80, 115, 0.3) !important;
-    color: var(--text-primary) !important;
+html.dark-mode textarea,
+html.dark-mode .filter-select,
+html.dark-mode .search-box input {
+    background-color: #1A0E1D !important;
+    border: 1px solid rgba(147, 80, 115, 0.45) !important;
+    color: #F8F4E9 !important;
+    caret-color: #F8F4E9 !important;
+    opacity: 1 !important;
 }
+
 html.dark-mode input::placeholder,
 html.dark-mode textarea::placeholder {
-    color: #935073 !important;
+    color: #c084fc !important;
+    opacity: 0.9 !important;
 }
+
+html.dark-mode input:not([type="checkbox"]):not([type="radio"]):hover,
+html.dark-mode select:hover,
+html.dark-mode textarea:hover,
+html.dark-mode .filter-select:hover,
+html.dark-mode .search-box input:hover {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.75) !important;
+    opacity: 1 !important;
+}
+
 html.dark-mode input:not([type="checkbox"]):not([type="radio"]):focus,
 html.dark-mode select:focus,
-html.dark-mode textarea:focus {
-    background-color: rgba(40, 22, 43, 0.95) !important;
-    border-color: rgba(246, 219, 192, 0.65) !important;
-    box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.25), inset 0 0 8px rgba(147, 80, 115, 0.1) !important;
+html.dark-mode textarea:focus,
+html.dark-mode .filter-select:focus,
+html.dark-mode .search-box input:focus {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.4), inset 0 0 8px rgba(147, 80, 115, 0.2) !important;
+    caret-color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 /* Primary Button in Dark Mode */
@@ -493,4 +514,114 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
 /* Dark mode invert for Dark Blue logo to White */
 html.dark-mode .dma-brand-logo-img {
     filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.35)) !important;
+}
+
+/* Table Status Row Backgrounds Overrides in Dark Mode */
+html.dark-mode .mro-table tr.status-completed td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-completed td {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    border-top: 1.5px solid rgba(34, 197, 94, 0.35) !important;
+    border-bottom: 1.5px solid rgba(34, 197, 94, 0.35) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.status-progress td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-progress td {
+    background-color: rgba(147, 80, 115, 0.22) !important;
+    border-top: 1.5px solid rgba(147, 80, 115, 0.4) !important;
+    border-bottom: 1.5px solid rgba(147, 80, 115, 0.4) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.status-open td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-open td {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    border-top: 1.5px solid rgba(147, 80, 115, 0.25) !important;
+    border-bottom: 1.5px solid rgba(147, 80, 115, 0.25) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.status-review td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-review td {
+    background-color: rgba(245, 158, 11, 0.18) !important;
+    border-top: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+    border-bottom: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.task-row td,
+html.dark-mode .mro-table tr.wk-print-log-row td,
+html.dark-mode .mro-table td {
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.task-row td span:not([class^="badge-"]) {
+    color: #F8F4E9 !important;
+}
+
+/* Alternate Parts Table & Rows in Dark Mode */
+html.dark-mode #altPartTableBody tr,
+html.dark-mode #altPartTableBody tr td {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode #altPartTableBody tr:hover td {
+    background-color: rgba(80, 45, 85, 0.5) !important;
+}
+
+/* Accordions & Expandable Rows in Dark Mode */
+html.dark-mode .accordion-header,
+html.dark-mode .accordion-title,
+html.dark-mode .accordion-item {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .accordion-body,
+html.dark-mode .accordion-content,
+html.dark-mode .expanded-details {
+    background-color: rgba(26, 14, 29, 0.95) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+/* Manual Issue Items in Dark Mode */
+html.dark-mode .manual-issue-item,
+html.dark-mode .manual-issue-card,
+html.dark-mode .recurring-item {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .manual-issue-item:hover,
+html.dark-mode .manual-issue-card:hover {
+    background-color: rgba(80, 45, 85, 0.5) !important;
+}
+
+/* Empty Table Rows & Team List Sections in Dark Mode */
+html.dark-mode .list-empty-row {
+    color: #F6DBC0 !important;
+    background-color: rgba(26, 14, 29, 0.85) !important;
+    font-style: italic !important;
+}
+
+html.dark-mode .mro-table tbody tr td,
+html.dark-mode .mro-table tr td {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .team-list-section {
+    background-color: rgba(40, 22, 43, 0.35) !important;
+    border: 1px solid rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .team-section-header {
+    background: rgba(26, 14, 29, 0.95) !important;
+    border-bottom: 1px solid rgba(147, 80, 115, 0.3) !important;
 }

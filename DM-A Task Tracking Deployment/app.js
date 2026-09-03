@@ -3249,16 +3249,14 @@ function openDetailsModal(id) {
     if (task.attachments && task.attachments.length > 0) {
         task.attachments.forEach(file => {
             const btn = document.createElement('a');
-            btn.href = file.data;
-            btn.target = '_blank';
-            btn.rel = 'noopener noreferrer';
             btn.className = 'download-file-btn';
+            btn.style.cursor = 'pointer';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                safeOpenOrDownload(file.data, file.name);
+            };
             
             const isUrl = file.type === 'url';
-            if (!isUrl) {
-                btn.download = file.name;
-            }
-
             const sizeLabel = isUrl ? 'Link' : `${(file.size / 1024).toFixed(1)} KB`;
             
             const leftIconSvg = isUrl ? `
@@ -5854,6 +5852,50 @@ function loadFYIs() {
     }
 }
 
+function safeOpenOrDownload(dataUrl, fileName) {
+    if (!dataUrl) return;
+    const str = String(dataUrl).trim();
+    if (!str) return;
+
+    // 1. Data URI (Base64 file download)
+    if (str.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = str;
+        link.download = fileName || 'download';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+    }
+
+    // 2. Extract nested target URL if wrapped in listurl= or url= parameter
+    let url = str;
+    if (url.includes('listurl=')) {
+        const match = url.match(/listurl=([^&]+)/i);
+        if (match && match[1]) {
+            try { url = decodeURIComponent(match[1]); } catch(e) {}
+        }
+    } else if (url.includes('url=')) {
+        const match = url.match(/url=([^&]+)/i);
+        if (match && match[1]) {
+            try { url = decodeURIComponent(match[1]); } catch(e) {}
+        }
+    }
+
+    // 3. Decode percent-encoded protocol prefix
+    if (url.startsWith('https%3A') || url.startsWith('http%3A')) {
+        try { url = decodeURIComponent(url); } catch(e) {}
+    }
+
+    // 4. Prepend https:// if protocol is missing
+    if (!/^https?:\/\//i.test(url) && !/^file:\/\//i.test(url) && !/^blob:/i.test(url)) {
+        url = 'https://' + url.replace(/^\/+/, '');
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+window.safeOpenOrDownload = safeOpenOrDownload;
+
 function renderFYITab() {
     const listContainer = document.getElementById('fyiList');
     if (!listContainer) return;
@@ -5889,6 +5931,9 @@ function renderFYITab() {
         card.style.position = 'relative';
         card.style.textAlign = 'left';
         
+        const safeUrlArg = (item.attachmentUrl || '').replace(/'/g, "\\'");
+        const safeNameArg = (item.attachmentName || 'Attachment').replace(/'/g, "\\'");
+        
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding-right: 3.5rem;">
@@ -5914,12 +5959,12 @@ function renderFYITab() {
             <p style="margin: 0 0 1rem 0; font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap;">${item.content}</p>
             ${item.attachmentUrl ? `
             <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 6px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--status-progress);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--status-progress); flex-shrink: 0;">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
-                <a href="${item.attachmentUrl}" target="_blank" style="font-size: 0.85rem; font-weight: 600; color: var(--status-progress); text-decoration: none; word-break: break-all;">
-                    ${item.attachmentName || 'View Attachment'}
-                </a>
+                <button type="button" onclick="safeOpenOrDownload('${safeUrlArg}', '${safeNameArg}')" style="background: none; border: none; padding: 0; font-size: 0.85rem; font-weight: 600; color: var(--status-progress); text-decoration: underline; cursor: pointer; word-break: break-all; text-align: left;">
+                    ${item.attachmentName || 'View Attachment / Open Link'}
+                </button>
             </div>
             ` : ''}
             <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
@@ -8297,14 +8342,23 @@ function isTaskInTeam(taskTeam, targetTeam) {
     if (targetLower.includes('mechanical') || targetLower === 'mech') {
         return teamLower.includes('mechanical') || teamLower.includes('mech');
     }
-    if (targetLower.includes('avionics') || targetLower.includes('avionic') || targetLower === 'avio') {
-        return teamLower.includes('avionics') || teamLower.includes('avionic') || teamLower.includes('avio');
+    if (targetLower.includes('avionic') || targetLower === 'avio') {
+        return teamLower.includes('avionic') || teamLower.includes('avio');
     }
     if (targetLower.includes('cabin') || targetLower.includes('safety')) {
         return teamLower.includes('cabin') || teamLower.includes('safety');
     }
-    if (targetLower.includes('structure') || targetLower.includes('composite') || targetLower.includes('engine')) {
-        return teamLower.includes('structure') || teamLower.includes('composite') || teamLower.includes('engine') || teamLower.includes('structures');
+    if (targetLower.includes('structure') || targetLower.includes('composite')) {
+        return teamLower.includes('structure') || teamLower.includes('composite') || teamLower.includes('struct');
+    }
+    if (targetLower.includes('engine')) {
+        return teamLower.includes('engine');
+    }
+    if (targetLower.includes('iera')) {
+        return teamLower.includes('iera');
+    }
+    if (targetLower.includes('component')) {
+        return teamLower.includes('component');
     }
     return teamLower.includes(targetLower);
 }
@@ -8333,21 +8387,26 @@ function renderMobileDashboard() {
     const teamWorkloadContainer = document.getElementById('mobTeamWorkloadContainer');
     if (teamWorkloadContainer) {
         const teamsList = [
-            { name: 'Mechanical System Team', color: '#3b82f6' },
-            { name: 'Avionics System Team', color: '#8b5cf6' },
-            { name: 'Cabin & Safety System Team', color: '#ec4899' },
-            { name: 'Structure & Composite Team', color: '#f59e0b' }
+            { name: 'Mechanical System Team', label: 'Mechanical', color: '#3b82f6' },
+            { name: 'Avionic Systems Team', label: 'Avionics', color: '#8b5cf6' },
+            { name: 'Structure Team', label: 'Structure', color: '#f59e0b' },
+            { name: 'Engines Team', label: 'Engines', color: '#ec4899' },
+            { name: 'IERA Shop', label: 'IERA Shop', color: '#6366f1' },
+            { name: 'Component Team', label: 'Component', color: '#14b8a6' },
+            { name: 'Cabin & Safety System Team', label: 'Cabin & Safety', color: '#e11d48' }
         ];
+
+        const totalAssignments = teamsList.reduce((sum, tm) => sum + tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name)).length, 0);
 
         teamWorkloadContainer.innerHTML = teamsList.map(tm => {
             const teamTasks = tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name));
             const count = teamTasks.length;
-            const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+            const pct = totalAssignments > 0 ? Math.round((count / totalAssignments) * 100) : 0;
             
             return `
-                <div onclick="setMobileTeamFilter('${tm.name}')" style="display: flex; flex-direction: column; gap: 4px; cursor: pointer;" title="Click to filter by ${tm.name}">
+                <div onclick="setMobileTeamFilter('${tm.name}')" style="display: flex; flex-direction: column; gap: 4px; cursor: pointer;" title="Click to filter by ${tm.label}">
                     <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-primary, #ffffff); font-weight: 600;">
-                        <span>${tm.name.replace(' System Team', '').replace(' & Composite Team', '')}</span>
+                        <span>${tm.label}</span>
                         <span>${count} tasks (${pct}%)</span>
                     </div>
                     <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">

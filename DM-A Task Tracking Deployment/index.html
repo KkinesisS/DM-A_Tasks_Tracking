@@ -1184,10 +1184,19 @@ header {
     border-radius: var(--radius-md);
     padding: 0.75rem;
     color: var(--text-primary);
+    caret-color: #2563eb;
+    opacity: 1 !important;
     font-family: var(--font-body);
     font-size: 0.9rem;
     outline: none;
     transition: var(--transition);
+}
+
+.form-group input:not([type="checkbox"]):not([type="radio"]):hover, 
+.form-group select:hover, 
+.form-group textarea:hover {
+    opacity: 1 !important;
+    background: #ffffff;
 }
 
 .form-group input:not([type="checkbox"]):not([type="radio"]):focus, 
@@ -1195,6 +1204,8 @@ header {
 .form-group textarea:focus {
     border-color: var(--team-avionics);
     background: #ffffff;
+    caret-color: #1d4ed8;
+    opacity: 1 !important;
     box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 
@@ -4780,21 +4791,42 @@ html.dark-mode .card-desc {
 /* Form Controls & Inputs */
 html.dark-mode input:not([type="checkbox"]):not([type="radio"]),
 html.dark-mode select,
-html.dark-mode textarea {
-    background-color: rgba(26, 14, 29, 0.85) !important;
-    border: 1px solid rgba(147, 80, 115, 0.3) !important;
-    color: var(--text-primary) !important;
+html.dark-mode textarea,
+html.dark-mode .filter-select,
+html.dark-mode .search-box input {
+    background-color: #1A0E1D !important;
+    border: 1px solid rgba(147, 80, 115, 0.45) !important;
+    color: #F8F4E9 !important;
+    caret-color: #F8F4E9 !important;
+    opacity: 1 !important;
 }
+
 html.dark-mode input::placeholder,
 html.dark-mode textarea::placeholder {
-    color: #935073 !important;
+    color: #c084fc !important;
+    opacity: 0.9 !important;
 }
+
+html.dark-mode input:not([type="checkbox"]):not([type="radio"]):hover,
+html.dark-mode select:hover,
+html.dark-mode textarea:hover,
+html.dark-mode .filter-select:hover,
+html.dark-mode .search-box input:hover {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.75) !important;
+    opacity: 1 !important;
+}
+
 html.dark-mode input:not([type="checkbox"]):not([type="radio"]):focus,
 html.dark-mode select:focus,
-html.dark-mode textarea:focus {
-    background-color: rgba(40, 22, 43, 0.95) !important;
-    border-color: rgba(246, 219, 192, 0.65) !important;
-    box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.25), inset 0 0 8px rgba(147, 80, 115, 0.1) !important;
+html.dark-mode textarea:focus,
+html.dark-mode .filter-select:focus,
+html.dark-mode .search-box input:focus {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.4), inset 0 0 8px rgba(147, 80, 115, 0.2) !important;
+    caret-color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 /* Primary Button in Dark Mode */
@@ -5186,6 +5218,116 @@ html.dark-mode .multiselect-option input[type="checkbox"] {
 /* Dark mode invert for Dark Blue logo to White */
 html.dark-mode .dma-brand-logo-img {
     filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.35)) !important;
+}
+
+/* Table Status Row Backgrounds Overrides in Dark Mode */
+html.dark-mode .mro-table tr.status-completed td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-completed td {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    border-top: 1.5px solid rgba(34, 197, 94, 0.35) !important;
+    border-bottom: 1.5px solid rgba(34, 197, 94, 0.35) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.status-progress td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-progress td {
+    background-color: rgba(147, 80, 115, 0.22) !important;
+    border-top: 1.5px solid rgba(147, 80, 115, 0.4) !important;
+    border-bottom: 1.5px solid rgba(147, 80, 115, 0.4) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.status-open td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-open td {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    border-top: 1.5px solid rgba(147, 80, 115, 0.25) !important;
+    border-bottom: 1.5px solid rgba(147, 80, 115, 0.25) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.status-review td,
+html.dark-mode .mro-table tr.wk-print-log-row.status-review td {
+    background-color: rgba(245, 158, 11, 0.18) !important;
+    border-top: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+    border-bottom: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.task-row td,
+html.dark-mode .mro-table tr.wk-print-log-row td,
+html.dark-mode .mro-table td {
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .mro-table tr.task-row td span:not([class^="badge-"]) {
+    color: #F8F4E9 !important;
+}
+
+/* Alternate Parts Table & Rows in Dark Mode */
+html.dark-mode #altPartTableBody tr,
+html.dark-mode #altPartTableBody tr td {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode #altPartTableBody tr:hover td {
+    background-color: rgba(80, 45, 85, 0.5) !important;
+}
+
+/* Accordions & Expandable Rows in Dark Mode */
+html.dark-mode .accordion-header,
+html.dark-mode .accordion-title,
+html.dark-mode .accordion-item {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .accordion-body,
+html.dark-mode .accordion-content,
+html.dark-mode .expanded-details {
+    background-color: rgba(26, 14, 29, 0.95) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+/* Manual Issue Items in Dark Mode */
+html.dark-mode .manual-issue-item,
+html.dark-mode .manual-issue-card,
+html.dark-mode .recurring-item {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .manual-issue-item:hover,
+html.dark-mode .manual-issue-card:hover {
+    background-color: rgba(80, 45, 85, 0.5) !important;
+}
+
+/* Empty Table Rows & Team List Sections in Dark Mode */
+html.dark-mode .list-empty-row {
+    color: #F6DBC0 !important;
+    background-color: rgba(26, 14, 29, 0.85) !important;
+    font-style: italic !important;
+}
+
+html.dark-mode .mro-table tbody tr td,
+html.dark-mode .mro-table tr td {
+    background-color: rgba(40, 22, 43, 0.85) !important;
+    color: #F8F4E9 !important;
+    border-color: rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .team-list-section {
+    background-color: rgba(40, 22, 43, 0.35) !important;
+    border: 1px solid rgba(147, 80, 115, 0.25) !important;
+}
+
+html.dark-mode .team-section-header {
+    background: rgba(26, 14, 29, 0.95) !important;
+    border-bottom: 1px solid rgba(147, 80, 115, 0.3) !important;
 }
 
 </style>
@@ -7506,9 +7648,12 @@ html.dark-mode .dma-brand-logo-img {
                         <select id="mobTeamFilterSelect" onchange="renderMobileDashboardTasks()" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; box-sizing: border-box;">
                             <option value="All" style="background: var(--bg-card); color: var(--text-primary);">All Teams</option>
                             <option value="Mechanical System Team" style="background: var(--bg-card); color: var(--text-primary);">Mechanical</option>
-                            <option value="Avionics System Team" style="background: var(--bg-card); color: var(--text-primary);">Avionics</option>
+                            <option value="Avionic Systems Team" style="background: var(--bg-card); color: var(--text-primary);">Avionics</option>
+                            <option value="Structure Team" style="background: var(--bg-card); color: var(--text-primary);">Structure</option>
+                            <option value="Engines Team" style="background: var(--bg-card); color: var(--text-primary);">Engines</option>
+                            <option value="IERA Shop" style="background: var(--bg-card); color: var(--text-primary);">IERA Shop</option>
+                            <option value="Component Team" style="background: var(--bg-card); color: var(--text-primary);">Component</option>
                             <option value="Cabin & Safety System Team" style="background: var(--bg-card); color: var(--text-primary);">Cabin & Safety</option>
-                            <option value="Structure & Composite Team" style="background: var(--bg-card); color: var(--text-primary);">Structure</option>
                         </select>
                         <select id="mobStatusFilterSelect" onchange="renderMobileDashboardTasks()" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; box-sizing: border-box;">
                             <option value="All" style="background: var(--bg-card); color: var(--text-primary);">All Statuses</option>
@@ -12285,16 +12430,14 @@ function openDetailsModal(id) {
     if (task.attachments && task.attachments.length > 0) {
         task.attachments.forEach(file => {
             const btn = document.createElement('a');
-            btn.href = file.data;
-            btn.target = '_blank';
-            btn.rel = 'noopener noreferrer';
             btn.className = 'download-file-btn';
+            btn.style.cursor = 'pointer';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                safeOpenOrDownload(file.data, file.name);
+            };
             
             const isUrl = file.type === 'url';
-            if (!isUrl) {
-                btn.download = file.name;
-            }
-
             const sizeLabel = isUrl ? 'Link' : `${(file.size / 1024).toFixed(1)} KB`;
             
             const leftIconSvg = isUrl ? `
@@ -14890,6 +15033,50 @@ function loadFYIs() {
     }
 }
 
+function safeOpenOrDownload(dataUrl, fileName) {
+    if (!dataUrl) return;
+    const str = String(dataUrl).trim();
+    if (!str) return;
+
+    // 1. Data URI (Base64 file download)
+    if (str.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = str;
+        link.download = fileName || 'download';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+    }
+
+    // 2. Extract nested target URL if wrapped in listurl= or url= parameter
+    let url = str;
+    if (url.includes('listurl=')) {
+        const match = url.match(/listurl=([^&]+)/i);
+        if (match && match[1]) {
+            try { url = decodeURIComponent(match[1]); } catch(e) {}
+        }
+    } else if (url.includes('url=')) {
+        const match = url.match(/url=([^&]+)/i);
+        if (match && match[1]) {
+            try { url = decodeURIComponent(match[1]); } catch(e) {}
+        }
+    }
+
+    // 3. Decode percent-encoded protocol prefix
+    if (url.startsWith('https%3A') || url.startsWith('http%3A')) {
+        try { url = decodeURIComponent(url); } catch(e) {}
+    }
+
+    // 4. Prepend https:// if protocol is missing
+    if (!/^https?:\/\//i.test(url) && !/^file:\/\//i.test(url) && !/^blob:/i.test(url)) {
+        url = 'https://' + url.replace(/^\/+/, '');
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+window.safeOpenOrDownload = safeOpenOrDownload;
+
 function renderFYITab() {
     const listContainer = document.getElementById('fyiList');
     if (!listContainer) return;
@@ -14925,6 +15112,9 @@ function renderFYITab() {
         card.style.position = 'relative';
         card.style.textAlign = 'left';
         
+        const safeUrlArg = (item.attachmentUrl || '').replace(/'/g, "\\'");
+        const safeNameArg = (item.attachmentName || 'Attachment').replace(/'/g, "\\'");
+        
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding-right: 3.5rem;">
@@ -14950,12 +15140,12 @@ function renderFYITab() {
             <p style="margin: 0 0 1rem 0; font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap;">${item.content}</p>
             ${item.attachmentUrl ? `
             <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 6px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--status-progress);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: var(--status-progress); flex-shrink: 0;">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
-                <a href="${item.attachmentUrl}" target="_blank" style="font-size: 0.85rem; font-weight: 600; color: var(--status-progress); text-decoration: none; word-break: break-all;">
-                    ${item.attachmentName || 'View Attachment'}
-                </a>
+                <button type="button" onclick="safeOpenOrDownload('${safeUrlArg}', '${safeNameArg}')" style="background: none; border: none; padding: 0; font-size: 0.85rem; font-weight: 600; color: var(--status-progress); text-decoration: underline; cursor: pointer; word-break: break-all; text-align: left;">
+                    ${item.attachmentName || 'View Attachment / Open Link'}
+                </button>
             </div>
             ` : ''}
             <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
@@ -17333,14 +17523,23 @@ function isTaskInTeam(taskTeam, targetTeam) {
     if (targetLower.includes('mechanical') || targetLower === 'mech') {
         return teamLower.includes('mechanical') || teamLower.includes('mech');
     }
-    if (targetLower.includes('avionics') || targetLower.includes('avionic') || targetLower === 'avio') {
-        return teamLower.includes('avionics') || teamLower.includes('avionic') || teamLower.includes('avio');
+    if (targetLower.includes('avionic') || targetLower === 'avio') {
+        return teamLower.includes('avionic') || teamLower.includes('avio');
     }
     if (targetLower.includes('cabin') || targetLower.includes('safety')) {
         return teamLower.includes('cabin') || teamLower.includes('safety');
     }
-    if (targetLower.includes('structure') || targetLower.includes('composite') || targetLower.includes('engine')) {
-        return teamLower.includes('structure') || teamLower.includes('composite') || teamLower.includes('engine') || teamLower.includes('structures');
+    if (targetLower.includes('structure') || targetLower.includes('composite')) {
+        return teamLower.includes('structure') || teamLower.includes('composite') || teamLower.includes('struct');
+    }
+    if (targetLower.includes('engine')) {
+        return teamLower.includes('engine');
+    }
+    if (targetLower.includes('iera')) {
+        return teamLower.includes('iera');
+    }
+    if (targetLower.includes('component')) {
+        return teamLower.includes('component');
     }
     return teamLower.includes(targetLower);
 }
@@ -17369,21 +17568,26 @@ function renderMobileDashboard() {
     const teamWorkloadContainer = document.getElementById('mobTeamWorkloadContainer');
     if (teamWorkloadContainer) {
         const teamsList = [
-            { name: 'Mechanical System Team', color: '#3b82f6' },
-            { name: 'Avionics System Team', color: '#8b5cf6' },
-            { name: 'Cabin & Safety System Team', color: '#ec4899' },
-            { name: 'Structure & Composite Team', color: '#f59e0b' }
+            { name: 'Mechanical System Team', label: 'Mechanical', color: '#3b82f6' },
+            { name: 'Avionic Systems Team', label: 'Avionics', color: '#8b5cf6' },
+            { name: 'Structure Team', label: 'Structure', color: '#f59e0b' },
+            { name: 'Engines Team', label: 'Engines', color: '#ec4899' },
+            { name: 'IERA Shop', label: 'IERA Shop', color: '#6366f1' },
+            { name: 'Component Team', label: 'Component', color: '#14b8a6' },
+            { name: 'Cabin & Safety System Team', label: 'Cabin & Safety', color: '#e11d48' }
         ];
+
+        const totalAssignments = teamsList.reduce((sum, tm) => sum + tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name)).length, 0);
 
         teamWorkloadContainer.innerHTML = teamsList.map(tm => {
             const teamTasks = tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name));
             const count = teamTasks.length;
-            const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+            const pct = totalAssignments > 0 ? Math.round((count / totalAssignments) * 100) : 0;
             
             return `
-                <div onclick="setMobileTeamFilter('${tm.name}')" style="display: flex; flex-direction: column; gap: 4px; cursor: pointer;" title="Click to filter by ${tm.name}">
+                <div onclick="setMobileTeamFilter('${tm.name}')" style="display: flex; flex-direction: column; gap: 4px; cursor: pointer;" title="Click to filter by ${tm.label}">
                     <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-primary, #ffffff); font-weight: 600;">
-                        <span>${tm.name.replace(' System Team', '').replace(' & Composite Team', '')}</span>
+                        <span>${tm.label}</span>
                         <span>${count} tasks (${pct}%)</span>
                     </div>
                     <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
