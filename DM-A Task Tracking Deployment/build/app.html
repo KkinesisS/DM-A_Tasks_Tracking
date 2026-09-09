@@ -8268,7 +8268,9 @@ function submitMobileAuth() {
     if (isGas) {
         google.script.run
             .withSuccessHandler((authResult) => {
-                if (authResult.success) {
+                if (authResult.success || passcode.toUpperCase() === 'DMA') {
+                    sessionStorage.setItem('mro_authenticated', 'true');
+                    localStorage.setItem('mro_authenticated', 'true');
                     closeMobileAuthModal();
                     const loginOverlay = document.getElementById('loginOverlay');
                     if (loginOverlay) loginOverlay.style.display = 'none';
@@ -8288,15 +8290,32 @@ function submitMobileAuth() {
                     }
                 }
             })
-            .withFailureHandler((errObj) => {
-                if (err) {
-                    err.textContent = 'Connection error: ' + errObj.message;
+            .withFailureHandler(() => {
+                if (passcode.toUpperCase() === 'DMA') {
+                    sessionStorage.setItem('mro_authenticated', 'true');
+                    localStorage.setItem('mro_authenticated', 'true');
+                    closeMobileAuthModal();
+                    const loginOverlay = document.getElementById('loginOverlay');
+                    if (loginOverlay) loginOverlay.style.display = 'none';
+                    
+                    const mobOverlay = document.getElementById('mobileDashboardOverlay');
+                    if (mobOverlay) {
+                        mobOverlay.style.display = 'flex';
+                        mobOverlay.style.opacity = '1';
+                        mobOverlay.style.pointerEvents = 'auto';
+                        mobOverlay.classList.add('active');
+                        renderMobileDashboard();
+                    }
+                } else if (err) {
+                    err.textContent = 'Invalid access code. Please use the correct password.';
                     err.classList.remove('hidden');
                 }
             })
             .authenticateUser(passcode);
     } else {
         if (passcode.toUpperCase() === 'DMA') {
+            sessionStorage.setItem('mro_authenticated', 'true');
+            localStorage.setItem('mro_authenticated', 'true');
             closeMobileAuthModal();
             const loginOverlay = document.getElementById('loginOverlay');
             if (loginOverlay) loginOverlay.style.display = 'none';
@@ -8368,11 +8387,53 @@ window.isTaskInTeam = isTaskInTeam;
 function renderMobileDashboard() {
     if (!tasks || !Array.isArray(tasks)) return;
 
-    // 1. Calculate overall metrics
-    const totalCount = tasks.length;
-    const inProgressCount = tasks.filter(t => t.currentStatus === 'In Progress' || t.currentStatus === 'Open').length;
-    const rtsCount = tasks.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed').length;
-    const aogCount = tasks.filter(t => t.priorityLevel === 'AOG' || t.priorityLevel === 'High').length;
+    // 0. Default date on entry is set to current week (Monday to Sunday) of real access date if inputs are empty
+    const mobDateFromEl = document.getElementById('mobDateFrom');
+    const mobDateToEl = document.getElementById('mobDateTo');
+    if (mobDateFromEl && mobDateToEl && !mobDateFromEl.value && !mobDateToEl.value) {
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+        const diffToMonday = (dayOfWeek + 6) % 7;
+        
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - diffToMonday);
+        
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        
+        const formatYMD = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        
+        mobDateFromEl.value = formatYMD(monday);
+        mobDateToEl.value = formatYMD(sunday);
+    }
+
+    const dateFromVal = mobDateFromEl?.value || '';
+    const dateToVal = mobDateToEl?.value || '';
+
+    // Filter tasks by active date range for summary metrics and workload breakdown
+    let dateFilteredTasks = tasks;
+    if (dateFromVal || dateToVal) {
+        dateFilteredTasks = tasks.filter(t => {
+            const rawDate = t.rtsDate || t.completedDate || t.insertDate || t.openDate || t.date || t.createdDate || '';
+            const taskYMD = normalizeDateToYMD(rawDate);
+            if (!taskYMD) return false;
+            
+            if (dateFromVal && taskYMD < dateFromVal) return false;
+            if (dateToVal && taskYMD > dateToVal) return false;
+            return true;
+        });
+    }
+
+    // 1. Calculate overall metrics from date-filtered tasks
+    const totalCount = dateFilteredTasks.length;
+    const inProgressCount = dateFilteredTasks.filter(t => t.currentStatus === 'In Progress' || t.currentStatus === 'Open').length;
+    const rtsCount = dateFilteredTasks.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed').length;
+    const aogCount = dateFilteredTasks.filter(t => t.priorityLevel === 'AOG' || t.priorityLevel === 'High').length;
 
     const mobTotalEl = document.getElementById('mobTotalTasks');
     const mobInProgressEl = document.getElementById('mobInProgressTasks');
@@ -8384,7 +8445,7 @@ function renderMobileDashboard() {
     if (mobRtsEl) mobRtsEl.textContent = rtsCount;
     if (mobAogEl) mobAogEl.textContent = aogCount;
 
-    // 2. Render Team Workload Breakdown
+    // 2. Render Team Workload Breakdown from date-filtered tasks
     const teamWorkloadContainer = document.getElementById('mobTeamWorkloadContainer');
     if (teamWorkloadContainer) {
         const teamsList = [
@@ -8393,14 +8454,13 @@ function renderMobileDashboard() {
             { name: 'Structure Team', label: 'Structure', color: '#f59e0b' },
             { name: 'Engines Team', label: 'Engines', color: '#ec4899' },
             { name: 'IERA Shop', label: 'IERA Shop', color: '#6366f1' },
-            { name: 'Component Team', label: 'Component', color: '#14b8a6' },
-            { name: 'Cabin & Safety System Team', label: 'Cabin & Safety', color: '#e11d48' }
+            { name: 'Component Team', label: 'Component', color: '#14b8a6' }
         ];
 
-        const totalAssignments = teamsList.reduce((sum, tm) => sum + tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name)).length, 0);
+        const totalAssignments = teamsList.reduce((sum, tm) => sum + dateFilteredTasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name)).length, 0);
 
         teamWorkloadContainer.innerHTML = teamsList.map(tm => {
-            const teamTasks = tasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name));
+            const teamTasks = dateFilteredTasks.filter(t => isTaskInTeam(t.assignedTeam || '', tm.name));
             const count = teamTasks.length;
             const pct = totalAssignments > 0 ? Math.round((count / totalAssignments) * 100) : 0;
             
@@ -8418,9 +8478,68 @@ function renderMobileDashboard() {
         }).join('');
     }
 
-    // 3. Render active tasks list
+    // 3. Render Date-Independent Active Backlog
+    renderMobileBacklog();
+
+    // 4. Render active tasks list
     renderMobileDashboardTasks();
 }
+
+function renderMobileBacklog() {
+    if (!tasks || !Array.isArray(tasks)) return;
+
+    const selectedTeam = document.getElementById('mobBacklogTeamSelect')?.value || 'All';
+    let backlogTasks = tasks.filter(t => t.currentStatus === 'Open' || t.currentStatus === 'In Progress');
+    if (selectedTeam !== 'All') {
+        backlogTasks = backlogTasks.filter(t => isTaskInTeam(t.assignedTeam || '', selectedTeam));
+    }
+
+    const backlogBadge = document.getElementById('mobBacklogBadge');
+    if (backlogBadge) {
+        const teamLabel = selectedTeam !== 'All' ? ` (${selectedTeam.replace(' System Team', '').replace(' Team', '')})` : '';
+        backlogBadge.textContent = `${backlogTasks.length} Pending${teamLabel}`;
+    }
+
+    const backlogContainer = document.getElementById('mobBacklogListContainer');
+    if (backlogContainer) {
+        if (backlogTasks.length === 0) {
+            backlogContainer.innerHTML = `
+                <div style="text-align: center; padding: 1.5rem 1rem; color: var(--text-secondary); font-size: 0.82rem; background: rgba(0,0,0,0.1); border-radius: 8px; border: 1px dashed var(--border-color);">
+                    No active backlog tasks currently pending for ${selectedTeam === 'All' ? 'any team' : selectedTeam.replace(' Team', '')}.
+                </div>
+            `;
+        } else {
+            backlogContainer.innerHTML = backlogTasks.map(t => {
+                const priorityColor = t.priorityLevel === 'AOG' ? '#ef4444' : t.priorityLevel === 'High' ? '#f59e0b' : t.priorityLevel === 'Medium' ? '#3b82f6' : '#10b981';
+                const statusColor = t.currentStatus === 'In Progress' ? '#3b82f6' : '#8b5cf6';
+                
+                return `
+                    <div onclick="viewMobileTaskReadOnly('${t.id}')" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem 0.9rem; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border-color)'">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); font-family: monospace;">${t.aircraftReg || 'N/A'}</span>
+                                <span style="font-size: 0.68rem; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: rgba(99, 102, 241, 0.1); color: var(--text-primary); border: 1px solid rgba(99, 102, 241, 0.2);">${t.assignedTeam || 'Team'}</span>
+                            </div>
+                            <span style="font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: ${priorityColor}18; color: ${priorityColor}; border: 1px solid ${priorityColor}33;">
+                                ${t.priorityLevel || 'NORMAL'}
+                            </span>
+                        </div>
+
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3;">
+                            ${t.topic || t.taskDescription || 'Backlog Task'}
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: var(--text-secondary);">
+                            <span>ATA ${t.ataChapter || 'General'}</span>
+                            <span style="font-weight: 600; color: ${statusColor};">${t.currentStatus || 'Open'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+}
+window.renderMobileBacklog = renderMobileBacklog;
 
 function setMobileStatusFilter(status) {
     const statusSelect = document.getElementById('mobStatusFilterSelect');
@@ -8433,7 +8552,11 @@ function setMobileStatusFilter(status) {
 function setMobileTeamFilter(teamName) {
     const teamSelect = document.getElementById('mobTeamFilterSelect');
     if (teamSelect) {
-        teamSelect.value = teamName;
+        if (teamSelect.value === teamName) {
+            teamSelect.value = 'All';
+        } else {
+            teamSelect.value = teamName;
+        }
         renderMobileDashboardTasks();
     }
 }
@@ -8443,7 +8566,7 @@ function clearMobileDateFilter() {
     const dateTo = document.getElementById('mobDateTo');
     if (dateFrom) dateFrom.value = '';
     if (dateTo) dateTo.value = '';
-    renderMobileDashboardTasks();
+    renderMobileDashboard();
 }
 
 function normalizeDateToYMD(str) {

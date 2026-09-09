@@ -2292,7 +2292,7 @@
             </div>
 
             <!-- Team Workload Overview -->
-            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.25rem;">
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
                 <h3 style="margin: 0 0 0.75rem 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px; color: #6366f1;">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -2303,6 +2303,41 @@
                     Team Workload Breakdown
                 </h3>
                 <div id="mobTeamWorkloadContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Active Backlog Tasks Section (Date-Independent & Separate Team Filter) -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 0.75rem;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="width: 16px; height: 16px;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Active Backlog (Open & In Progress)
+                            <span id="mobBacklogBadge" style="font-size: 0.7rem; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); padding: 1px 8px; border-radius: 12px; margin-left: 4px;">0 Pending</span>
+                        </h3>
+                        <p style="margin: 2px 0 0 0; font-size: 0.72rem; color: var(--text-secondary);">Ongoing maintenance backlog (all dates, excluding RTS/Completed)</p>
+                    </div>
+
+                    <!-- Dedicated Backlog Team Filter -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <select id="mobBacklogTeamSelect" onchange="renderMobileBacklog()" style="padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.78rem; font-weight: 600; outline: none; cursor: pointer;" title="Filter Backlog Team">
+                            <option value="All" style="background: var(--bg-card); color: var(--text-primary);">All Teams</option>
+                            <option value="Mechanical System Team" style="background: var(--bg-card); color: var(--text-primary);">Mechanical</option>
+                            <option value="Avionic Systems Team" style="background: var(--bg-card); color: var(--text-primary);">Avionics</option>
+                            <option value="Structure Team" style="background: var(--bg-card); color: var(--text-primary);">Structure</option>
+                            <option value="Engines Team" style="background: var(--bg-card); color: var(--text-primary);">Engines</option>
+                            <option value="IERA Shop" style="background: var(--bg-card); color: var(--text-primary);">IERA Shop</option>
+                            <option value="Component Team" style="background: var(--bg-card); color: var(--text-primary);">Component</option>
+                        </select>
+                        <span style="font-size: 0.68rem; background: rgba(148, 163, 184, 0.12); color: var(--text-secondary); border: 1px solid rgba(148, 163, 184, 0.25); padding: 2px 8px; border-radius: 6px; font-weight: 600;">Date-Independent</span>
+                    </div>
+                </div>
+                
+                <div id="mobBacklogListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 2px;">
                     <!-- Rendered dynamically -->
                 </div>
             </div>
@@ -2346,7 +2381,6 @@
                             <option value="Engines Team" style="background: var(--bg-card); color: var(--text-primary);">Engines</option>
                             <option value="IERA Shop" style="background: var(--bg-card); color: var(--text-primary);">IERA Shop</option>
                             <option value="Component Team" style="background: var(--bg-card); color: var(--text-primary);">Component</option>
-                            <option value="Cabin & Safety System Team" style="background: var(--bg-card); color: var(--text-primary);">Cabin & Safety</option>
                         </select>
                         <select id="mobStatusFilterSelect" onchange="renderMobileDashboardTasks()" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.85rem; outline: none; box-sizing: border-box;">
                             <option value="All" style="background: var(--bg-card); color: var(--text-primary);">All Statuses</option>
@@ -2369,9 +2403,9 @@
                             Date Range:
                         </span>
                         <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 220px; flex-wrap: wrap;">
-                            <input type="date" id="mobDateFrom" onchange="renderMobileDashboardTasks()" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.8rem; outline: none; flex: 1; min-width: 110px;" title="From Date" />
+                            <input type="date" id="mobDateFrom" onchange="renderMobileDashboard()" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.8rem; outline: none; flex: 1; min-width: 110px;" title="From Date" />
                             <span style="font-size: 0.75rem; color: var(--text-secondary);">to</span>
-                            <input type="date" id="mobDateTo" onchange="renderMobileDashboardTasks()" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.8rem; outline: none; flex: 1; min-width: 110px;" title="To Date" />
+                            <input type="date" id="mobDateTo" onchange="renderMobileDashboard()" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.8rem; outline: none; flex: 1; min-width: 110px;" title="To Date" />
                         </div>
                         <button type="button" onclick="clearMobileDateFilter()" style="padding: 0.35rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; cursor: pointer;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'">
                             Clear Dates
