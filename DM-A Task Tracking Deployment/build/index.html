@@ -7626,7 +7626,7 @@ html.dark-mode .team-section-header {
                             Active Backlog (Open & In Progress)
                             <span id="mobBacklogBadge" style="font-size: 0.7rem; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); padding: 1px 8px; border-radius: 12px; margin-left: 4px;">0 Pending</span>
                         </h3>
-                        <p style="margin: 2px 0 0 0; font-size: 0.72rem; color: var(--text-secondary);">Ongoing maintenance backlog (all dates, excluding RTS/Completed)</p>
+                        <p style="margin: 2px 0 0 0; font-size: 0.72rem; color: var(--text-secondary);">Ongoing maintenance backlog (Open & In Progress tasks NOT in selected date range)</p>
                     </div>
 
                     <!-- Dedicated Backlog Team Filter -->
@@ -7640,7 +7640,7 @@ html.dark-mode .team-section-header {
                             <option value="IERA Shop" style="background: var(--bg-card); color: var(--text-primary);">IERA Shop</option>
                             <option value="Component Team" style="background: var(--bg-card); color: var(--text-primary);">Component</option>
                         </select>
-                        <span style="font-size: 0.68rem; background: rgba(148, 163, 184, 0.12); color: var(--text-secondary); border: 1px solid rgba(148, 163, 184, 0.25); padding: 2px 8px; border-radius: 6px; font-weight: 600;">Date-Independent</span>
+                        <span id="mobBacklogDateBadge" style="font-size: 0.68rem; background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); padding: 2px 8px; border-radius: 6px; font-weight: 600;">Outside Date Range</span>
                     </div>
                 </div>
                 
@@ -17598,6 +17598,51 @@ function isTaskInTeam(taskTeam, targetTeam) {
 }
 window.isTaskInTeam = isTaskInTeam;
 
+function getTaskEffectiveDateYMD(task) {
+    if (!task) return '';
+    
+    // 1. Check completion/RTS dates
+    let ymd = normalizeDateToYMD(task.rtsDate) || normalizeDateToYMD(task.completedDate);
+    if (ymd) return ymd;
+    
+    // 2. Check open/creation dates
+    ymd = normalizeDateToYMD(task.openDate) || normalizeDateToYMD(task.insertDate) || normalizeDateToYMD(task.dateCreated) || normalizeDateToYMD(task.date);
+    if (ymd) return ymd;
+
+    // 3. Check comment timestamps (latest or any)
+    if (task.comments) {
+        let commentsArr = [];
+        if (Array.isArray(task.comments)) {
+            commentsArr = task.comments;
+        } else if (typeof task.comments === 'string') {
+            try { commentsArr = JSON.parse(task.comments); } catch(e) {}
+        }
+        if (Array.isArray(commentsArr)) {
+            for (let i = commentsArr.length - 1; i >= 0; i--) {
+                const c = commentsArr[i];
+                const cDateStr = c?.timestamp || c?.date || c?.createdDate || '';
+                const cYmd = normalizeDateToYMD(cDateStr);
+                if (cYmd) return cYmd;
+            }
+        }
+    }
+    
+    return '';
+}
+window.getTaskEffectiveDateYMD = getTaskEffectiveDateYMD;
+
+function isTaskInDateRange(task, dateFromVal, dateToVal) {
+    if (!dateFromVal && !dateToVal) return true;
+    
+    const taskYMD = getTaskEffectiveDateYMD(task);
+    if (!taskYMD) return false;
+
+    if (dateFromVal && taskYMD < dateFromVal) return false;
+    if (dateToVal && taskYMD > dateToVal) return false;
+    return true;
+}
+window.isTaskInDateRange = isTaskInDateRange;
+
 function renderMobileDashboard() {
     if (!tasks || !Array.isArray(tasks)) return;
 
@@ -17629,21 +17674,13 @@ function renderMobileDashboard() {
     const dateFromVal = mobDateFromEl?.value || '';
     const dateToVal = mobDateToEl?.value || '';
 
-    // Filter tasks by active date range for summary metrics and workload breakdown
+    // Filter tasks by active date range for summary metrics and workload breakdown (Fig 3)
     let dateFilteredTasks = tasks;
     if (dateFromVal || dateToVal) {
-        dateFilteredTasks = tasks.filter(t => {
-            const rawDate = t.rtsDate || t.completedDate || t.insertDate || t.openDate || t.date || t.createdDate || '';
-            const taskYMD = normalizeDateToYMD(rawDate);
-            if (!taskYMD) return false;
-            
-            if (dateFromVal && taskYMD < dateFromVal) return false;
-            if (dateToVal && taskYMD > dateToVal) return false;
-            return true;
-        });
+        dateFilteredTasks = tasks.filter(t => isTaskInDateRange(t, dateFromVal, dateToVal));
     }
 
-    // 1. Calculate overall metrics from date-filtered tasks
+    // 1. Calculate overall metrics from date-filtered tasks (Fig 3 overview)
     const totalCount = dateFilteredTasks.length;
     const inProgressCount = dateFilteredTasks.filter(t => t.currentStatus === 'In Progress' || t.currentStatus === 'Open').length;
     const rtsCount = dateFilteredTasks.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed').length;
@@ -17659,7 +17696,7 @@ function renderMobileDashboard() {
     if (mobRtsEl) mobRtsEl.textContent = rtsCount;
     if (mobAogEl) mobAogEl.textContent = aogCount;
 
-    // 2. Render Team Workload Breakdown from date-filtered tasks
+    // 2. Render Team Workload Breakdown from date-filtered tasks (Fig 3 overview)
     const teamWorkloadContainer = document.getElementById('mobTeamWorkloadContainer');
     if (teamWorkloadContainer) {
         const teamsList = [
@@ -17692,10 +17729,10 @@ function renderMobileDashboard() {
         }).join('');
     }
 
-    // 3. Render Date-Independent Active Backlog
+    // 3. Render Active Backlog (Open & In Progress NOT in selected date range)
     renderMobileBacklog();
 
-    // 4. Render active tasks list
+    // 4. Render active tasks list (Figure 2)
     renderMobileDashboardTasks();
 }
 
@@ -17703,9 +17740,18 @@ function renderMobileBacklog() {
     if (!tasks || !Array.isArray(tasks)) return;
 
     const selectedTeam = document.getElementById('mobBacklogTeamSelect')?.value || 'All';
+    const dateFromVal = document.getElementById('mobDateFrom')?.value || '';
+    const dateToVal = document.getElementById('mobDateTo')?.value || '';
+
     let backlogTasks = tasks.filter(t => t.currentStatus === 'Open' || t.currentStatus === 'In Progress');
+
     if (selectedTeam !== 'All') {
         backlogTasks = backlogTasks.filter(t => isTaskInTeam(t.assignedTeam || '', selectedTeam));
+    }
+
+    // Backlog displays Open & In Progress tasks that are NOT in the selected date range
+    if (dateFromVal || dateToVal) {
+        backlogTasks = backlogTasks.filter(t => !isTaskInDateRange(t, dateFromVal, dateToVal));
     }
 
     const backlogBadge = document.getElementById('mobBacklogBadge');
@@ -17719,7 +17765,7 @@ function renderMobileBacklog() {
         if (backlogTasks.length === 0) {
             backlogContainer.innerHTML = `
                 <div style="text-align: center; padding: 1.5rem 1rem; color: var(--text-secondary); font-size: 0.82rem; background: rgba(0,0,0,0.1); border-radius: 8px; border: 1px dashed var(--border-color);">
-                    No active backlog tasks currently pending for ${selectedTeam === 'All' ? 'any team' : selectedTeam.replace(' Team', '')}.
+                    No active backlog tasks outside selected date range for ${selectedTeam === 'All' ? 'any team' : selectedTeam.replace(' Team', '')}.
                 </div>
             `;
         } else {
@@ -17847,15 +17893,7 @@ function renderMobileDashboardTasks() {
     }
 
     if (dateFromVal || dateToVal) {
-        filtered = filtered.filter(t => {
-            const rawDate = t.rtsDate || t.completedDate || t.insertDate || t.openDate || t.date || t.createdDate || '';
-            const taskYMD = normalizeDateToYMD(rawDate);
-            if (!taskYMD) return false;
-            
-            if (dateFromVal && taskYMD < dateFromVal) return false;
-            if (dateToVal && taskYMD > dateToVal) return false;
-            return true;
-        });
+        filtered = filtered.filter(t => isTaskInDateRange(t, dateFromVal, dateToVal));
     }
 
     if (searchVal) {
@@ -17919,6 +17957,16 @@ function viewMobileTaskReadOnly(taskId) {
     const task = tasks.find(t => String(t.id) === String(taskId));
     if (!task) return;
 
+    let comments = task.comments || [];
+    if (typeof comments === 'string') {
+        try { comments = JSON.parse(comments); } catch(e) { comments = []; }
+    }
+
+    let attachments = task.attachments || [];
+    if (typeof attachments === 'string') {
+        try { attachments = JSON.parse(attachments); } catch(e) { attachments = []; }
+    }
+
     const modal = document.getElementById('mobileTaskDetailsModal');
     const regBadge = document.getElementById('mobModalRegBadge');
     const body = document.getElementById('mobileTaskDetailsBody');
@@ -17927,6 +17975,58 @@ function viewMobileTaskReadOnly(taskId) {
     
     if (body) {
         const priorityColor = task.priorityLevel === 'AOG' ? '#ef4444' : task.priorityLevel === 'High' ? '#f59e0b' : task.priorityLevel === 'Medium' ? '#3b82f6' : '#10b981';
+
+        const commentsHtml = comments.length === 0 ? `
+            <div style="font-size: 0.8rem; color: var(--text-secondary); padding: 0.5rem 0; font-style: italic;">No status updates or comments recorded for this task.</div>
+        ` : comments.map(c => {
+            const author = c.author || c.user || c.username || 'System Staff';
+            const text = c.text || c.content || c.message || '';
+            const rawTime = c.timestamp || c.date || c.createdDate || '';
+            let dateStr = rawTime;
+            try {
+                if (rawTime) {
+                    const d = new Date(rawTime);
+                    if (!isNaN(d.getTime())) {
+                        dateStr = d.toLocaleString();
+                    }
+                }
+            } catch(e) {}
+
+            return `
+                <div style="background: rgba(0,0,0,0.12); border-left: 3px solid #3b82f6; padding: 0.6rem 0.8rem; border-radius: 4px 8px 8px 4px; margin-bottom: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 0.73rem;">
+                        <span style="font-weight: 700; color: var(--text-primary);">${author}</span>
+                        <span style="color: var(--text-secondary); font-size: 0.68rem;">${dateStr}</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; white-space: pre-wrap;">${text}</div>
+                </div>
+            `;
+        }).join('');
+
+        const attachmentsHtml = attachments.length === 0 ? '' : `
+            <div style="margin-top: 6px;">
+                <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Attached Files & Links (${attachments.length})</label>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    ${attachments.map(att => {
+                        const isUrl = att.type === 'url';
+                        const name = att.name || 'Attachment';
+                        const safeUrlArg = (att.data || att.url || '').replace(/'/g, "\\'");
+                        const safeNameArg = name.replace(/'/g, "\\'");
+                        
+                        return `
+                            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.12); padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; color: #3b82f6; flex-shrink: 0;">
+                                    ${isUrl ? `<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>` : `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>`}
+                                </svg>
+                                <button type="button" onclick="safeOpenOrDownload('${safeUrlArg}', '${safeNameArg}')" style="background: none; border: none; padding: 0; font-size: 0.8rem; font-weight: 600; color: #3b82f6; text-decoration: underline; cursor: pointer; text-align: left; word-break: break-all;">
+                                    ${name} ${isUrl ? '(Link)' : ''}
+                                </button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
 
         body.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 12px; font-family: var(--font-body);">
@@ -17964,6 +18064,17 @@ function viewMobileTaskReadOnly(taskId) {
                 <div>
                     <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Task Description</label>
                     <div style="font-size: 0.83rem; color: var(--text-primary); line-height: 1.5; white-space: pre-wrap; background: rgba(0,0,0,0.15); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);">${task.taskDescription || 'No description provided.'}</div>
+                </div>
+
+                ${attachmentsHtml}
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">Status Updates & Comments (${comments.length})</label>
+                    </div>
+                    <div style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
+                        ${commentsHtml}
+                    </div>
                 </div>
             </div>
         `;
