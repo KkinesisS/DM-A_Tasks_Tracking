@@ -36,6 +36,7 @@ function initSupabase() {
 let activeFilters = {
     search: '',
     team: 'All',
+    teams: ['All'],
     priority: 'All',
     status: 'All',
     viewMode: 'kanban' // 'kanban' or 'list'
@@ -971,9 +972,19 @@ function getFilteredTasks() {
             task.taskDescription.toLowerCase().includes(searchLower) ||
             (task.customId || task.id || '').toLowerCase().includes(searchLower);
 
-        // Team filter matches — supports comma-separated multi-team values
-        const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
-        const matchesTeam = activeFilters.team === 'All' || assignedTeams.includes(activeFilters.team);
+        // Team filter matches — supports multiple selected teams and comma-separated multi-team task values
+        const selectedTeams = Array.isArray(activeFilters.teams) && activeFilters.teams.length > 0 
+            ? activeFilters.teams 
+            : (activeFilters.team ? activeFilters.team.split(',').map(s => s.trim()) : ['All']);
+
+        const isAllTeams = selectedTeams.includes('All') || selectedTeams.length === 0;
+        let matchesTeam = isAllTeams;
+        if (!matchesTeam) {
+            const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
+            matchesTeam = selectedTeams.some(targetTeam => 
+                assignedTeams.includes(targetTeam) || (typeof isTaskInTeam === 'function' && isTaskInTeam(task.assignedTeam, targetTeam))
+            );
+        }
 
         // Priority filter matches
         const matchesPriority = activeFilters.priority === 'All' || task.priorityLevel === activeFilters.priority;
@@ -1495,6 +1506,14 @@ function renderList(filteredTasks) {
         const badge = document.getElementById(team.badgeId);
         tbody.innerHTML = '';
 
+        // Show/hide entire team section if specific teams are selected
+        const section = document.querySelector(`.team-list-section[data-team="${team.name}"]`);
+        const isAll = !activeFilters.teams || activeFilters.teams.length === 0 || activeFilters.teams.includes('All');
+        if (section) {
+            const isSelected = isAll || activeFilters.teams.includes(team.name);
+            section.style.display = isSelected ? 'block' : 'none';
+        }
+
         // Filter tasks specifically for this team AND matching active text searches / priority filters
         // Supports comma-separated multi-team values
         const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(team.name));
@@ -1599,6 +1618,8 @@ window.toggleMultiselectApp = function(dropdownId, triggerEl) {
     if (!dropdown || !triggerEl) return;
     
     const isOpen = dropdown.classList.contains('open');
+    const container = triggerEl.closest('.multiselect-container');
+    const controlsPanel = triggerEl.closest('.controls-panel');
     
     // Close all other open dropdowns first
     document.querySelectorAll('.multiselect-dropdown.open').forEach(d => {
@@ -1608,6 +1629,8 @@ window.toggleMultiselectApp = function(dropdownId, triggerEl) {
             if (otherTrigger) {
                 otherTrigger.classList.remove('active');
                 otherTrigger.setAttribute('aria-expanded', 'false');
+                const otherCont = otherTrigger.closest('.multiselect-container');
+                if (otherCont) otherCont.style.zIndex = '';
             }
         }
     });
@@ -1616,10 +1639,14 @@ window.toggleMultiselectApp = function(dropdownId, triggerEl) {
         dropdown.classList.remove('open');
         triggerEl.classList.remove('active');
         triggerEl.setAttribute('aria-expanded', 'false');
+        if (container) container.style.zIndex = '';
+        if (controlsPanel) controlsPanel.style.zIndex = '100';
     } else {
         dropdown.classList.add('open');
         triggerEl.classList.add('active');
         triggerEl.setAttribute('aria-expanded', 'true');
+        if (container) container.style.zIndex = '9999';
+        if (controlsPanel) controlsPanel.style.zIndex = '9999';
     }
 };
 
@@ -1831,6 +1858,10 @@ window.addEventListener('click', (e) => {
             if (trigger) {
                 trigger.classList.remove('active');
                 trigger.setAttribute('aria-expanded', 'false');
+                const cont = trigger.closest('.multiselect-container');
+                if (cont) cont.style.zIndex = '';
+                const cp = trigger.closest('.controls-panel');
+                if (cp) cp.style.zIndex = '100';
             }
         });
     }
@@ -1846,29 +1877,59 @@ function setupEventListeners() {
         renderTasks();
     });
 
-    // Dropdown Team Filter
-    const teamFilter = document.getElementById('teamFilter');
-    teamFilter.addEventListener('change', (e) => {
-        activeFilters.team = e.target.value;
-        syncTeamTabs(e.target.value);
-        renderTasks();
-    });
+    // Multiselect Dropdown Team Filter
+    const teamFilterTrigger = document.getElementById('teamFilterTrigger');
+    if (teamFilterTrigger) {
+        teamFilterTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.toggleMultiselectApp('teamFilterDropdown', teamFilterTrigger);
+        });
+    }
 
-    // Tab Bar Team Filters (For Kanban View)
+    const teamFilterDropdown = document.getElementById('teamFilterDropdown');
+    if (teamFilterDropdown) {
+        teamFilterDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+        teamFilterDropdown.addEventListener('change', (e) => {
+            if (e.target.id === 'teamFilterAllCheckbox') {
+                if (e.target.checked) {
+                    setSelectedTeams(['All']);
+                } else {
+                    e.target.checked = true;
+                }
+            } else {
+                const checked = Array.from(teamFilterDropdown.querySelectorAll('input[type="checkbox"]:not(#teamFilterAllCheckbox):checked')).map(cb => cb.value);
+                setSelectedTeams(checked.length > 0 ? checked : ['All']);
+            }
+        });
+    }
+
+    // Tab Bar Team Filters (For Kanban View) — supports selecting 2 or more teams
     const tabContainer = document.getElementById('teamTabs');
-    tabContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('team-tab-btn')) {
-            const selectedTeam = e.target.dataset.team;
-            activeFilters.team = selectedTeam;
-            teamFilter.value = selectedTeam; // Keep dropdown filter in sync
+    if (tabContainer) {
+        tabContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.team-tab-btn');
+            if (!btn) return;
             
-            // Toggle active classes on tab buttons
-            document.querySelectorAll('#teamTabs .team-tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.team === selectedTeam);
-            });
-            renderTasks();
-        }
-    });
+            const clickedTeam = btn.dataset.team;
+            const currentTeams = [...(activeFilters.teams || ['All'])];
+            
+            if (clickedTeam === 'All') {
+                setSelectedTeams(['All']);
+            } else {
+                if (currentTeams.includes('All')) {
+                    setSelectedTeams([clickedTeam]);
+                } else {
+                    if (currentTeams.includes(clickedTeam)) {
+                        const remaining = currentTeams.filter(t => t !== clickedTeam);
+                        setSelectedTeams(remaining.length > 0 ? remaining : ['All']);
+                    } else {
+                        setSelectedTeams([...currentTeams, clickedTeam]);
+                    }
+                }
+            }
+        });
+    }
 
     // Priority Filter
     document.getElementById('priorityFilter').addEventListener('change', (e) => {
@@ -2339,10 +2400,15 @@ function setupEventListeners() {
                         data: url
                     });
                     
+                    const trimmedText = text ? text.trim() : '';
+                    const updateContent = trimmedText 
+                        ? `${trimmedText}\n\nAttached file: ${file.name}` 
+                        : `Attached file: ${file.name}`;
+                    
                     task.comments = task.comments || [];
                     task.comments.push({
                         author: author,
-                        text: `Attached file: ${file.name}\n\n${text}`,
+                        text: updateContent,
                         timestamp: new Date().toISOString(),
                         type: 'update'
                     });
@@ -2363,10 +2429,15 @@ function setupEventListeners() {
                         data: e.target.result // Base64 data URL
                     });
                     
+                    const trimmedTextFallback = text ? text.trim() : '';
+                    const updateContentFallback = trimmedTextFallback 
+                        ? `${trimmedTextFallback}\n\nAttached file: ${file.name}` 
+                        : `Attached file: ${file.name}`;
+
                     task.comments = task.comments || [];
                     task.comments.push({
                         author: author,
-                        text: `Attached file: ${file.name}\n\n${text}`,
+                        text: updateContentFallback,
                         timestamp: new Date().toISOString(),
                         type: 'update'
                     });
@@ -2573,11 +2644,72 @@ function setupEventListeners() {
     setupFyiTeamTabs();
 }
 
-// Helper to keep tab classes in sync with dropdown filter changes
-function syncTeamTabs(teamValue) {
+// Sets active teams for filtering, supporting 2 or more teams simultaneously, and syncs pills + dropdown
+function setSelectedTeams(teams) {
+    let normalized = [];
+    if (Array.isArray(teams)) {
+        normalized = teams.map(t => String(t).trim()).filter(Boolean);
+    } else if (typeof teams === 'string') {
+        normalized = teams.split(',').map(t => t.trim()).filter(Boolean);
+    }
+    
+    if (normalized.length === 0 || normalized.includes('All')) {
+        normalized = ['All'];
+    } else {
+        // Remove 'All' if specific teams are selected
+        normalized = Array.from(new Set(normalized.filter(t => t !== 'All')));
+        if (normalized.length === 0) normalized = ['All'];
+    }
+    
+    activeFilters.teams = normalized;
+    activeFilters.team = normalized.includes('All') ? 'All' : normalized.join(', ');
+    
+    // 1. Sync Team Tabs (Pills)
     document.querySelectorAll('#teamTabs .team-tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.team === teamValue);
+        const btnTeam = btn.dataset.team;
+        if (normalized.includes('All')) {
+            btn.classList.toggle('active', btnTeam === 'All');
+        } else {
+            btn.classList.toggle('active', normalized.includes(btnTeam));
+        }
     });
+    
+    // 2. Sync Multiselect Dropdown
+    const hiddenInput = document.getElementById('teamFilter');
+    if (hiddenInput) hiddenInput.value = activeFilters.team;
+    
+    const allCb = document.getElementById('teamFilterAllCheckbox');
+    if (allCb) allCb.checked = normalized.includes('All');
+    
+    document.querySelectorAll('#teamFilterDropdown input[type="checkbox"]:not(#teamFilterAllCheckbox)').forEach(cb => {
+        cb.checked = !normalized.includes('All') && normalized.includes(cb.value);
+    });
+    
+    const textEl = document.getElementById('teamFilterText');
+    if (textEl) {
+        if (normalized.includes('All')) {
+            textEl.textContent = 'All Teams';
+            textEl.classList.remove('has-value');
+        } else if (normalized.length === 1) {
+            textEl.textContent = normalized[0].replace(' Team', '');
+            textEl.classList.add('has-value');
+        } else if (normalized.length === 2) {
+            textEl.textContent = normalized.map(t => t.replace(' Team', '').replace(' Systems', '').replace(' System', '')).join(', ');
+            textEl.classList.add('has-value');
+        } else {
+            textEl.textContent = `${normalized.length} teams selected`;
+            textEl.classList.add('has-value');
+        }
+    }
+    
+    // 3. Re-render tasks
+    renderTasks();
+}
+window.setSelectedTeams = setSelectedTeams;
+
+// Backward-compatibility helper
+function syncTeamTabs(teamValue) {
+    setSelectedTeams(teamValue);
 }
 
 function setViewMode(mode) {
@@ -3292,9 +3424,11 @@ function openDetailsModal(id) {
             btn.innerHTML = `
                 <span class="btn-left">
                     ${leftIconSvg}
-                    <span>${file.name} (${sizeLabel})</span>
+                    <span class="download-file-name">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
                 </span>
-                ${rightIconSvg}
+                <span class="btn-right-icon">
+                    ${rightIconSvg}
+                </span>
             `;
             filesContainer.appendChild(btn);
         });
@@ -3404,6 +3538,49 @@ function deleteLogUpdate(taskId, timestamp) {
 }
 window.deleteLogUpdate = deleteLogUpdate;
 
+// Helper: Determine DHL timeline badge style & status classification
+function getTimelineBadgeInfo(text) {
+    const raw = (text || '').toLowerCase().replace(/[-_]/g, ' ');
+    if (raw.includes('completed')) {
+        return {
+            type: 'completed',
+            className: 'dhl-badge-completed',
+            color: '#10b981' // Green
+        };
+    }
+    if (raw.includes('in progress')) {
+        return {
+            type: 'in-progress',
+            className: 'dhl-badge-in-progress',
+            color: '#2563eb' // Blue
+        };
+    }
+    if (raw.includes('status updated to open')) {
+        return {
+            type: 'open',
+            className: 'dhl-badge-open',
+            color: '#64748b' // Slate
+        };
+    }
+    // "if it on progress turn to purple" -> intermediate progress logs / notes
+    return {
+        type: 'progress',
+        className: 'dhl-badge-progress',
+        color: '#8b5cf6' // Purple
+    };
+}
+window.getTimelineBadgeInfo = getTimelineBadgeInfo;
+
+// Helper: Determine shading gradient between consecutive timeline badges
+function getTimelineSegmentGradient(fromInfo, toInfo) {
+    // When transitioning directly from In Progress to Completed, shade through purple in the middle
+    if (fromInfo.type === 'in-progress' && toInfo.type === 'completed') {
+        return 'linear-gradient(to bottom, #2563eb 0%, #8b5cf6 50%, #10b981 100%)';
+    }
+    return `linear-gradient(to bottom, ${fromInfo.color}, ${toInfo.color})`;
+}
+window.getTimelineSegmentGradient = getTimelineSegmentGradient;
+
 // Helper: Render Comments and Updates inside Details Modal
 function renderComments(task) {
     const commentsList = document.getElementById('detailCommentsList');
@@ -3425,7 +3602,7 @@ function renderComments(task) {
         commentsList.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted); display: block; padding: 0.5rem 0;">No comments yet. Be the first to comment!</span>';
     } else {
         comments.forEach(comment => {
-            commentsList.appendChild(createCommentDOM(comment));
+            commentsList.appendChild(createCommentDOM(comment, false, task));
         });
     }
 
@@ -3472,6 +3649,15 @@ function renderComments(task) {
                 } catch(e) {}
             }
             
+            const badgeInfo = getTimelineBadgeInfo(update.text);
+            const isNotLast = idx < sortedUpdates.length - 1;
+            let segmentStyle = '';
+            if (isNotLast) {
+                const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[idx + 1].text);
+                const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
+                segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+            }
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'dhl-timeline-item';
             
@@ -3484,8 +3670,8 @@ function renderComments(task) {
                 <div class="dhl-timeline-date">
                     ${dateHtml}
                 </div>
-                <div class="dhl-timeline-node-container">
-                    <div class="dhl-timeline-badge">
+                <div class="dhl-timeline-node-container"${segmentStyle}>
+                    <div class="dhl-timeline-badge ${badgeInfo.className}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="dhl-checkmark">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
@@ -3493,7 +3679,7 @@ function renderComments(task) {
                 </div>
                 <div class="dhl-timeline-content" style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; width: 100%;">
                     <div style="flex: 1; min-width: 0;">
-                        <div class="dhl-status-title">${escapeHTMLApp(update.text)}</div>
+                        <div class="dhl-status-title">${formatTimelineUpdateHtml(update.text, task)}</div>
                         <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(update.author)}</div>
                     </div>
                     <button class="delete-update-btn" onclick="deleteLogUpdate('${task.id}', '${update.timestamp}')" onmouseover="this.style.opacity='1'; this.style.color='var(--priority-aog, #ef4444)';" onmouseout="this.style.opacity='0.4'; this.style.color='var(--text-muted)';" style="background: none; border: none; padding: 4px; cursor: pointer; color: var(--text-muted); opacity: 0.4; transition: opacity 0.2s, color 0.2s; display: flex; align-items: center; justify-content: center; margin-top: 2px;" title="Delete update">
@@ -3512,7 +3698,7 @@ function renderComments(task) {
 }
 
 // Helper: Generate DOM for comments and updates
-function createCommentDOM(item, isLatest) {
+function createCommentDOM(item, isLatest, task) {
     if (item.type === 'update') {
         const itemDiv = document.createElement('div');
         itemDiv.className = `timeline-item${isLatest ? ' latest' : ''}`;
@@ -3541,7 +3727,7 @@ function createCommentDOM(item, isLatest) {
                     <span class="timeline-author">${escapeHTMLApp(item.author)}</span>
                     <span class="timeline-time">${dateStr}</span>
                 </div>
-                <div class="timeline-card-text">${escapeHTMLApp(item.text)}</div>
+                <div class="timeline-card-text">${formatTimelineUpdateHtml(item.text, task)}</div>
             </div>
         `;
         return itemDiv;
@@ -3568,7 +3754,7 @@ function createCommentDOM(item, isLatest) {
                 <span class="comment-author">${escapeHTMLApp(item.author)}</span>
                 <span class="comment-time">${dateStr}</span>
             </div>
-            <div class="comment-text">${escapeHTMLApp(item.text)}</div>
+            <div class="comment-text">${formatTimelineUpdateHtml(item.text, task)}</div>
         `;
         return itemDiv;
     }
@@ -3583,6 +3769,97 @@ function escapeHTMLApp(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+function escapeRegexApp(str) {
+    if (!str) return '';
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Formats timeline update text so that user text message is shown first, and attached file is placed after text
+function formatTimelineUpdateHtml(updateText, task) {
+    if (!updateText) return '';
+    
+    let mainText = '';
+    let attachedFileName = '';
+    
+    // First attempt: check against task attachments directly if available
+    let matchedFromTask = false;
+    if (task && Array.isArray(task.attachments) && task.attachments.length > 0) {
+        // Sort attachments by name length descending so longer matching names take precedence
+        const sortedAtts = [...task.attachments].sort((a, b) => (b.name ? b.name.length : 0) - (a.name ? a.name.length : 0));
+        for (const att of sortedAtts) {
+            if (!att || !att.name) continue;
+            const attName = att.name.trim();
+            // Check prefix: "Attached file: <attName>"
+            const prefixRegex = new RegExp(`^Attached file:\\s*${escapeRegexApp(attName)}(?:\\s*[\\r\\n]+\\s*|\\s+|$)([\\s\\S]*)$`, 'i');
+            const pMatch = updateText.match(prefixRegex);
+            if (pMatch) {
+                attachedFileName = attName;
+                mainText = (pMatch[1] || '').trim();
+                matchedFromTask = true;
+                break;
+            }
+            // Check suffix: "<text> Attached file: <attName>"
+            const suffixRegex = new RegExp(`^([\\s\\S]*?)(?:[\\r\\n]+\\s*|\\s+)Attached file:\\s*${escapeRegexApp(attName)}$`, 'i');
+            const sMatch = updateText.match(suffixRegex);
+            if (sMatch) {
+                attachedFileName = attName;
+                mainText = (sMatch[1] || '').trim();
+                matchedFromTask = true;
+                break;
+            }
+        }
+    }
+    
+    if (!matchedFromTask) {
+        // Fallback regex matching:
+        // 1. Check old prefix format: "Attached file: <filename> <text>" or "Attached file: <filename>\n\n<text>"
+        const oldPrefixMatch = updateText.match(/^Attached file:\s*([^\r\n]+?\.(?:[a-zA-Z0-9]{2,5}))(?:\s*[\r\n]+\s*|\s+)([\s\S]+)$/i);
+        // 2. Check suffix format: "<text>\n\nAttached file: <filename>" or "<text> Attached file: <filename>"
+        const suffixMatch = updateText.match(/^([\s\S]+?)(?:[\r\n]+\s*|\s+)Attached file:\s*([^\r\n]+)$/i);
+        // 3. Check only attached file: "Attached file: <filename>"
+        const onlyFileMatch = updateText.match(/^Attached file:\s*([^\r\n]+)$/i);
+        
+        if (oldPrefixMatch) {
+            attachedFileName = oldPrefixMatch[1].trim();
+            mainText = oldPrefixMatch[2].trim();
+        } else if (suffixMatch) {
+            mainText = suffixMatch[1].trim();
+            attachedFileName = suffixMatch[2].trim();
+        } else if (onlyFileMatch) {
+            attachedFileName = onlyFileMatch[1].trim();
+            mainText = '';
+        } else {
+            mainText = updateText.trim();
+        }
+    }
+    
+    let html = '';
+    if (mainText) {
+        html += `<div class="dhl-update-msg" style="white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45;">${escapeHTMLApp(mainText)}</div>`;
+    }
+    
+    if (attachedFileName) {
+        const attObj = (task && task.attachments) 
+            ? task.attachments.find(a => a.name === attachedFileName || (a.name && a.name.toLowerCase() === attachedFileName.toLowerCase())) 
+            : null;
+        const attachClickAttr = attObj 
+            ? `onclick="event.stopPropagation(); safeOpenOrDownload('${escapeHTMLApp(attObj.data)}', '${escapeHTMLApp(attObj.name)}');" style="cursor: pointer;" title="Click to view / download ${escapeHTMLApp(attachedFileName)}"` 
+            : '';
+        
+        html += `
+            <div class="dhl-attachment-pill" ${attachClickAttr} style="display: inline-flex; align-items: center; gap: 5px; margin-top: ${mainText ? '6px' : '0'}; background: var(--bg-hover, rgba(255,255,255,0.06)); border: 1px solid var(--border-color, rgba(255,255,255,0.15)); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; font-weight: 500; color: var(--text-primary); max-width: 100%; box-sizing: border-box; overflow: hidden; word-break: break-word;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px; color: var(--team-avionics, #935073); flex-shrink: 0;">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                <span style="color: var(--text-muted); font-weight: 400; flex-shrink: 0;">Attached file:</span>
+                <span style="color: var(--text-primary); font-weight: 600; text-decoration: ${attObj ? 'underline' : 'none'}; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word;">${escapeHTMLApp(attachedFileName)}</span>
+            </div>
+        `;
+    }
+    
+    return html;
 }
 
 function saveTaskWithUploads(taskToSave, wasExternal) {
@@ -4148,9 +4425,9 @@ function renderFilePreviews() {
         item.innerHTML = `
             <div class="file-item-name">
                 ${iconSvg}
-                <span title="${file.name}">${file.name} (${sizeLabel})</span>
+                <span class="file-preview-text" title="${escapeHTMLApp(file.name)}">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
             </div>
-            <button type="button" class="remove-file" onclick="removeAttachment(${index})">
+            <button type="button" class="remove-file" onclick="removeAttachment(${index})" title="Remove attachment">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -5369,110 +5646,111 @@ function renderWeeklySummaryTab() {
     }
 
     // 2. Executive Narrative Highlights Generator
-    const teams = [
-        'Mechanical System Team',
-        'Avionic Systems Team',
-        'Structure Team',
-        'Engines Team',
-        'IERA Shop',
-        'Component Team'
-    ];
-    
     const narrativeContainer = document.getElementById('summaryNarrative');
-    narrativeContainer.innerHTML = '';
-    
-    const teamsToRender = selectedTeams.length === 0 ? teams : selectedTeams;
-    
-    teamsToRender.forEach(teamName => {
-        const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(teamName));
-        if (teamTasks.length === 0) {
-            narrativeContainer.innerHTML += `
+    if (narrativeContainer) {
+        narrativeContainer.innerHTML = '';
+        const teams = [
+            'Mechanical System Team',
+            'Avionic Systems Team',
+            'Structure Team',
+            'Engines Team',
+            'IERA Shop',
+            'Component Team'
+        ];
+        
+        const teamsToRender = selectedTeams.length === 0 ? teams : selectedTeams;
+        
+        teamsToRender.forEach(teamName => {
+            const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(teamName));
+            if (teamTasks.length === 0) {
+                narrativeContainer.innerHTML += `
+                    <div class="narrative-item">
+                        <div class="narrative-team-title">
+                            <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);"></span>
+                            ${teamName}
+                        </div>
+                        <p style="margin: 0; padding-left: 1.25rem; font-style: italic; color: var(--text-muted);">No active maintenance events logged for this period.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const completedTasks = teamTasks.filter(t => t.currentStatus === 'Completed');
+            const activeTasks = teamTasks.filter(t => t.currentStatus !== 'Completed');
+            
+            let dotColor = '#059669';
+            if (teamName.includes('Avionic')) dotColor = '#0891b2';
+            else if (teamName.includes('Structure')) dotColor = '#7c3aed';
+            else if (teamName.includes('Engines')) dotColor = '#db2777';
+            else if (teamName.includes('IERA')) dotColor = '#4f46e5';
+            else if (teamName.includes('Component')) dotColor = '#d97706';
+            
+            let narrativeHtml = `
                 <div class="narrative-item">
                     <div class="narrative-team-title">
-                        <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);"></span>
+                        <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${dotColor};"></span>
                         ${teamName}
                     </div>
-                    <p style="margin: 0; padding-left: 1.25rem; font-style: italic; color: var(--text-muted);">No active maintenance events logged for this period.</p>
-                </div>
+                    <div style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.55rem;">
             `;
-            return;
-        }
-        
-        const completedTasks = teamTasks.filter(t => t.currentStatus === 'Completed');
-        const activeTasks = teamTasks.filter(t => t.currentStatus !== 'Completed');
-        
-        let dotColor = '#059669';
-        if (teamName.includes('Avionic')) dotColor = '#0891b2';
-        else if (teamName.includes('Structure')) dotColor = '#7c3aed';
-        else if (teamName.includes('Engines')) dotColor = '#db2777';
-        else if (teamName.includes('IERA')) dotColor = '#4f46e5';
-        else if (teamName.includes('Component')) dotColor = '#d97706';
-        
-        let narrativeHtml = `
-            <div class="narrative-item">
-                <div class="narrative-team-title">
-                    <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${dotColor};"></span>
-                    ${teamName}
-                </div>
-                <div style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.55rem;">
-        `;
 
-        // -- Successfully Completed paragraph --
-        if (completedTasks.length > 0) {
-            const itemsHtml = completedTasks
-                .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
-                .join('');
-            narrativeHtml += `
-                <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
-                    <div>
-                        <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#059669; background:rgba(5,150,105,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Successfully Completed</span>
-                    </div>
-                    <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
-                        ${itemsHtml}
-                    </ul>
-                </div>`;
-        }
+            // -- Successfully Completed paragraph --
+            if (completedTasks.length > 0) {
+                const itemsHtml = completedTasks
+                    .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
+                    .join('');
+                narrativeHtml += `
+                    <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
+                        <div>
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#059669; background:rgba(5,150,105,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Successfully Completed</span>
+                        </div>
+                        <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
+                            ${itemsHtml}
+                        </ul>
+                    </div>`;
+            }
 
-        // -- CRITICAL AOG paragraph --
-        const aogActive = activeTasks.filter(t => t.priorityLevel === 'AOG');
-        if (aogActive.length > 0) {
-            const itemsHtml = aogActive
-                .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
-                .join('');
-            narrativeHtml += `
-                <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
-                    <div>
-                        <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--priority-aog); background:rgba(220,38,38,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Critical / AOG</span>
-                        <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Active AOG defect(s):</span>
-                    </div>
-                    <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
-                        ${itemsHtml}
-                    </ul>
-                </div>`;
-        }
+            // -- CRITICAL AOG paragraph --
+            const aogActive = activeTasks.filter(t => t.priorityLevel === 'AOG');
+            if (aogActive.length > 0) {
+                const itemsHtml = aogActive
+                    .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
+                    .join('');
+                narrativeHtml += `
+                    <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
+                        <div>
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--priority-aog); background:rgba(220,38,38,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Critical / AOG</span>
+                            <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Active AOG defect(s):</span>
+                        </div>
+                        <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
+                            ${itemsHtml}
+                        </ul>
+                    </div>`;
+            }
 
-        // -- In Progress / Open paragraph --
-        const normalActive = activeTasks.filter(t => t.priorityLevel !== 'AOG');
-        if (normalActive.length > 0) {
-            const statusSummary = [...new Set(normalActive.map(t => t.currentStatus))].join(' / ');
-            const itemsHtml = normalActive
-                .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
-                .join('');
-            narrativeHtml += `
-                <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
-                    <div>
-                        <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#d97706; background:rgba(217,119,6,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">${statusSummary}</span>
-                        <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Progressing ${normalActive.length} active task(s):</span>
-                    </div>
-                    <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
-                        ${itemsHtml}
-                    </ul>
-                </div>`;
-        }
+            // -- In Progress / Open paragraph --
+            const normalActive = activeTasks.filter(t => t.priorityLevel !== 'AOG');
+            if (normalActive.length > 0) {
+                const statusSummary = [...new Set(normalActive.map(t => t.currentStatus))].join(' / ');
+                const itemsHtml = normalActive
+                    .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
+                    .join('');
+                narrativeHtml += `
+                    <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
+                        <div>
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#d97706; background:rgba(217,119,6,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">${statusSummary}</span>
+                            <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Progressing ${normalActive.length} active task(s):</span>
+                        </div>
+                        <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
+                            ${itemsHtml}
+                        </ul>
+                    </div>`;
+            }
 
-        narrativeHtml += `</div></div>`;
-        narrativeContainer.innerHTML += narrativeHtml;
-    });
+            narrativeHtml += `</div></div>`;
+            narrativeContainer.innerHTML += narrativeHtml;
+        });
+    }
 
     // 3. Team Workload Analysis — count each team a task is assigned to
     const teamCounts = {};
@@ -5745,20 +6023,29 @@ function renderWeeklySummaryTab() {
                                    <span class="dhl-date-year">${yearVal}</span>`
                                 : '';
                             
+                            const badgeInfo = getTimelineBadgeInfo(u.text);
+                            const isNotLast = i < sortedUpdates.length - 1;
+                            let segmentStyle = '';
+                            if (isNotLast) {
+                                const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[i + 1].text);
+                                const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
+                                segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+                            }
+                            
                             return `
                                 <div class="dhl-timeline-item">
                                     <div class="dhl-timeline-date">
                                         ${dateHtml}
                                     </div>
-                                    <div class="dhl-timeline-node-container">
-                                        <div class="dhl-timeline-badge">
+                                    <div class="dhl-timeline-node-container"${segmentStyle}>
+                                        <div class="dhl-timeline-badge ${badgeInfo.className}">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="dhl-checkmark">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
                                         </div>
                                     </div>
                                     <div class="dhl-timeline-content">
-                                        <div class="dhl-status-title">${escapeHTMLApp(u.text)}</div>
+                                        <div class="dhl-status-title">${formatTimelineUpdateHtml(u.text, t)}</div>
                                         <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(u.author)}</div>
                                     </div>
                                 </div>`;
@@ -7494,20 +7781,29 @@ function showUpdateLogModal(taskId) {
                        <span class="dhl-date-year">${yearVal}</span>`
                     : '';
                 
+                const badgeInfo = getTimelineBadgeInfo(u.text);
+                const isNotLast = i < sortedUpdates.length - 1;
+                let segmentStyle = '';
+                if (isNotLast) {
+                    const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[i + 1].text);
+                    const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
+                    segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+                }
+                
                 return `
                     <div class="dhl-timeline-item">
                         <div class="dhl-timeline-date">
                             ${dateHtml}
                         </div>
-                        <div class="dhl-timeline-node-container">
-                            <div class="dhl-timeline-badge">
+                        <div class="dhl-timeline-node-container"${segmentStyle}>
+                            <div class="dhl-timeline-badge ${badgeInfo.className}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="dhl-checkmark">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                             </div>
                         </div>
                         <div class="dhl-timeline-content">
-                            <div class="dhl-status-title">${escapeHTMLApp(u.text)}</div>
+                            <div class="dhl-status-title">${formatTimelineUpdateHtml(u.text, task)}</div>
                             <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(u.author)}</div>
                         </div>
                     </div>`;

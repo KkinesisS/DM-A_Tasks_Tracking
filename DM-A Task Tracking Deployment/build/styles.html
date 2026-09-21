@@ -298,12 +298,16 @@ header {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    position: relative;
+    z-index: 100;
 }
 
 .filters-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 100;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -371,6 +375,66 @@ header {
 
 .filter-select:focus, .filter-select:hover {
     border-color: var(--border-color-hover);
+}
+
+/* Team Filter Multiselect Dropdown in Filter Group */
+.team-filter-multiselect {
+    position: relative;
+    display: inline-block;
+    z-index: 100;
+}
+
+.team-filter-multiselect .multiselect-trigger {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0 8px 0 0.75rem;
+    height: 38px;
+    min-height: 38px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-sizing: border-box;
+    background-image: none !important;
+    min-width: 140px;
+}
+
+.team-filter-multiselect .multiselect-trigger:hover,
+.team-filter-multiselect .multiselect-trigger.active {
+    border-color: var(--border-color-hover);
+    box-shadow: none;
+}
+
+.team-filter-multiselect .multiselect-text {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+}
+
+.team-filter-multiselect .multiselect-arrow {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #475569;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.team-filter-multiselect .multiselect-trigger.active .multiselect-arrow {
+    transform: rotate(180deg);
+}
+
+.team-filter-multiselect .multiselect-dropdown {
+    top: calc(100% + 4px);
+    min-width: 220px;
+    z-index: 9999;
 }
 
 /* View Mode Toggles */
@@ -1126,7 +1190,11 @@ header {
 .modal-body {
     padding: 1.5rem;
     overflow-y: auto;
+    overflow-x: hidden !important;
     flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Form Styles */
@@ -1214,6 +1282,7 @@ header {
     cursor: pointer;
     outline: none;
     transition: var(--transition);
+    background-image: none !important;
 }
 
 .multiselect-trigger:hover,
@@ -1568,6 +1637,10 @@ header {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .file-item {
@@ -1579,16 +1652,24 @@ header {
     justify-content: space-between;
     align-items: center;
     font-size: 0.8rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    gap: 0.5rem;
 }
 
 .file-item-name {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     color: var(--text-primary);
+    line-height: 1.4;
 }
 
 .file-item-name svg {
@@ -1596,6 +1677,22 @@ header {
     height: 14px;
     color: var(--text-secondary);
     flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.file-item-name span,
+.file-item-name .file-preview-text {
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.file-item-name .file-size-label {
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-size: 0.75rem;
 }
 
 .remove-file {
@@ -1604,11 +1701,17 @@ header {
     color: var(--text-muted);
     cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 4px;
     transition: var(--transition);
 }
 
 .remove-file:hover {
     color: var(--priority-aog);
+    background: rgba(239, 68, 68, 0.1);
 }
 
 .modal-footer {
@@ -1622,10 +1725,22 @@ header {
 }
 
 /* Details Modal Specific Styles */
+#detailsModal .modal-content {
+    max-width: 1200px;
+    width: 95%;
+}
+
 .details-grid {
     display: grid;
-    grid-template-columns: 1.0fr 2.0fr 0.8fr;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
     gap: 1.5rem;
+    width: 100%;
+    min-width: 0;
+}
+
+.details-grid > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .details-main {
@@ -1633,6 +1748,9 @@ header {
     flex-direction: column;
     gap: 1.25rem;
     height: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .details-middle {
@@ -1643,6 +1761,9 @@ header {
     border-left: 1px solid var(--border-color);
     padding-left: 1.5rem;
     height: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .details-sidebar {
@@ -1652,12 +1773,16 @@ header {
     background: #f8fafc;
     border-left: 1px solid var(--border-color);
     padding-left: 1.5rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .detail-section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .detail-section h4 {
@@ -1679,6 +1804,8 @@ header {
     padding: 1rem;
     min-height: 120px;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     color: var(--text-primary);
 }
 
@@ -1704,6 +1831,11 @@ header {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .download-file-btn {
@@ -1718,6 +1850,12 @@ header {
     text-decoration: none;
     font-size: 0.85rem;
     transition: var(--transition);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    gap: 0.75rem;
+    overflow: hidden;
 }
 
 .download-file-btn:hover {
@@ -1727,17 +1865,59 @@ header {
 
 .download-file-btn .btn-left {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-.download-file-btn svg {
+.download-file-btn .btn-left svg {
     width: 16px;
     height: 16px;
     color: var(--text-secondary);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.download-file-btn .btn-left span,
+.download-file-btn .download-file-name {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.4;
+    min-width: 0;
+    flex: 1;
+}
+
+.download-file-btn .file-size-label {
+    white-space: nowrap !important;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline;
+    margin-left: 0.25rem;
+}
+
+.download-file-btn > svg,
+.download-file-btn .btn-right-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+}
+
+.download-file-btn .btn-right-icon svg,
+.download-file-btn > svg:last-child {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
 }
 
 /* Empty State */
@@ -2426,6 +2606,9 @@ header {
     border-radius: 8px;
     padding: 0.75rem 1rem;
     animation: fadeInComment 0.25s ease-out;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
 }
 
 @keyframes fadeInComment {
@@ -2462,6 +2645,8 @@ header {
     color: var(--text-secondary);
     line-height: 1.45;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .comment-input-area {
@@ -2470,6 +2655,7 @@ header {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 0.75rem;
+    min-width: 0;
 }
 
 .ata-badge {
@@ -2746,33 +2932,16 @@ header {
     .summary-grid,
     html.dark-mode .summary-grid {
         display: grid !important;
-        grid-template-columns: 3fr 2fr !important;
+        grid-template-columns: 1fr 1fr !important;
         gap: 1.5rem !important;
         margin-bottom: 1rem !important;
         page-break-after: always !important;
         break-after: page !important;
     }
 
-    .summary-grid > div:first-child {
+    .summary-grid > .glass-panel {
         width: auto !important;
         margin-bottom: 0 !important;
-    }
-
-    .summary-grid > div:nth-child(2) {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 1rem !important;
-        width: auto !important;
-    }
-
-    .summary-grid > div:nth-child(2) > .glass-panel {
-        flex: none !important;
-        margin-bottom: 0 !important;
-    }
-
-    #summaryNarrative {
-        font-size: 16pt !important;
-        line-height: 1.4 !important;
     }
 
     /* Pill progress bars styling in print */
@@ -3048,15 +3217,16 @@ header {
 
     /* DHL Timeline Print Styles */
     .dhl-timeline::before {
-        background: #FFC72C !important;
+        display: none !important;
+    }
+    
+    .dhl-timeline-item:not(:last-child) .dhl-timeline-node-container::after {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
     
     .dhl-timeline-badge {
-        background-color: #FFC72C !important;
         border-color: #ffffff !important;
-        box-shadow: 0 0 0 2px #FFC72C !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -3209,14 +3379,6 @@ header {
         break-after: avoid !important;
     }
 
-    /* Side-by-side workload and alerts inside right column wrapper */
-    body.print-one-page .summary-grid > div:nth-child(2) {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 0.5rem !important;
-        flex-direction: row !important;
-    }
-    
     body.print-one-page .glass-panel {
         padding: 0.35rem 0.5rem !important;
         margin-bottom: 0.1rem !important;
@@ -3226,12 +3388,6 @@ header {
         font-size: 0.8rem !important;
         margin-bottom: 0.25rem !important;
         padding-bottom: 0.1rem !important;
-    }
-    
-    body.print-one-page #summaryNarrative {
-        font-size: 7.5pt !important;
-        line-height: 1.25 !important;
-        gap: 0.2rem !important;
     }
     
     body.print-one-page #summaryTeamWorkload {
@@ -3500,7 +3656,14 @@ body.force-desktop .form-group.full-width {
 }
 
 body.force-desktop .details-grid {
-    grid-template-columns: 2fr 1fr !important;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 0.8fr) !important;
+}
+
+body.force-desktop .details-middle {
+    border-left: 1px solid var(--border-color) !important;
+    border-top: none !important;
+    padding-left: 1.5rem !important;
+    padding-top: 0 !important;
 }
 
 body.force-desktop .details-sidebar {
@@ -3624,6 +3787,13 @@ body.force-mobile .form-group.full-width {
 
 body.force-mobile .details-grid {
     grid-template-columns: 1fr !important;
+}
+
+body.force-mobile .details-middle {
+    border-left: none !important;
+    border-top: 1px solid var(--border-color) !important;
+    padding-left: 0 !important;
+    padding-top: 1.5rem !important;
 }
 
 body.force-mobile .details-sidebar {
@@ -3960,27 +4130,20 @@ html.dark-mode .stat-card.completed,
    DHL-STYLE TIMELINE FOR STATUS LOG & UPDATES
    ========================================================================== */
 .dhl-timeline {
+    --timeline-gap: 1.25rem;
     position: relative;
     padding: 0.5rem 0;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: var(--timeline-gap);
 }
 
-/* Single continuous vertical gold timeline line connecting all badges */
+/* Hide legacy global vertical line to eliminate bottom protrusion & duplicates */
 .dhl-timeline::before {
-    content: '';
-    position: absolute;
-    top: 20px; /* Center of the first badge */
-    bottom: 20px; /* Center of the last badge */
-    left: 96px; /* Aligns with center of the badges (80px date + 16px half of node container) */
-    width: 4px;
-    background: #FFC72C;
-    z-index: 1;
-    transform: translateX(-50%);
+    display: none !important;
 }
 
-/* Hide the line if there's only one item */
+/* Hide line if there's only one item */
 .dhl-timeline:has(.dhl-timeline-item:only-child)::before {
     display: none;
 }
@@ -4023,27 +4186,67 @@ html.dark-mode .stat-card.completed,
     flex-shrink: 0;
     position: relative;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+}
+
+/* Dynamic shading line progress connecting badges */
+.dhl-timeline-item:not(:last-child) .dhl-timeline-node-container::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: calc(-1 * var(--timeline-gap, 1.25rem) - 12px);
+    left: 50%;
+    width: 4px;
+    transform: translateX(-50%);
+    background: var(--segment-gradient, linear-gradient(to bottom, #2563eb 0%, #8b5cf6 50%, #10b981 100%));
+    z-index: 1;
+    border-radius: 2px;
 }
 
 .dhl-timeline-badge {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #FFC72C; /* Gold background */
+    background: #FFC72C; /* Gold default fallback */
     border: 2px solid #ffffff; /* White border */
     box-shadow: 0 0 0 2px #FFC72C; /* Secondary gold ring */
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     z-index: 2;
     margin-top: 1px;
     flex-shrink: 0;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Timeline Status Badge Variants */
+.dhl-timeline-badge.dhl-badge-in-progress {
+    background: #2563eb;
+    box-shadow: 0 0 0 2px #2563eb;
+}
+
+.dhl-timeline-badge.dhl-badge-progress {
+    background: #8b5cf6;
+    box-shadow: 0 0 0 2px #8b5cf6;
+}
+
+.dhl-timeline-badge.dhl-badge-completed {
+    background: #10b981;
+    box-shadow: 0 0 0 2px #10b981;
+}
+
+.dhl-timeline-badge.dhl-badge-open {
+    background: #64748b;
+    box-shadow: 0 0 0 2px #64748b;
 }
 
 /* In dark mode, let's make the badge border match dark card bg */
 html.dark-mode .dhl-timeline-badge {
-    border-color: var(--bg-card);
+    border-color: #1A0E1D;
 }
 
 .dhl-checkmark {
@@ -4065,6 +4268,50 @@ html.dark-mode .dhl-timeline-badge {
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.dhl-update-msg {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.dhl-attachment-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    max-width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.dhl-attachment-pill:hover {
+    background: var(--primary-light, rgba(230, 0, 0, 0.08));
+    border-color: var(--primary-color, #d40511);
+}
+
+html.dark-mode .dhl-attachment-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+html.dark-mode .dhl-attachment-pill:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.28);
 }
 
 .dhl-status-subtext {

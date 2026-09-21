@@ -53,20 +53,20 @@ $indexHtml = $indexHtml.Replace('<script src="manualIssues.js"></script>', "<scr
 $indexHtml = $indexHtml.Replace('<script src="app.js"></script>', "<script>`n$appContent`n</script>")
 
 # Write index.html to build folder and root folder
-$indexHtml | Set-Content -Path "build/index.html" -Encoding UTF8
-$indexHtml | Set-Content -Path "index.html" -Encoding UTF8
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) "build/index.html"), $indexHtml, [System.Text.Encoding]::UTF8)
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) "index.html"), $indexHtml, [System.Text.Encoding]::UTF8)
 Write-Host "$templatePath -> build/index.html and index.html compiled (fully inlined)."
 
 # Wrap and write CSS files as HTML
 $cssFiles = @('styles.css', 'dark-mode.css')
 foreach ($file in $cssFiles) {
     if (Test-Path $file) {
-        $content = Get-Content -Path $file -Raw -Encoding UTF8
+        $content = [System.IO.File]::ReadAllText((Join-Path (Get-Location) $file), [System.Text.Encoding]::UTF8)
         if ($file -eq "styles.css") {
             $content = $stylesContent
         }
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file)
-        "<style>`n$content`n</style>" | Set-Content -Path "build/$baseName.html" -Encoding UTF8
+        [System.IO.File]::WriteAllText((Join-Path (Get-Location) "build/$baseName.html"), "<style>`n$content`n</style>", [System.Text.Encoding]::UTF8)
         Write-Host "$file wrapped -> build/$baseName.html"
     }
 }
@@ -75,9 +75,9 @@ foreach ($file in $cssFiles) {
 $jsFiles = @('tabs.js', 'manualIssues.js', 'app.js')
 foreach ($file in $jsFiles) {
     if (Test-Path $file) {
-        $content = Get-Content -Path $file -Raw -Encoding UTF8
+        $content = [System.IO.File]::ReadAllText((Join-Path (Get-Location) $file), [System.Text.Encoding]::UTF8)
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file)
-        "<script>`n$content`n</script>" | Set-Content -Path "build/$baseName.html" -Encoding UTF8
+        [System.IO.File]::WriteAllText((Join-Path (Get-Location) "build/$baseName.html"), "<script>`n$content`n</script>", [System.Text.Encoding]::UTF8)
         Write-Host "$file wrapped -> build/$baseName.html"
     }
 }

@@ -348,8 +348,11 @@ html.dark-mode .recurring-empty {
 }
 
 /* Custom dropdown arrow for filter select elements in dark mode */
-html.dark-mode .filter-select {
+html.dark-mode select.filter-select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F6DBC0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 8px center !important;
+    background-size: 14px !important;
 }
 
 /* View Mode Toggles in Dark Mode */
@@ -470,6 +473,7 @@ html.dark-mode .team-badge.component {
 /* ── Dark Mode: Custom Multi-Select Dropdown ───────────────────────── */
 html.dark-mode .multiselect-trigger {
     background-color: rgba(26, 14, 29, 0.85) !important;
+    background-image: none !important;
     border: 1px solid rgba(147, 80, 115, 0.3) !important;
     color: var(--text-primary) !important;
 }
@@ -477,6 +481,7 @@ html.dark-mode .multiselect-trigger {
 html.dark-mode .multiselect-trigger:hover,
 html.dark-mode .multiselect-trigger.active {
     background-color: rgba(40, 22, 43, 0.95) !important;
+    background-image: none !important;
     border-color: rgba(246, 219, 192, 0.65) !important;
     box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.25), inset 0 0 8px rgba(147, 80, 115, 0.1) !important;
 }
@@ -491,6 +496,49 @@ html.dark-mode .multiselect-text.has-value {
 
 html.dark-mode .multiselect-arrow {
     color: #935073 !important;
+}
+
+/* Specific styling for Team Filter Multiselect to match .filter-select exactly */
+html.dark-mode .controls-panel {
+    position: relative;
+    z-index: 100;
+}
+
+html.dark-mode .team-filter-multiselect {
+    position: relative;
+    z-index: 100 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-trigger {
+    background-color: #1A0E1D !important;
+    border: 1px solid rgba(147, 80, 115, 0.45) !important;
+    color: #F8F4E9 !important;
+    background-image: none !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-trigger:hover {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.75) !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-trigger.active {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.4), inset 0 0 8px rgba(147, 80, 115, 0.2) !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-text,
+html.dark-mode .team-filter-multiselect .multiselect-text.has-value {
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-arrow {
+    color: #F6DBC0 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-dropdown {
+    z-index: 9999 !important;
 }
 
 html.dark-mode .multiselect-dropdown {

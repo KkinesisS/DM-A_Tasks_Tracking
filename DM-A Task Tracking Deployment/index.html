@@ -322,12 +322,16 @@ header {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    position: relative;
+    z-index: 100;
 }
 
 .filters-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 100;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -395,6 +399,66 @@ header {
 
 .filter-select:focus, .filter-select:hover {
     border-color: var(--border-color-hover);
+}
+
+/* Team Filter Multiselect Dropdown in Filter Group */
+.team-filter-multiselect {
+    position: relative;
+    display: inline-block;
+    z-index: 100;
+}
+
+.team-filter-multiselect .multiselect-trigger {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0 8px 0 0.75rem;
+    height: 38px;
+    min-height: 38px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-sizing: border-box;
+    background-image: none !important;
+    min-width: 140px;
+}
+
+.team-filter-multiselect .multiselect-trigger:hover,
+.team-filter-multiselect .multiselect-trigger.active {
+    border-color: var(--border-color-hover);
+    box-shadow: none;
+}
+
+.team-filter-multiselect .multiselect-text {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+}
+
+.team-filter-multiselect .multiselect-arrow {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #475569;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.team-filter-multiselect .multiselect-trigger.active .multiselect-arrow {
+    transform: rotate(180deg);
+}
+
+.team-filter-multiselect .multiselect-dropdown {
+    top: calc(100% + 4px);
+    min-width: 220px;
+    z-index: 9999;
 }
 
 /* View Mode Toggles */
@@ -1150,7 +1214,11 @@ header {
 .modal-body {
     padding: 1.5rem;
     overflow-y: auto;
+    overflow-x: hidden !important;
     flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Form Styles */
@@ -1238,6 +1306,7 @@ header {
     cursor: pointer;
     outline: none;
     transition: var(--transition);
+    background-image: none !important;
 }
 
 .multiselect-trigger:hover,
@@ -1592,6 +1661,10 @@ header {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .file-item {
@@ -1603,16 +1676,24 @@ header {
     justify-content: space-between;
     align-items: center;
     font-size: 0.8rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    gap: 0.5rem;
 }
 
 .file-item-name {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     color: var(--text-primary);
+    line-height: 1.4;
 }
 
 .file-item-name svg {
@@ -1620,6 +1701,22 @@ header {
     height: 14px;
     color: var(--text-secondary);
     flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.file-item-name span,
+.file-item-name .file-preview-text {
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.file-item-name .file-size-label {
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-size: 0.75rem;
 }
 
 .remove-file {
@@ -1628,11 +1725,17 @@ header {
     color: var(--text-muted);
     cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 4px;
     transition: var(--transition);
 }
 
 .remove-file:hover {
     color: var(--priority-aog);
+    background: rgba(239, 68, 68, 0.1);
 }
 
 .modal-footer {
@@ -1646,10 +1749,22 @@ header {
 }
 
 /* Details Modal Specific Styles */
+#detailsModal .modal-content {
+    max-width: 1200px;
+    width: 95%;
+}
+
 .details-grid {
     display: grid;
-    grid-template-columns: 1.0fr 2.0fr 0.8fr;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
     gap: 1.5rem;
+    width: 100%;
+    min-width: 0;
+}
+
+.details-grid > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .details-main {
@@ -1657,6 +1772,9 @@ header {
     flex-direction: column;
     gap: 1.25rem;
     height: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .details-middle {
@@ -1667,6 +1785,9 @@ header {
     border-left: 1px solid var(--border-color);
     padding-left: 1.5rem;
     height: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .details-sidebar {
@@ -1676,12 +1797,16 @@ header {
     background: #f8fafc;
     border-left: 1px solid var(--border-color);
     padding-left: 1.5rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .detail-section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .detail-section h4 {
@@ -1703,6 +1828,8 @@ header {
     padding: 1rem;
     min-height: 120px;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     color: var(--text-primary);
 }
 
@@ -1728,6 +1855,11 @@ header {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .download-file-btn {
@@ -1742,6 +1874,12 @@ header {
     text-decoration: none;
     font-size: 0.85rem;
     transition: var(--transition);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    gap: 0.75rem;
+    overflow: hidden;
 }
 
 .download-file-btn:hover {
@@ -1751,17 +1889,59 @@ header {
 
 .download-file-btn .btn-left {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-.download-file-btn svg {
+.download-file-btn .btn-left svg {
     width: 16px;
     height: 16px;
     color: var(--text-secondary);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.download-file-btn .btn-left span,
+.download-file-btn .download-file-name {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.4;
+    min-width: 0;
+    flex: 1;
+}
+
+.download-file-btn .file-size-label {
+    white-space: nowrap !important;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline;
+    margin-left: 0.25rem;
+}
+
+.download-file-btn > svg,
+.download-file-btn .btn-right-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+}
+
+.download-file-btn .btn-right-icon svg,
+.download-file-btn > svg:last-child {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
 }
 
 /* Empty State */
@@ -2450,6 +2630,9 @@ header {
     border-radius: 8px;
     padding: 0.75rem 1rem;
     animation: fadeInComment 0.25s ease-out;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
 }
 
 @keyframes fadeInComment {
@@ -2486,6 +2669,8 @@ header {
     color: var(--text-secondary);
     line-height: 1.45;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .comment-input-area {
@@ -2494,6 +2679,7 @@ header {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 0.75rem;
+    min-width: 0;
 }
 
 .ata-badge {
@@ -2770,33 +2956,16 @@ header {
     .summary-grid,
     html.dark-mode .summary-grid {
         display: grid !important;
-        grid-template-columns: 3fr 2fr !important;
+        grid-template-columns: 1fr 1fr !important;
         gap: 1.5rem !important;
         margin-bottom: 1rem !important;
         page-break-after: always !important;
         break-after: page !important;
     }
 
-    .summary-grid > div:first-child {
+    .summary-grid > .glass-panel {
         width: auto !important;
         margin-bottom: 0 !important;
-    }
-
-    .summary-grid > div:nth-child(2) {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 1rem !important;
-        width: auto !important;
-    }
-
-    .summary-grid > div:nth-child(2) > .glass-panel {
-        flex: none !important;
-        margin-bottom: 0 !important;
-    }
-
-    #summaryNarrative {
-        font-size: 16pt !important;
-        line-height: 1.4 !important;
     }
 
     /* Pill progress bars styling in print */
@@ -3072,15 +3241,16 @@ header {
 
     /* DHL Timeline Print Styles */
     .dhl-timeline::before {
-        background: #FFC72C !important;
+        display: none !important;
+    }
+    
+    .dhl-timeline-item:not(:last-child) .dhl-timeline-node-container::after {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
     
     .dhl-timeline-badge {
-        background-color: #FFC72C !important;
         border-color: #ffffff !important;
-        box-shadow: 0 0 0 2px #FFC72C !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -3233,14 +3403,6 @@ header {
         break-after: avoid !important;
     }
 
-    /* Side-by-side workload and alerts inside right column wrapper */
-    body.print-one-page .summary-grid > div:nth-child(2) {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 0.5rem !important;
-        flex-direction: row !important;
-    }
-    
     body.print-one-page .glass-panel {
         padding: 0.35rem 0.5rem !important;
         margin-bottom: 0.1rem !important;
@@ -3250,12 +3412,6 @@ header {
         font-size: 0.8rem !important;
         margin-bottom: 0.25rem !important;
         padding-bottom: 0.1rem !important;
-    }
-    
-    body.print-one-page #summaryNarrative {
-        font-size: 7.5pt !important;
-        line-height: 1.25 !important;
-        gap: 0.2rem !important;
     }
     
     body.print-one-page #summaryTeamWorkload {
@@ -3524,7 +3680,14 @@ body.force-desktop .form-group.full-width {
 }
 
 body.force-desktop .details-grid {
-    grid-template-columns: 2fr 1fr !important;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 0.8fr) !important;
+}
+
+body.force-desktop .details-middle {
+    border-left: 1px solid var(--border-color) !important;
+    border-top: none !important;
+    padding-left: 1.5rem !important;
+    padding-top: 0 !important;
 }
 
 body.force-desktop .details-sidebar {
@@ -3648,6 +3811,13 @@ body.force-mobile .form-group.full-width {
 
 body.force-mobile .details-grid {
     grid-template-columns: 1fr !important;
+}
+
+body.force-mobile .details-middle {
+    border-left: none !important;
+    border-top: 1px solid var(--border-color) !important;
+    padding-left: 0 !important;
+    padding-top: 1.5rem !important;
 }
 
 body.force-mobile .details-sidebar {
@@ -3984,27 +4154,20 @@ html.dark-mode .stat-card.completed,
    DHL-STYLE TIMELINE FOR STATUS LOG & UPDATES
    ========================================================================== */
 .dhl-timeline {
+    --timeline-gap: 1.25rem;
     position: relative;
     padding: 0.5rem 0;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: var(--timeline-gap);
 }
 
-/* Single continuous vertical gold timeline line connecting all badges */
+/* Hide legacy global vertical line to eliminate bottom protrusion & duplicates */
 .dhl-timeline::before {
-    content: '';
-    position: absolute;
-    top: 20px; /* Center of the first badge */
-    bottom: 20px; /* Center of the last badge */
-    left: 96px; /* Aligns with center of the badges (80px date + 16px half of node container) */
-    width: 4px;
-    background: #FFC72C;
-    z-index: 1;
-    transform: translateX(-50%);
+    display: none !important;
 }
 
-/* Hide the line if there's only one item */
+/* Hide line if there's only one item */
 .dhl-timeline:has(.dhl-timeline-item:only-child)::before {
     display: none;
 }
@@ -4047,27 +4210,67 @@ html.dark-mode .stat-card.completed,
     flex-shrink: 0;
     position: relative;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+}
+
+/* Dynamic shading line progress connecting badges */
+.dhl-timeline-item:not(:last-child) .dhl-timeline-node-container::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: calc(-1 * var(--timeline-gap, 1.25rem) - 12px);
+    left: 50%;
+    width: 4px;
+    transform: translateX(-50%);
+    background: var(--segment-gradient, linear-gradient(to bottom, #2563eb 0%, #8b5cf6 50%, #10b981 100%));
+    z-index: 1;
+    border-radius: 2px;
 }
 
 .dhl-timeline-badge {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #FFC72C; /* Gold background */
+    background: #FFC72C; /* Gold default fallback */
     border: 2px solid #ffffff; /* White border */
     box-shadow: 0 0 0 2px #FFC72C; /* Secondary gold ring */
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     z-index: 2;
     margin-top: 1px;
     flex-shrink: 0;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Timeline Status Badge Variants */
+.dhl-timeline-badge.dhl-badge-in-progress {
+    background: #2563eb;
+    box-shadow: 0 0 0 2px #2563eb;
+}
+
+.dhl-timeline-badge.dhl-badge-progress {
+    background: #8b5cf6;
+    box-shadow: 0 0 0 2px #8b5cf6;
+}
+
+.dhl-timeline-badge.dhl-badge-completed {
+    background: #10b981;
+    box-shadow: 0 0 0 2px #10b981;
+}
+
+.dhl-timeline-badge.dhl-badge-open {
+    background: #64748b;
+    box-shadow: 0 0 0 2px #64748b;
 }
 
 /* In dark mode, let's make the badge border match dark card bg */
 html.dark-mode .dhl-timeline-badge {
-    border-color: var(--bg-card);
+    border-color: #1A0E1D;
 }
 
 .dhl-checkmark {
@@ -4089,6 +4292,50 @@ html.dark-mode .dhl-timeline-badge {
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.dhl-update-msg {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.dhl-attachment-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    max-width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.dhl-attachment-pill:hover {
+    background: var(--primary-light, rgba(230, 0, 0, 0.08));
+    border-color: var(--primary-color, #d40511);
+}
+
+html.dark-mode .dhl-attachment-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+html.dark-mode .dhl-attachment-pill:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.28);
 }
 
 .dhl-status-subtext {
@@ -5052,8 +5299,11 @@ html.dark-mode .recurring-empty {
 }
 
 /* Custom dropdown arrow for filter select elements in dark mode */
-html.dark-mode .filter-select {
+html.dark-mode select.filter-select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F6DBC0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 8px center !important;
+    background-size: 14px !important;
 }
 
 /* View Mode Toggles in Dark Mode */
@@ -5174,6 +5424,7 @@ html.dark-mode .team-badge.component {
 /* ── Dark Mode: Custom Multi-Select Dropdown ───────────────────────── */
 html.dark-mode .multiselect-trigger {
     background-color: rgba(26, 14, 29, 0.85) !important;
+    background-image: none !important;
     border: 1px solid rgba(147, 80, 115, 0.3) !important;
     color: var(--text-primary) !important;
 }
@@ -5181,6 +5432,7 @@ html.dark-mode .multiselect-trigger {
 html.dark-mode .multiselect-trigger:hover,
 html.dark-mode .multiselect-trigger.active {
     background-color: rgba(40, 22, 43, 0.95) !important;
+    background-image: none !important;
     border-color: rgba(246, 219, 192, 0.65) !important;
     box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.25), inset 0 0 8px rgba(147, 80, 115, 0.1) !important;
 }
@@ -5195,6 +5447,49 @@ html.dark-mode .multiselect-text.has-value {
 
 html.dark-mode .multiselect-arrow {
     color: #935073 !important;
+}
+
+/* Specific styling for Team Filter Multiselect to match .filter-select exactly */
+html.dark-mode .controls-panel {
+    position: relative;
+    z-index: 100;
+}
+
+html.dark-mode .team-filter-multiselect {
+    position: relative;
+    z-index: 100 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-trigger {
+    background-color: #1A0E1D !important;
+    border: 1px solid rgba(147, 80, 115, 0.45) !important;
+    color: #F8F4E9 !important;
+    background-image: none !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-trigger:hover {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.75) !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-trigger.active {
+    background-color: #28162B !important;
+    border-color: rgba(246, 219, 192, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(147, 80, 115, 0.4), inset 0 0 8px rgba(147, 80, 115, 0.2) !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-text,
+html.dark-mode .team-filter-multiselect .multiselect-text.has-value {
+    color: #F8F4E9 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-arrow {
+    color: #F6DBC0 !important;
+}
+
+html.dark-mode .team-filter-multiselect .multiselect-dropdown {
+    z-index: 9999 !important;
 }
 
 html.dark-mode .multiselect-dropdown {
@@ -5619,15 +5914,25 @@ html.dark-mode .team-section-header {
 
                 <!-- Filters & Views -->
                 <div class="filters-group">
-                    <select id="teamFilter" class="filter-select">
-                        <option value="All">All Teams</option>
-                        <option value="Mechanical System Team">Mechanical System</option>
-                        <option value="Avionic Systems Team">Avionic Systems</option>
-                        <option value="Structure Team">Structure Team</option>
-                        <option value="Engines Team">Engines Team</option>
-                        <option value="IERA Shop">IERA Shop</option>
-                        <option value="Component Team">Component Team</option>
-                    </select>
+                    <!-- Team Filter Multiselect Dropdown -->
+                    <div class="multiselect-container team-filter-multiselect" id="teamFilterContainer" style="width: auto; min-width: 140px; margin: 0; position: relative; z-index: 100;">
+                        <button type="button" class="multiselect-trigger" id="teamFilterTrigger" aria-haspopup="listbox" aria-expanded="false" style="padding: 0 8px 0 0.75rem; height: 38px; min-height: 38px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; box-sizing: border-box; min-width: 140px;">
+                            <span class="multiselect-text" id="teamFilterText" style="flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem;">All Teams</span>
+                            <svg class="multiselect-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;"><path d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="multiselect-dropdown" id="teamFilterDropdown" role="listbox" style="min-width: 220px; z-index: 9999;">
+                            <label class="multiselect-option" style="border-bottom: 1px solid var(--border-color); font-weight: 600; padding-bottom: 6px; margin-bottom: 4px;">
+                                <input type="checkbox" id="teamFilterAllCheckbox" value="All" checked> All Teams
+                            </label>
+                            <label class="multiselect-option"><input type="checkbox" value="Mechanical System Team"> Mechanical System</label>
+                            <label class="multiselect-option"><input type="checkbox" value="Avionic Systems Team"> Avionic Systems</label>
+                            <label class="multiselect-option"><input type="checkbox" value="Structure Team"> Structure Team</label>
+                            <label class="multiselect-option"><input type="checkbox" value="Engines Team"> Engines Team</label>
+                            <label class="multiselect-option"><input type="checkbox" value="IERA Shop"> IERA Shop</label>
+                            <label class="multiselect-option"><input type="checkbox" value="Component Team"> Component Team</label>
+                        </div>
+                        <input type="hidden" id="teamFilter" value="All" />
+                    </div>
 
                     <select id="priorityFilter" class="filter-select">
                         <option value="All">All Priorities</option>
@@ -6377,57 +6682,36 @@ html.dark-mode .team-section-header {
             </div>
 
             <!-- Main Summary Grid -->
-            <div class="summary-grid" style="display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem; margin-bottom: 2rem;">
-                <!-- Left Column: Activity Narrative -->
+            <div class="summary-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <!-- Team Workload Analysis -->
                 <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card);">
                     <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--team-struct);">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--team-engines);">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
                         </svg>
-                        Weekly Executive Activity Highlights
+                        Team Workload Analysis
                     </h3>
-                    <div id="summaryNarrative" class="narrative-section" style="display: flex; flex-direction: column; gap: 1rem; color: var(--text-secondary); line-height: 1.6; font-size: 0.92rem;">
-                        <!-- Javascript generated highlights will insert here -->
+                    <div id="summaryTeamWorkload" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Progress bars will insert here -->
                     </div>
                 </div>
 
-                <!-- Right Column: Workload Analysis & Alerts -->
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <!-- ATA Chapters -->
-                    <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card);">
-                        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--team-engines);">
-                                <line x1="18" y1="20" x2="18" y2="10"></line>
-                                <line x1="12" y1="20" x2="12" y2="4"></line>
-                                <line x1="6" y1="20" x2="6" y2="14"></line>
-                            </svg>
-                            Team Workload Analysis
-                        </h3>
-                        <div id="summaryTeamWorkload" style="display: flex; flex-direction: column; gap: 1rem;">
-                            <!-- Progress bars will insert here -->
-                        </div>
+                <!-- AOG Critical Box -->
+                <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card);">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--priority-aog);">
+                            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        Active Critical AOG Alerts
+                    </h3>
+                    <div id="summaryAogAlertsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- AOG warnings insert here -->
                     </div>
-
-                    <!-- AOG Critical Box -->
-                    <div class="glass-panel" style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card);">
-                        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--priority-aog);">
-                                <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            Active Critical AOG Alerts
-                        </h3>
-                        <div id="summaryAogAlertsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <!-- AOG warnings insert here -->
-                        </div>
-                    </div>
-
-</div>
+                </div>
             </div>
 
             <!-- Active Backlog Box -->
@@ -7077,7 +7361,7 @@ html.dark-mode .team-section-header {
 
     <!-- View Details Modal -->
     <div id="detailsModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 1120px;">
+        <div class="modal-content" style="max-width: 1200px; width: 95%;">
             <div class="modal-header">
                 <h2>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -7109,7 +7393,7 @@ html.dark-mode .team-section-header {
 
                         <!-- Topic -->
                         <div class="detail-section" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
-                            <h3 id="detailTopic" style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin: 0;"></h3>
+                            <h3 id="detailTopic" style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin: 0; word-break: break-word; overflow-wrap: anywhere;"></h3>
                         </div>
 
                         <!-- Description -->
@@ -7166,10 +7450,10 @@ html.dark-mode .team-section-header {
                                     <button type="button" id="addUpdateBtn" class="btn btn-primary" style="height: 50px; padding: 0 1rem; font-size: 0.85rem; background: var(--team-avionics); flex-shrink: 0;">Log Update</button>
                                 </div>
                                 <div id="detailLogUpdateFileIndicator" style="display: none; align-items: center; gap: 0.35rem; margin-top: 0.5rem; font-size: 0.78rem; color: var(--text-secondary); background: var(--bg-hover); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px dashed var(--border-color);">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px; color: #10b981;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                    <span id="detailLogUpdateFileName" style="font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 200px;"></span>
-                                    <span id="detailLogUpdateFileSize" style="color: var(--text-muted);"></span>
-                                    <button type="button" id="detailLogUpdateFileRemoveBtn" style="border: none; background: transparent; padding: 0; margin-left: auto; cursor: pointer; color: var(--priority-aog); display: flex; align-items: center;" title="Remove File">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px; color: #10b981; flex-shrink: 0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <span id="detailLogUpdateFileName" style="font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: normal; word-break: break-word; overflow-wrap: anywhere; flex: 1; min-width: 0;"></span>
+                                    <span id="detailLogUpdateFileSize" style="color: var(--text-muted); flex-shrink: 0;"></span>
+                                    <button type="button" id="detailLogUpdateFileRemoveBtn" style="border: none; background: transparent; padding: 0; margin-left: auto; cursor: pointer; color: var(--priority-aog); display: flex; align-items: center; flex-shrink: 0;" title="Remove File">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                     </button>
                                 </div>
@@ -9250,6 +9534,7 @@ function initSupabase() {
 let activeFilters = {
     search: '',
     team: 'All',
+    teams: ['All'],
     priority: 'All',
     status: 'All',
     viewMode: 'kanban' // 'kanban' or 'list'
@@ -10185,9 +10470,19 @@ function getFilteredTasks() {
             task.taskDescription.toLowerCase().includes(searchLower) ||
             (task.customId || task.id || '').toLowerCase().includes(searchLower);
 
-        // Team filter matches — supports comma-separated multi-team values
-        const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
-        const matchesTeam = activeFilters.team === 'All' || assignedTeams.includes(activeFilters.team);
+        // Team filter matches — supports multiple selected teams and comma-separated multi-team task values
+        const selectedTeams = Array.isArray(activeFilters.teams) && activeFilters.teams.length > 0 
+            ? activeFilters.teams 
+            : (activeFilters.team ? activeFilters.team.split(',').map(s => s.trim()) : ['All']);
+
+        const isAllTeams = selectedTeams.includes('All') || selectedTeams.length === 0;
+        let matchesTeam = isAllTeams;
+        if (!matchesTeam) {
+            const assignedTeams = (task.assignedTeam || '').split(',').map(s => s.trim());
+            matchesTeam = selectedTeams.some(targetTeam => 
+                assignedTeams.includes(targetTeam) || (typeof isTaskInTeam === 'function' && isTaskInTeam(task.assignedTeam, targetTeam))
+            );
+        }
 
         // Priority filter matches
         const matchesPriority = activeFilters.priority === 'All' || task.priorityLevel === activeFilters.priority;
@@ -10709,6 +11004,14 @@ function renderList(filteredTasks) {
         const badge = document.getElementById(team.badgeId);
         tbody.innerHTML = '';
 
+        // Show/hide entire team section if specific teams are selected
+        const section = document.querySelector(`.team-list-section[data-team="${team.name}"]`);
+        const isAll = !activeFilters.teams || activeFilters.teams.length === 0 || activeFilters.teams.includes('All');
+        if (section) {
+            const isSelected = isAll || activeFilters.teams.includes(team.name);
+            section.style.display = isSelected ? 'block' : 'none';
+        }
+
         // Filter tasks specifically for this team AND matching active text searches / priority filters
         // Supports comma-separated multi-team values
         const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(team.name));
@@ -10813,6 +11116,8 @@ window.toggleMultiselectApp = function(dropdownId, triggerEl) {
     if (!dropdown || !triggerEl) return;
     
     const isOpen = dropdown.classList.contains('open');
+    const container = triggerEl.closest('.multiselect-container');
+    const controlsPanel = triggerEl.closest('.controls-panel');
     
     // Close all other open dropdowns first
     document.querySelectorAll('.multiselect-dropdown.open').forEach(d => {
@@ -10822,6 +11127,8 @@ window.toggleMultiselectApp = function(dropdownId, triggerEl) {
             if (otherTrigger) {
                 otherTrigger.classList.remove('active');
                 otherTrigger.setAttribute('aria-expanded', 'false');
+                const otherCont = otherTrigger.closest('.multiselect-container');
+                if (otherCont) otherCont.style.zIndex = '';
             }
         }
     });
@@ -10830,10 +11137,14 @@ window.toggleMultiselectApp = function(dropdownId, triggerEl) {
         dropdown.classList.remove('open');
         triggerEl.classList.remove('active');
         triggerEl.setAttribute('aria-expanded', 'false');
+        if (container) container.style.zIndex = '';
+        if (controlsPanel) controlsPanel.style.zIndex = '100';
     } else {
         dropdown.classList.add('open');
         triggerEl.classList.add('active');
         triggerEl.setAttribute('aria-expanded', 'true');
+        if (container) container.style.zIndex = '9999';
+        if (controlsPanel) controlsPanel.style.zIndex = '9999';
     }
 };
 
@@ -11045,6 +11356,10 @@ window.addEventListener('click', (e) => {
             if (trigger) {
                 trigger.classList.remove('active');
                 trigger.setAttribute('aria-expanded', 'false');
+                const cont = trigger.closest('.multiselect-container');
+                if (cont) cont.style.zIndex = '';
+                const cp = trigger.closest('.controls-panel');
+                if (cp) cp.style.zIndex = '100';
             }
         });
     }
@@ -11060,29 +11375,59 @@ function setupEventListeners() {
         renderTasks();
     });
 
-    // Dropdown Team Filter
-    const teamFilter = document.getElementById('teamFilter');
-    teamFilter.addEventListener('change', (e) => {
-        activeFilters.team = e.target.value;
-        syncTeamTabs(e.target.value);
-        renderTasks();
-    });
+    // Multiselect Dropdown Team Filter
+    const teamFilterTrigger = document.getElementById('teamFilterTrigger');
+    if (teamFilterTrigger) {
+        teamFilterTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.toggleMultiselectApp('teamFilterDropdown', teamFilterTrigger);
+        });
+    }
 
-    // Tab Bar Team Filters (For Kanban View)
+    const teamFilterDropdown = document.getElementById('teamFilterDropdown');
+    if (teamFilterDropdown) {
+        teamFilterDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+        teamFilterDropdown.addEventListener('change', (e) => {
+            if (e.target.id === 'teamFilterAllCheckbox') {
+                if (e.target.checked) {
+                    setSelectedTeams(['All']);
+                } else {
+                    e.target.checked = true;
+                }
+            } else {
+                const checked = Array.from(teamFilterDropdown.querySelectorAll('input[type="checkbox"]:not(#teamFilterAllCheckbox):checked')).map(cb => cb.value);
+                setSelectedTeams(checked.length > 0 ? checked : ['All']);
+            }
+        });
+    }
+
+    // Tab Bar Team Filters (For Kanban View) — supports selecting 2 or more teams
     const tabContainer = document.getElementById('teamTabs');
-    tabContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('team-tab-btn')) {
-            const selectedTeam = e.target.dataset.team;
-            activeFilters.team = selectedTeam;
-            teamFilter.value = selectedTeam; // Keep dropdown filter in sync
+    if (tabContainer) {
+        tabContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.team-tab-btn');
+            if (!btn) return;
             
-            // Toggle active classes on tab buttons
-            document.querySelectorAll('#teamTabs .team-tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.team === selectedTeam);
-            });
-            renderTasks();
-        }
-    });
+            const clickedTeam = btn.dataset.team;
+            const currentTeams = [...(activeFilters.teams || ['All'])];
+            
+            if (clickedTeam === 'All') {
+                setSelectedTeams(['All']);
+            } else {
+                if (currentTeams.includes('All')) {
+                    setSelectedTeams([clickedTeam]);
+                } else {
+                    if (currentTeams.includes(clickedTeam)) {
+                        const remaining = currentTeams.filter(t => t !== clickedTeam);
+                        setSelectedTeams(remaining.length > 0 ? remaining : ['All']);
+                    } else {
+                        setSelectedTeams([...currentTeams, clickedTeam]);
+                    }
+                }
+            }
+        });
+    }
 
     // Priority Filter
     document.getElementById('priorityFilter').addEventListener('change', (e) => {
@@ -11553,10 +11898,15 @@ function setupEventListeners() {
                         data: url
                     });
                     
+                    const trimmedText = text ? text.trim() : '';
+                    const updateContent = trimmedText 
+                        ? `${trimmedText}\n\nAttached file: ${file.name}` 
+                        : `Attached file: ${file.name}`;
+                    
                     task.comments = task.comments || [];
                     task.comments.push({
                         author: author,
-                        text: `Attached file: ${file.name}\n\n${text}`,
+                        text: updateContent,
                         timestamp: new Date().toISOString(),
                         type: 'update'
                     });
@@ -11577,10 +11927,15 @@ function setupEventListeners() {
                         data: e.target.result // Base64 data URL
                     });
                     
+                    const trimmedTextFallback = text ? text.trim() : '';
+                    const updateContentFallback = trimmedTextFallback 
+                        ? `${trimmedTextFallback}\n\nAttached file: ${file.name}` 
+                        : `Attached file: ${file.name}`;
+
                     task.comments = task.comments || [];
                     task.comments.push({
                         author: author,
-                        text: `Attached file: ${file.name}\n\n${text}`,
+                        text: updateContentFallback,
                         timestamp: new Date().toISOString(),
                         type: 'update'
                     });
@@ -11787,11 +12142,72 @@ function setupEventListeners() {
     setupFyiTeamTabs();
 }
 
-// Helper to keep tab classes in sync with dropdown filter changes
-function syncTeamTabs(teamValue) {
+// Sets active teams for filtering, supporting 2 or more teams simultaneously, and syncs pills + dropdown
+function setSelectedTeams(teams) {
+    let normalized = [];
+    if (Array.isArray(teams)) {
+        normalized = teams.map(t => String(t).trim()).filter(Boolean);
+    } else if (typeof teams === 'string') {
+        normalized = teams.split(',').map(t => t.trim()).filter(Boolean);
+    }
+    
+    if (normalized.length === 0 || normalized.includes('All')) {
+        normalized = ['All'];
+    } else {
+        // Remove 'All' if specific teams are selected
+        normalized = Array.from(new Set(normalized.filter(t => t !== 'All')));
+        if (normalized.length === 0) normalized = ['All'];
+    }
+    
+    activeFilters.teams = normalized;
+    activeFilters.team = normalized.includes('All') ? 'All' : normalized.join(', ');
+    
+    // 1. Sync Team Tabs (Pills)
     document.querySelectorAll('#teamTabs .team-tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.team === teamValue);
+        const btnTeam = btn.dataset.team;
+        if (normalized.includes('All')) {
+            btn.classList.toggle('active', btnTeam === 'All');
+        } else {
+            btn.classList.toggle('active', normalized.includes(btnTeam));
+        }
     });
+    
+    // 2. Sync Multiselect Dropdown
+    const hiddenInput = document.getElementById('teamFilter');
+    if (hiddenInput) hiddenInput.value = activeFilters.team;
+    
+    const allCb = document.getElementById('teamFilterAllCheckbox');
+    if (allCb) allCb.checked = normalized.includes('All');
+    
+    document.querySelectorAll('#teamFilterDropdown input[type="checkbox"]:not(#teamFilterAllCheckbox)').forEach(cb => {
+        cb.checked = !normalized.includes('All') && normalized.includes(cb.value);
+    });
+    
+    const textEl = document.getElementById('teamFilterText');
+    if (textEl) {
+        if (normalized.includes('All')) {
+            textEl.textContent = 'All Teams';
+            textEl.classList.remove('has-value');
+        } else if (normalized.length === 1) {
+            textEl.textContent = normalized[0].replace(' Team', '');
+            textEl.classList.add('has-value');
+        } else if (normalized.length === 2) {
+            textEl.textContent = normalized.map(t => t.replace(' Team', '').replace(' Systems', '').replace(' System', '')).join(', ');
+            textEl.classList.add('has-value');
+        } else {
+            textEl.textContent = `${normalized.length} teams selected`;
+            textEl.classList.add('has-value');
+        }
+    }
+    
+    // 3. Re-render tasks
+    renderTasks();
+}
+window.setSelectedTeams = setSelectedTeams;
+
+// Backward-compatibility helper
+function syncTeamTabs(teamValue) {
+    setSelectedTeams(teamValue);
 }
 
 function setViewMode(mode) {
@@ -12506,9 +12922,11 @@ function openDetailsModal(id) {
             btn.innerHTML = `
                 <span class="btn-left">
                     ${leftIconSvg}
-                    <span>${file.name} (${sizeLabel})</span>
+                    <span class="download-file-name">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
                 </span>
-                ${rightIconSvg}
+                <span class="btn-right-icon">
+                    ${rightIconSvg}
+                </span>
             `;
             filesContainer.appendChild(btn);
         });
@@ -12618,6 +13036,49 @@ function deleteLogUpdate(taskId, timestamp) {
 }
 window.deleteLogUpdate = deleteLogUpdate;
 
+// Helper: Determine DHL timeline badge style & status classification
+function getTimelineBadgeInfo(text) {
+    const raw = (text || '').toLowerCase().replace(/[-_]/g, ' ');
+    if (raw.includes('completed')) {
+        return {
+            type: 'completed',
+            className: 'dhl-badge-completed',
+            color: '#10b981' // Green
+        };
+    }
+    if (raw.includes('in progress')) {
+        return {
+            type: 'in-progress',
+            className: 'dhl-badge-in-progress',
+            color: '#2563eb' // Blue
+        };
+    }
+    if (raw.includes('status updated to open')) {
+        return {
+            type: 'open',
+            className: 'dhl-badge-open',
+            color: '#64748b' // Slate
+        };
+    }
+    // "if it on progress turn to purple" -> intermediate progress logs / notes
+    return {
+        type: 'progress',
+        className: 'dhl-badge-progress',
+        color: '#8b5cf6' // Purple
+    };
+}
+window.getTimelineBadgeInfo = getTimelineBadgeInfo;
+
+// Helper: Determine shading gradient between consecutive timeline badges
+function getTimelineSegmentGradient(fromInfo, toInfo) {
+    // When transitioning directly from In Progress to Completed, shade through purple in the middle
+    if (fromInfo.type === 'in-progress' && toInfo.type === 'completed') {
+        return 'linear-gradient(to bottom, #2563eb 0%, #8b5cf6 50%, #10b981 100%)';
+    }
+    return `linear-gradient(to bottom, ${fromInfo.color}, ${toInfo.color})`;
+}
+window.getTimelineSegmentGradient = getTimelineSegmentGradient;
+
 // Helper: Render Comments and Updates inside Details Modal
 function renderComments(task) {
     const commentsList = document.getElementById('detailCommentsList');
@@ -12639,7 +13100,7 @@ function renderComments(task) {
         commentsList.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted); display: block; padding: 0.5rem 0;">No comments yet. Be the first to comment!</span>';
     } else {
         comments.forEach(comment => {
-            commentsList.appendChild(createCommentDOM(comment));
+            commentsList.appendChild(createCommentDOM(comment, false, task));
         });
     }
 
@@ -12686,6 +13147,15 @@ function renderComments(task) {
                 } catch(e) {}
             }
             
+            const badgeInfo = getTimelineBadgeInfo(update.text);
+            const isNotLast = idx < sortedUpdates.length - 1;
+            let segmentStyle = '';
+            if (isNotLast) {
+                const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[idx + 1].text);
+                const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
+                segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+            }
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'dhl-timeline-item';
             
@@ -12698,8 +13168,8 @@ function renderComments(task) {
                 <div class="dhl-timeline-date">
                     ${dateHtml}
                 </div>
-                <div class="dhl-timeline-node-container">
-                    <div class="dhl-timeline-badge">
+                <div class="dhl-timeline-node-container"${segmentStyle}>
+                    <div class="dhl-timeline-badge ${badgeInfo.className}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="dhl-checkmark">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
@@ -12707,7 +13177,7 @@ function renderComments(task) {
                 </div>
                 <div class="dhl-timeline-content" style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; width: 100%;">
                     <div style="flex: 1; min-width: 0;">
-                        <div class="dhl-status-title">${escapeHTMLApp(update.text)}</div>
+                        <div class="dhl-status-title">${formatTimelineUpdateHtml(update.text, task)}</div>
                         <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(update.author)}</div>
                     </div>
                     <button class="delete-update-btn" onclick="deleteLogUpdate('${task.id}', '${update.timestamp}')" onmouseover="this.style.opacity='1'; this.style.color='var(--priority-aog, #ef4444)';" onmouseout="this.style.opacity='0.4'; this.style.color='var(--text-muted)';" style="background: none; border: none; padding: 4px; cursor: pointer; color: var(--text-muted); opacity: 0.4; transition: opacity 0.2s, color 0.2s; display: flex; align-items: center; justify-content: center; margin-top: 2px;" title="Delete update">
@@ -12726,7 +13196,7 @@ function renderComments(task) {
 }
 
 // Helper: Generate DOM for comments and updates
-function createCommentDOM(item, isLatest) {
+function createCommentDOM(item, isLatest, task) {
     if (item.type === 'update') {
         const itemDiv = document.createElement('div');
         itemDiv.className = `timeline-item${isLatest ? ' latest' : ''}`;
@@ -12755,7 +13225,7 @@ function createCommentDOM(item, isLatest) {
                     <span class="timeline-author">${escapeHTMLApp(item.author)}</span>
                     <span class="timeline-time">${dateStr}</span>
                 </div>
-                <div class="timeline-card-text">${escapeHTMLApp(item.text)}</div>
+                <div class="timeline-card-text">${formatTimelineUpdateHtml(item.text, task)}</div>
             </div>
         `;
         return itemDiv;
@@ -12782,7 +13252,7 @@ function createCommentDOM(item, isLatest) {
                 <span class="comment-author">${escapeHTMLApp(item.author)}</span>
                 <span class="comment-time">${dateStr}</span>
             </div>
-            <div class="comment-text">${escapeHTMLApp(item.text)}</div>
+            <div class="comment-text">${formatTimelineUpdateHtml(item.text, task)}</div>
         `;
         return itemDiv;
     }
@@ -12797,6 +13267,97 @@ function escapeHTMLApp(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+function escapeRegexApp(str) {
+    if (!str) return '';
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Formats timeline update text so that user text message is shown first, and attached file is placed after text
+function formatTimelineUpdateHtml(updateText, task) {
+    if (!updateText) return '';
+    
+    let mainText = '';
+    let attachedFileName = '';
+    
+    // First attempt: check against task attachments directly if available
+    let matchedFromTask = false;
+    if (task && Array.isArray(task.attachments) && task.attachments.length > 0) {
+        // Sort attachments by name length descending so longer matching names take precedence
+        const sortedAtts = [...task.attachments].sort((a, b) => (b.name ? b.name.length : 0) - (a.name ? a.name.length : 0));
+        for (const att of sortedAtts) {
+            if (!att || !att.name) continue;
+            const attName = att.name.trim();
+            // Check prefix: "Attached file: <attName>"
+            const prefixRegex = new RegExp(`^Attached file:\\s*${escapeRegexApp(attName)}(?:\\s*[\\r\\n]+\\s*|\\s+|$)([\\s\\S]*)$`, 'i');
+            const pMatch = updateText.match(prefixRegex);
+            if (pMatch) {
+                attachedFileName = attName;
+                mainText = (pMatch[1] || '').trim();
+                matchedFromTask = true;
+                break;
+            }
+            // Check suffix: "<text> Attached file: <attName>"
+            const suffixRegex = new RegExp(`^([\\s\\S]*?)(?:[\\r\\n]+\\s*|\\s+)Attached file:\\s*${escapeRegexApp(attName)}$`, 'i');
+            const sMatch = updateText.match(suffixRegex);
+            if (sMatch) {
+                attachedFileName = attName;
+                mainText = (sMatch[1] || '').trim();
+                matchedFromTask = true;
+                break;
+            }
+        }
+    }
+    
+    if (!matchedFromTask) {
+        // Fallback regex matching:
+        // 1. Check old prefix format: "Attached file: <filename> <text>" or "Attached file: <filename>\n\n<text>"
+        const oldPrefixMatch = updateText.match(/^Attached file:\s*([^\r\n]+?\.(?:[a-zA-Z0-9]{2,5}))(?:\s*[\r\n]+\s*|\s+)([\s\S]+)$/i);
+        // 2. Check suffix format: "<text>\n\nAttached file: <filename>" or "<text> Attached file: <filename>"
+        const suffixMatch = updateText.match(/^([\s\S]+?)(?:[\r\n]+\s*|\s+)Attached file:\s*([^\r\n]+)$/i);
+        // 3. Check only attached file: "Attached file: <filename>"
+        const onlyFileMatch = updateText.match(/^Attached file:\s*([^\r\n]+)$/i);
+        
+        if (oldPrefixMatch) {
+            attachedFileName = oldPrefixMatch[1].trim();
+            mainText = oldPrefixMatch[2].trim();
+        } else if (suffixMatch) {
+            mainText = suffixMatch[1].trim();
+            attachedFileName = suffixMatch[2].trim();
+        } else if (onlyFileMatch) {
+            attachedFileName = onlyFileMatch[1].trim();
+            mainText = '';
+        } else {
+            mainText = updateText.trim();
+        }
+    }
+    
+    let html = '';
+    if (mainText) {
+        html += `<div class="dhl-update-msg" style="white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45;">${escapeHTMLApp(mainText)}</div>`;
+    }
+    
+    if (attachedFileName) {
+        const attObj = (task && task.attachments) 
+            ? task.attachments.find(a => a.name === attachedFileName || (a.name && a.name.toLowerCase() === attachedFileName.toLowerCase())) 
+            : null;
+        const attachClickAttr = attObj 
+            ? `onclick="event.stopPropagation(); safeOpenOrDownload('${escapeHTMLApp(attObj.data)}', '${escapeHTMLApp(attObj.name)}');" style="cursor: pointer;" title="Click to view / download ${escapeHTMLApp(attachedFileName)}"` 
+            : '';
+        
+        html += `
+            <div class="dhl-attachment-pill" ${attachClickAttr} style="display: inline-flex; align-items: center; gap: 5px; margin-top: ${mainText ? '6px' : '0'}; background: var(--bg-hover, rgba(255,255,255,0.06)); border: 1px solid var(--border-color, rgba(255,255,255,0.15)); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; font-weight: 500; color: var(--text-primary); max-width: 100%; box-sizing: border-box; overflow: hidden; word-break: break-word;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px; color: var(--team-avionics, #935073); flex-shrink: 0;">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                <span style="color: var(--text-muted); font-weight: 400; flex-shrink: 0;">Attached file:</span>
+                <span style="color: var(--text-primary); font-weight: 600; text-decoration: ${attObj ? 'underline' : 'none'}; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word;">${escapeHTMLApp(attachedFileName)}</span>
+            </div>
+        `;
+    }
+    
+    return html;
 }
 
 function saveTaskWithUploads(taskToSave, wasExternal) {
@@ -13362,9 +13923,9 @@ function renderFilePreviews() {
         item.innerHTML = `
             <div class="file-item-name">
                 ${iconSvg}
-                <span title="${file.name}">${file.name} (${sizeLabel})</span>
+                <span class="file-preview-text" title="${escapeHTMLApp(file.name)}">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
             </div>
-            <button type="button" class="remove-file" onclick="removeAttachment(${index})">
+            <button type="button" class="remove-file" onclick="removeAttachment(${index})" title="Remove attachment">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -14583,110 +15144,111 @@ function renderWeeklySummaryTab() {
     }
 
     // 2. Executive Narrative Highlights Generator
-    const teams = [
-        'Mechanical System Team',
-        'Avionic Systems Team',
-        'Structure Team',
-        'Engines Team',
-        'IERA Shop',
-        'Component Team'
-    ];
-    
     const narrativeContainer = document.getElementById('summaryNarrative');
-    narrativeContainer.innerHTML = '';
-    
-    const teamsToRender = selectedTeams.length === 0 ? teams : selectedTeams;
-    
-    teamsToRender.forEach(teamName => {
-        const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(teamName));
-        if (teamTasks.length === 0) {
-            narrativeContainer.innerHTML += `
+    if (narrativeContainer) {
+        narrativeContainer.innerHTML = '';
+        const teams = [
+            'Mechanical System Team',
+            'Avionic Systems Team',
+            'Structure Team',
+            'Engines Team',
+            'IERA Shop',
+            'Component Team'
+        ];
+        
+        const teamsToRender = selectedTeams.length === 0 ? teams : selectedTeams;
+        
+        teamsToRender.forEach(teamName => {
+            const teamTasks = filteredTasks.filter(t => (t.assignedTeam || '').split(',').map(s => s.trim()).includes(teamName));
+            if (teamTasks.length === 0) {
+                narrativeContainer.innerHTML += `
+                    <div class="narrative-item">
+                        <div class="narrative-team-title">
+                            <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);"></span>
+                            ${teamName}
+                        </div>
+                        <p style="margin: 0; padding-left: 1.25rem; font-style: italic; color: var(--text-muted);">No active maintenance events logged for this period.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const completedTasks = teamTasks.filter(t => t.currentStatus === 'Completed');
+            const activeTasks = teamTasks.filter(t => t.currentStatus !== 'Completed');
+            
+            let dotColor = '#059669';
+            if (teamName.includes('Avionic')) dotColor = '#0891b2';
+            else if (teamName.includes('Structure')) dotColor = '#7c3aed';
+            else if (teamName.includes('Engines')) dotColor = '#db2777';
+            else if (teamName.includes('IERA')) dotColor = '#4f46e5';
+            else if (teamName.includes('Component')) dotColor = '#d97706';
+            
+            let narrativeHtml = `
                 <div class="narrative-item">
                     <div class="narrative-team-title">
-                        <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);"></span>
+                        <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${dotColor};"></span>
                         ${teamName}
                     </div>
-                    <p style="margin: 0; padding-left: 1.25rem; font-style: italic; color: var(--text-muted);">No active maintenance events logged for this period.</p>
-                </div>
+                    <div style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.55rem;">
             `;
-            return;
-        }
-        
-        const completedTasks = teamTasks.filter(t => t.currentStatus === 'Completed');
-        const activeTasks = teamTasks.filter(t => t.currentStatus !== 'Completed');
-        
-        let dotColor = '#059669';
-        if (teamName.includes('Avionic')) dotColor = '#0891b2';
-        else if (teamName.includes('Structure')) dotColor = '#7c3aed';
-        else if (teamName.includes('Engines')) dotColor = '#db2777';
-        else if (teamName.includes('IERA')) dotColor = '#4f46e5';
-        else if (teamName.includes('Component')) dotColor = '#d97706';
-        
-        let narrativeHtml = `
-            <div class="narrative-item">
-                <div class="narrative-team-title">
-                    <span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${dotColor};"></span>
-                    ${teamName}
-                </div>
-                <div style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.55rem;">
-        `;
 
-        // -- Successfully Completed paragraph --
-        if (completedTasks.length > 0) {
-            const itemsHtml = completedTasks
-                .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
-                .join('');
-            narrativeHtml += `
-                <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
-                    <div>
-                        <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#059669; background:rgba(5,150,105,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Successfully Completed</span>
-                    </div>
-                    <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
-                        ${itemsHtml}
-                    </ul>
-                </div>`;
-        }
+            // -- Successfully Completed paragraph --
+            if (completedTasks.length > 0) {
+                const itemsHtml = completedTasks
+                    .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
+                    .join('');
+                narrativeHtml += `
+                    <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
+                        <div>
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#059669; background:rgba(5,150,105,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Successfully Completed</span>
+                        </div>
+                        <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
+                            ${itemsHtml}
+                        </ul>
+                    </div>`;
+            }
 
-        // -- CRITICAL AOG paragraph --
-        const aogActive = activeTasks.filter(t => t.priorityLevel === 'AOG');
-        if (aogActive.length > 0) {
-            const itemsHtml = aogActive
-                .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
-                .join('');
-            narrativeHtml += `
-                <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
-                    <div>
-                        <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--priority-aog); background:rgba(220,38,38,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Critical / AOG</span>
-                        <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Active AOG defect(s):</span>
-                    </div>
-                    <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
-                        ${itemsHtml}
-                    </ul>
-                </div>`;
-        }
+            // -- CRITICAL AOG paragraph --
+            const aogActive = activeTasks.filter(t => t.priorityLevel === 'AOG');
+            if (aogActive.length > 0) {
+                const itemsHtml = aogActive
+                    .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
+                    .join('');
+                narrativeHtml += `
+                    <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
+                        <div>
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--priority-aog); background:rgba(220,38,38,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">Critical / AOG</span>
+                            <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Active AOG defect(s):</span>
+                        </div>
+                        <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
+                            ${itemsHtml}
+                        </ul>
+                    </div>`;
+            }
 
-        // -- In Progress / Open paragraph --
-        const normalActive = activeTasks.filter(t => t.priorityLevel !== 'AOG');
-        if (normalActive.length > 0) {
-            const statusSummary = [...new Set(normalActive.map(t => t.currentStatus))].join(' / ');
-            const itemsHtml = normalActive
-                .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
-                .join('');
-            narrativeHtml += `
-                <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
-                    <div>
-                        <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#d97706; background:rgba(217,119,6,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">${statusSummary}</span>
-                        <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Progressing ${normalActive.length} active task(s):</span>
-                    </div>
-                    <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
-                        ${itemsHtml}
-                    </ul>
-                </div>`;
-        }
+            // -- In Progress / Open paragraph --
+            const normalActive = activeTasks.filter(t => t.priorityLevel !== 'AOG');
+            if (normalActive.length > 0) {
+                const statusSummary = [...new Set(normalActive.map(t => t.currentStatus))].join(' / ');
+                const itemsHtml = normalActive
+                    .map(t => `<li style="margin-bottom: 0.25rem;"><strong>${t.aircraftReg}</strong> (${t.aircraftType || 'A/C'}): ${truncateSummaryString(t.taskDescription, 80)}</li>`)
+                    .join('');
+                narrativeHtml += `
+                    <div style="margin: 0 0 0.6rem 0; font-size: 0.88rem; line-height: 1.6;">
+                        <div>
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:#d97706; background:rgba(217,119,6,0.1); border-radius:4px; padding:0.1rem 0.45rem; vertical-align:middle;">${statusSummary}</span>
+                            <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.25rem;">Progressing ${normalActive.length} active task(s):</span>
+                        </div>
+                        <ul style="margin: 0.35rem 0 0.5rem 0; padding-left: 1.25rem; list-style-type: disc; color: var(--text-secondary);">
+                            ${itemsHtml}
+                        </ul>
+                    </div>`;
+            }
 
-        narrativeHtml += `</div></div>`;
-        narrativeContainer.innerHTML += narrativeHtml;
-    });
+            narrativeHtml += `</div></div>`;
+            narrativeContainer.innerHTML += narrativeHtml;
+        });
+    }
 
     // 3. Team Workload Analysis — count each team a task is assigned to
     const teamCounts = {};
@@ -14959,20 +15521,29 @@ function renderWeeklySummaryTab() {
                                    <span class="dhl-date-year">${yearVal}</span>`
                                 : '';
                             
+                            const badgeInfo = getTimelineBadgeInfo(u.text);
+                            const isNotLast = i < sortedUpdates.length - 1;
+                            let segmentStyle = '';
+                            if (isNotLast) {
+                                const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[i + 1].text);
+                                const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
+                                segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+                            }
+                            
                             return `
                                 <div class="dhl-timeline-item">
                                     <div class="dhl-timeline-date">
                                         ${dateHtml}
                                     </div>
-                                    <div class="dhl-timeline-node-container">
-                                        <div class="dhl-timeline-badge">
+                                    <div class="dhl-timeline-node-container"${segmentStyle}>
+                                        <div class="dhl-timeline-badge ${badgeInfo.className}">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="dhl-checkmark">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
                                         </div>
                                     </div>
                                     <div class="dhl-timeline-content">
-                                        <div class="dhl-status-title">${escapeHTMLApp(u.text)}</div>
+                                        <div class="dhl-status-title">${formatTimelineUpdateHtml(u.text, t)}</div>
                                         <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(u.author)}</div>
                                     </div>
                                 </div>`;
@@ -16708,20 +17279,29 @@ function showUpdateLogModal(taskId) {
                        <span class="dhl-date-year">${yearVal}</span>`
                     : '';
                 
+                const badgeInfo = getTimelineBadgeInfo(u.text);
+                const isNotLast = i < sortedUpdates.length - 1;
+                let segmentStyle = '';
+                if (isNotLast) {
+                    const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[i + 1].text);
+                    const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
+                    segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+                }
+                
                 return `
                     <div class="dhl-timeline-item">
                         <div class="dhl-timeline-date">
                             ${dateHtml}
                         </div>
-                        <div class="dhl-timeline-node-container">
-                            <div class="dhl-timeline-badge">
+                        <div class="dhl-timeline-node-container"${segmentStyle}>
+                            <div class="dhl-timeline-badge ${badgeInfo.className}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="dhl-checkmark">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                             </div>
                         </div>
                         <div class="dhl-timeline-content">
-                            <div class="dhl-status-title">${escapeHTMLApp(u.text)}</div>
+                            <div class="dhl-status-title">${formatTimelineUpdateHtml(u.text, task)}</div>
                             <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(u.author)}</div>
                         </div>
                     </div>`;
@@ -18150,6 +18730,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
 
 
