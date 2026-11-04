@@ -2019,6 +2019,10 @@ header {
         padding-top: 1.5rem;
     }
 
+    .details-middle #detailUpdatesList {
+        max-height: 380px;
+    }
+
     .details-sidebar {
         border-left: none;
         border-top: 1px solid var(--border-color);
@@ -3980,15 +3984,57 @@ html.dark-mode body.force-mobile .tab-item.active {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
 }
 
 .details-middle #detailUpdatesList {
     flex: 1;
-    max-height: 450px; /* Increased to touch the log input box */
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.details-middle #detailUpdatesList .dhl-timeline {
+    flex: 1;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 0;
+}
+
+.details-middle #detailUpdatesList .dhl-timeline-item:last-child {
+    flex: 1;
+    min-height: auto;
+}
+
+.details-middle #detailUpdatesList .dhl-timeline-item:last-child .dhl-timeline-node-container {
+    align-self: stretch;
+    height: 100%;
+    position: relative;
+}
+
+/* Timeline axis line extends downwards from the last status node to meet the input box line */
+.details-middle #detailUpdatesList .dhl-timeline-item:last-child .dhl-timeline-node-container::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: -0.75rem;
+    left: 50%;
+    width: 4px;
+    transform: translateX(-50%);
+    background: var(--segment-gradient, linear-gradient(to bottom, #10b981 0%, rgba(148, 163, 184, 0.45) 80%, rgba(148, 163, 184, 0.15) 100%));
+    border-radius: 2px;
+    z-index: 1;
 }
 
 .details-middle .comment-input-area {
-    margin-top: auto;
+    margin-top: 0;
+    flex-shrink: 0;
 }
 
 .details-main .comments-section {
@@ -4122,6 +4168,27 @@ html.dark-mode .stat-card.completed,
     .wk-print-log-row span {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+    }
+
+    /* Attachment hyperlink pills in printed PDF */
+    .dhl-attachment-pill,
+    a.dhl-attachment-pill {
+        display: inline-flex !important;
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e293b !important;
+        text-decoration: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .dhl-attachment-pill span,
+    a.dhl-attachment-pill span {
+        color: #1e293b !important;
+    }
+    .dhl-attachment-pill span:last-child,
+    a.dhl-attachment-pill span:last-child {
+        color: #1d4ed8 !important;
+        text-decoration: underline !important;
     }
 }
 
@@ -4281,6 +4348,7 @@ html.dark-mode .dhl-timeline-badge {
     overflow-wrap: anywhere;
 }
 
+a.dhl-attachment-pill,
 .dhl-attachment-pill {
     display: inline-flex;
     align-items: center;
@@ -4293,24 +4361,31 @@ html.dark-mode .dhl-timeline-badge {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--text-primary);
+    text-decoration: none;
     max-width: 100%;
     box-sizing: border-box;
     transition: all 0.2s ease;
 }
 
+a.dhl-attachment-pill:hover,
 .dhl-attachment-pill:hover {
     background: var(--primary-light, rgba(230, 0, 0, 0.08));
     border-color: var(--primary-color, #d40511);
+    text-decoration: none;
 }
 
+html.dark-mode a.dhl-attachment-pill,
 html.dark-mode .dhl-attachment-pill {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.14);
+    color: var(--text-primary);
 }
 
+html.dark-mode a.dhl-attachment-pill:hover,
 html.dark-mode .dhl-attachment-pill:hover {
     background: rgba(255, 255, 255, 0.12);
     border-color: rgba(255, 255, 255, 0.28);
+    text-decoration: none;
 }
 
 .dhl-status-subtext {

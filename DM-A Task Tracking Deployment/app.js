@@ -1044,6 +1044,18 @@ function renderTasks() {
     }
 }
 
+// Priority weight helper for sorting from Top to Bottom: 1. AOG, 2. High, 3. Moderate, 4. Low
+function getPriorityWeight(priority) {
+    if (!priority) return 99;
+    const p = String(priority).trim().toLowerCase();
+    if (p === 'aog' || p === 'urgent') return 1;
+    if (p === 'high') return 2;
+    if (p === 'moderate' || p === 'medium' || p === 'normal') return 3;
+    if (p === 'low' || p === 'routine') return 4;
+    return 99;
+}
+window.getPriorityWeight = getPriorityWeight;
+
 // Render Kanban columns
 function renderKanban(filteredTasks) {
     const statuses = ['Open', 'In Progress', 'Completed'];
@@ -1055,6 +1067,16 @@ function renderKanban(filteredTasks) {
         colContainer.innerHTML = '';
         const statusTasks = filteredTasks.filter(t => t.currentStatus === status);
         countBadge.textContent = statusTasks.length;
+
+        // Sort task card priorities from Top to Bottom by: 1. AOG, 2. High, 3. Moderate, 4. Low
+        statusTasks.sort((a, b) => {
+            const pA = getPriorityWeight(a.priorityLevel);
+            const pB = getPriorityWeight(b.priorityLevel);
+            if (pA !== pB) return pA - pB;
+            const dateA = a.rtsDate && a.rtsDate !== 'N/A' ? new Date(a.rtsDate).getTime() : (a.createdDate ? new Date(a.createdDate).getTime() : 0);
+            const dateB = b.rtsDate && b.rtsDate !== 'N/A' ? new Date(b.rtsDate).getTime() : (b.createdDate ? new Date(b.createdDate).getTime() : 0);
+            return (dateA || 0) - (dateB || 0);
+        });
 
         statusTasks.forEach(task => {
             const card = createTaskCard(task);
@@ -1524,6 +1546,16 @@ function renderList(filteredTasks) {
             tbody.appendChild(emptyRow);
             return;
         }
+
+        // Sort tasks by priority from Top to Bottom: 1. AOG, 2. High, 3. Moderate, 4. Low
+        teamTasks.sort((a, b) => {
+            const pA = getPriorityWeight(a.priorityLevel);
+            const pB = getPriorityWeight(b.priorityLevel);
+            if (pA !== pB) return pA - pB;
+            const dateA = a.rtsDate && a.rtsDate !== 'N/A' ? new Date(a.rtsDate).getTime() : (a.createdDate ? new Date(a.createdDate).getTime() : 0);
+            const dateB = b.rtsDate && b.rtsDate !== 'N/A' ? new Date(b.rtsDate).getTime() : (b.createdDate ? new Date(b.createdDate).getTime() : 0);
+            return (dateA || 0) - (dateB || 0);
+        });
 
         teamTasks.forEach(task => {
             const prioClass = task.priorityLevel.toLowerCase();
@@ -2242,6 +2274,10 @@ function setupEventListeners() {
     // Modal click-outside to close
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
+            // Prevent accidental closure: detailsModal (and taskModal) can only be closed via its close buttons
+            if (e.target.id === 'detailsModal' || e.target.id === 'mobileTaskDetailsModal') {
+                return;
+            }
             closeModal(e.target.id);
         }
     });
@@ -2250,7 +2286,7 @@ function setupEventListeners() {
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeModal('taskModal');
-            closeModal('detailsModal');
+            // detailsModal requires clicking the close button to avoid accidental close
         }
     });
 
@@ -3383,9 +3419,21 @@ function openDetailsModal(id) {
             const btn = document.createElement('a');
             btn.className = 'download-file-btn';
             btn.style.cursor = 'pointer';
+            const resolvedFileUrl = typeof getResolvedAttachmentUrl === 'function' ? getResolvedAttachmentUrl(file.data || file.url || '') : (file.data || file.url || '');
+            if (resolvedFileUrl) {
+                btn.href = resolvedFileUrl;
+                if (!resolvedFileUrl.startsWith('data:')) {
+                    btn.target = '_blank';
+                    btn.rel = 'noopener noreferrer';
+                } else {
+                    btn.download = file.name || 'download';
+                }
+            }
             btn.onclick = (e) => {
-                e.preventDefault();
-                safeOpenOrDownload(file.data, file.name);
+                if (resolvedFileUrl && resolvedFileUrl.startsWith('data:')) {
+                    e.preventDefault();
+                    safeOpenOrDownload(file.data, file.name);
+                }
             };
             
             const isUrl = file.type === 'url';
@@ -3655,6 +3703,9 @@ function renderComments(task) {
                 const nextBadgeInfo = getTimelineBadgeInfo(sortedUpdates[idx + 1].text);
                 const segmentGradient = getTimelineSegmentGradient(badgeInfo, nextBadgeInfo);
                 segmentStyle = ` style="--segment-gradient: ${segmentGradient};"`;
+            } else {
+                const endGradient = `linear-gradient(to bottom, ${badgeInfo.color || '#10b981'} 0%, rgba(148, 163, 184, 0.45) 80%, rgba(148, 163, 184, 0.15) 100%)`;
+                segmentStyle = ` style="--segment-gradient: ${endGradient};"`;
             }
 
             const itemDiv = document.createElement('div');
@@ -3775,18 +3826,79 @@ function escapeRegexApp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// Formats timeline update text so that user text message is shown first, and attached file is placed after text
+// Resolves any attachment data/url to a clean, absolute web URL or data URI
+function getResolvedAttachmentUrl(dataUrl) {
+    if (!dataUrl) return '';
+    let url = String(dataUrl).trim();
+    if (!url) return '';
+
+    // 1. Data URI
+    if (url.startsWith('data:')) {
+        return url;
+    }
+
+    // 2. Decode possible HTML entities (e.g. &amp;)
+    if (url.includes('&amp;') || url.includes('&lt;') || url.includes('&gt;') || url.includes('&quot;') || url.includes('&#039;')) {
+        url = url.replace(/&amp;/g, '&')
+                 .replace(/&lt;/g, '<')
+                 .replace(/&gt;/g, '>')
+                 .replace(/&quot;/g, '"')
+                 .replace(/&#039;/g, "'");
+    }
+
+    // 3. Extract nested target URL if wrapped in listurl= or url= parameter (SharePoint / OneDrive)
+    if (url.includes('listurl=')) {
+        const match = url.match(/listurl=([^&]+)/i);
+        if (match && match[1]) {
+            try { url = decodeURIComponent(match[1]); } catch(e) {}
+        }
+    } else if (url.includes('url=')) {
+        const match = url.match(/url=([^&]+)/i);
+        if (match && match[1]) {
+            try { url = decodeURIComponent(match[1]); } catch(e) {}
+        }
+    }
+
+    // 4. Decode percent-encoded protocol prefix
+    if (url.startsWith('https%3A') || url.startsWith('http%3A')) {
+        try { url = decodeURIComponent(url); } catch(e) {}
+    }
+
+    // 5. Prepend https:// if protocol is missing (or relative url)
+    if (!/^https?:\/\//i.test(url) && !/^file:\/\//i.test(url) && !/^blob:/i.test(url)) {
+        if (url.startsWith('/')) {
+            url = (typeof window !== 'undefined' && window.location ? window.location.origin : '') + url;
+        } else {
+            url = 'https://' + url.replace(/^\/+/, '');
+        }
+    }
+
+    return url;
+}
+window.getResolvedAttachmentUrl = getResolvedAttachmentUrl;
+
+// Formats timeline update text so that user text message is shown first, and attached file is placed after text as an interactive hyperlink (clickable in browser and in downloaded/printed PDF)
 function formatTimelineUpdateHtml(updateText, task) {
     if (!updateText) return '';
     
     let mainText = '';
     let attachedFileName = '';
     
+    // Ensure task attachments are accessible as an array
+    let attachmentsList = [];
+    if (task) {
+        if (Array.isArray(task.attachments)) {
+            attachmentsList = task.attachments;
+        } else if (typeof task.attachments === 'string') {
+            try { attachmentsList = JSON.parse(task.attachments); } catch(e) { attachmentsList = []; }
+        }
+    }
+    
     // First attempt: check against task attachments directly if available
     let matchedFromTask = false;
-    if (task && Array.isArray(task.attachments) && task.attachments.length > 0) {
+    if (attachmentsList.length > 0) {
         // Sort attachments by name length descending so longer matching names take precedence
-        const sortedAtts = [...task.attachments].sort((a, b) => (b.name ? b.name.length : 0) - (a.name ? a.name.length : 0));
+        const sortedAtts = [...attachmentsList].sort((a, b) => (b && b.name ? b.name.length : 0) - (a && a.name ? a.name.length : 0));
         for (const att of sortedAtts) {
             if (!att || !att.name) continue;
             const attName = att.name.trim();
@@ -3840,21 +3952,81 @@ function formatTimelineUpdateHtml(updateText, task) {
     }
     
     if (attachedFileName) {
-        const attObj = (task && task.attachments) 
-            ? task.attachments.find(a => a.name === attachedFileName || (a.name && a.name.toLowerCase() === attachedFileName.toLowerCase())) 
-            : null;
-        const attachClickAttr = attObj 
-            ? `onclick="event.stopPropagation(); safeOpenOrDownload('${escapeHTMLApp(attObj.data)}', '${escapeHTMLApp(attObj.name)}');" style="cursor: pointer;" title="Click to view / download ${escapeHTMLApp(attachedFileName)}"` 
-            : '';
+        let attObj = null;
+        if (attachmentsList.length > 0) {
+            const cleanTarget = attachedFileName.trim();
+            const cleanTargetLower = cleanTarget.toLowerCase();
+            const cleanTargetNorm = cleanTargetLower.replace(/[\s_]+/g, '_');
+            const cleanTargetBase = cleanTargetLower.replace(/\.[^/.]+$/, "");
+
+            attObj = attachmentsList.find(a => {
+                if (!a || !a.name) return false;
+                const aName = a.name.trim();
+                const aNameLower = aName.toLowerCase();
+                const aNameNorm = aNameLower.replace(/[\s_]+/g, '_');
+                const aNameBase = aNameLower.replace(/\.[^/.]+$/, "");
+                
+                return aName === cleanTarget ||
+                       aNameLower === cleanTargetLower ||
+                       aNameNorm === cleanTargetNorm ||
+                       aNameBase === cleanTargetBase ||
+                       aNameLower.includes(cleanTargetBase) ||
+                       cleanTargetLower.includes(aNameBase);
+            });
+            
+            // If still not found and there is only 1 attachment on this task, link to it
+            if (!attObj && attachmentsList.length === 1) {
+                attObj = attachmentsList[0];
+            }
+        }
+
+        // Fallback: search for URL embedded in updateText
+        if (!attObj && updateText) {
+            const urlMatch = updateText.match(/https?:\/\/[^\s<>"')]+/i);
+            if (urlMatch) {
+                attObj = { name: attachedFileName, data: urlMatch[0] };
+            }
+        }
+
+        const rawUrl = attObj ? (attObj.data || attObj.url || '') : '';
+        const resolvedUrl = getResolvedAttachmentUrl(rawUrl);
+        const isDataUri = resolvedUrl ? resolvedUrl.startsWith('data:') : false;
+
+        let tag = 'div';
+        let hrefAttr = '';
+        let targetAttr = '';
+        let attachClickAttr = '';
+        let titleAttr = `title="${escapeHTMLApp(attachedFileName)}"`;
+        let cursorStyle = 'default';
+        let underlineStyle = 'none';
+
+        if (resolvedUrl) {
+            tag = 'a';
+            cursorStyle = 'pointer';
+            underlineStyle = 'underline';
+
+            if (isDataUri) {
+                hrefAttr = `href="${escapeHTMLApp(resolvedUrl)}"`;
+                targetAttr = `download="${escapeHTMLApp(attObj?.name || attachedFileName)}"`;
+                titleAttr = `title="Click to download ${escapeHTMLApp(attachedFileName)}"`;
+            } else {
+                hrefAttr = `href="${escapeHTMLApp(resolvedUrl)}"`;
+                targetAttr = `target="_blank" rel="noopener noreferrer"`;
+                attachClickAttr = `onclick="event.stopPropagation();"`;
+                titleAttr = `title="Click to view / open ${escapeHTMLApp(attachedFileName)}"`;
+            }
+        } else if (attObj) {
+            attachClickAttr = `onclick="event.stopPropagation();"`;
+        }
         
         html += `
-            <div class="dhl-attachment-pill" ${attachClickAttr} style="display: inline-flex; align-items: center; gap: 5px; margin-top: ${mainText ? '6px' : '0'}; background: var(--bg-hover, rgba(255,255,255,0.06)); border: 1px solid var(--border-color, rgba(255,255,255,0.15)); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; font-weight: 500; color: var(--text-primary); max-width: 100%; box-sizing: border-box; overflow: hidden; word-break: break-word;">
+            <${tag} class="dhl-attachment-pill" ${hrefAttr} ${targetAttr} ${attachClickAttr} ${titleAttr} style="display: inline-flex; align-items: center; gap: 5px; margin-top: ${mainText ? '6px' : '0'}; background: var(--bg-hover, rgba(255,255,255,0.06)); border: 1px solid var(--border-color, rgba(255,255,255,0.15)); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; font-weight: 500; color: var(--text-primary); text-decoration: none; max-width: 100%; box-sizing: border-box; overflow: hidden; word-break: break-word; cursor: ${cursorStyle};">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px; color: var(--team-avionics, #935073); flex-shrink: 0;">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
                 <span style="color: var(--text-muted); font-weight: 400; flex-shrink: 0;">Attached file:</span>
-                <span style="color: var(--text-primary); font-weight: 600; text-decoration: ${attObj ? 'underline' : 'none'}; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word;">${escapeHTMLApp(attachedFileName)}</span>
-            </div>
+                <span style="color: var(--text-primary); font-weight: 600; text-decoration: ${underlineStyle}; overflow: hidden; text-overflow: ellipsis; white-space: normal; word-break: break-word;">${escapeHTMLApp(attachedFileName)}</span>
+            </${tag}>
         `;
     }
     
@@ -4322,6 +4494,12 @@ function exportToExcel() {
 
 // EXPORT TO PDF (Native window print layout)
 function exportToPdf() {
+    const activeTabItem = document.querySelector('.tab-item.active');
+    const activeTab = activeTabItem ? activeTabItem.dataset.tab : 'board';
+    if (activeTab === 'summary') {
+        printSummaryReport('normal');
+        return;
+    }
     // Generate list grouping tables before print, so print outputs all items regardless of active view
     renderList(tasks); 
     window.print();
@@ -5486,8 +5664,8 @@ function renderWeeklySummaryTab() {
     const teamHidden = document.getElementById('summaryTeamHidden');
     const selectedTeams = teamHidden && teamHidden.value ? teamHidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
 
-    // Filter tasks by selected teams & date range (including tasks with status updates/logs in the period)
-    const filteredTasks = weeklyTasks.filter(t => {
+    // Filter tasks by selected teams & date range (tasks with status updates/logs, creation, or completion in the period)
+    const periodTasks = weeklyTasks.filter(t => {
         // 1. Team filtering
         if (selectedTeams.length > 0) {
             const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
@@ -5508,16 +5686,34 @@ function renderWeeklySummaryTab() {
             return uDate >= startDateStr && uDate <= endDateStr;
         });
 
-        // Only include tasks that have recent status update/log, creation, or completion in this report period
         return createdInPeriod || updatedInPeriod || completedInPeriod;
     });
 
+    // Identify active backlog tasks currently In Progress (date-insensitive, matching selected teams)
+    const inProgressBacklogTasks = weeklyTasks.filter(t => {
+        if (t.currentStatus !== 'In Progress') return false;
+        const createdDate = t.createdDate || '';
+        if (createdDate && createdDate > endDateStr) return false;
+        if (selectedTeams.length > 0) {
+            const taskTeams = (t.assignedTeam || '').split(',').map(s => s.trim());
+            const matchesTeam = taskTeams.some(team => selectedTeams.includes(team));
+            if (!matchesTeam) return false;
+        }
+        return !periodTasks.some(pt => pt.id === t.id);
+    });
+
+    // Combined tasks for KPI & status calculations (counts active backlog tasks if in progress)
+    const kpiTasks = [...periodTasks, ...inProgressBacklogTasks];
+
+    // Filtered tasks for the weekly report sections (narrative, workload, table do not include active backlog tasks)
+    const filteredTasks = periodTasks;
+
     // 1. KPI Calculations
-    const total = filteredTasks.length;
-    const open = filteredTasks.filter(t => t.currentStatus === 'Open').length;
-    const inProgress = filteredTasks.filter(t => t.currentStatus === 'In Progress').length;
-    const completed = filteredTasks.filter(t => t.currentStatus === 'Completed').length;
-    const aog = filteredTasks.filter(t => t.priorityLevel === 'AOG' && t.currentStatus !== 'Completed').length;
+    const total = kpiTasks.length;
+    const open = kpiTasks.filter(t => t.currentStatus === 'Open').length;
+    const inProgress = kpiTasks.filter(t => t.currentStatus === 'In Progress').length;
+    const completed = kpiTasks.filter(t => t.currentStatus === 'Completed').length;
+    const aog = kpiTasks.filter(t => t.priorityLevel === 'AOG' && t.currentStatus !== 'Completed').length;
     const compliance = total > 0 ? Math.round((completed / total) * 100) : 100;
     
     document.getElementById('kpiTotalTasks').textContent = total;
@@ -5914,7 +6110,8 @@ function renderWeeklySummaryTab() {
     // Remove dynamic task-group tbodys, preserving the container tbody
     rtsTable.querySelectorAll('tbody.task-group').forEach(tbody => tbody.remove());
     
-    const reportTasks = filteredTasks;
+    // 5. Weekly Report Table (Active backlog tasks are excluded from the weekly report table)
+    const reportTasks = periodTasks;
     
     const sortedTasks = reportTasks.sort((a,b) => {
         const statusOrder = { 'Open': 1, 'In Progress': 2, 'Completed': 3 };
@@ -6141,42 +6338,18 @@ function loadFYIs() {
 
 function safeOpenOrDownload(dataUrl, fileName) {
     if (!dataUrl) return;
-    const str = String(dataUrl).trim();
-    if (!str) return;
+    const url = typeof getResolvedAttachmentUrl === 'function' ? getResolvedAttachmentUrl(dataUrl) : String(dataUrl).trim();
+    if (!url) return;
 
     // 1. Data URI (Base64 file download)
-    if (str.startsWith('data:')) {
+    if (url.startsWith('data:')) {
         const link = document.createElement('a');
-        link.href = str;
+        link.href = url;
         link.download = fileName || 'download';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         return;
-    }
-
-    // 2. Extract nested target URL if wrapped in listurl= or url= parameter
-    let url = str;
-    if (url.includes('listurl=')) {
-        const match = url.match(/listurl=([^&]+)/i);
-        if (match && match[1]) {
-            try { url = decodeURIComponent(match[1]); } catch(e) {}
-        }
-    } else if (url.includes('url=')) {
-        const match = url.match(/url=([^&]+)/i);
-        if (match && match[1]) {
-            try { url = decodeURIComponent(match[1]); } catch(e) {}
-        }
-    }
-
-    // 3. Decode percent-encoded protocol prefix
-    if (url.startsWith('https%3A') || url.startsWith('http%3A')) {
-        try { url = decodeURIComponent(url); } catch(e) {}
-    }
-
-    // 4. Prepend https:// if protocol is missing
-    if (!/^https?:\/\//i.test(url) && !/^file:\/\//i.test(url) && !/^blob:/i.test(url)) {
-        url = 'https://' + url.replace(/^\/+/, '');
     }
 
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -7606,7 +7779,7 @@ function handleCloudOrLocalUpload(file, base64Data, successCallback, localFallba
                 if (trimmedText) {
                     try {
                         const result = JSON.parse(trimmedText);
-                        fileUrl = result.link || result.url || result.fileUrl || '';
+                        fileUrl = result.link || result.url || result.fileUrl || result.webUrl || result.sharingLink || result.shareLink || (result.body && (result.body.link || result.body.url || result.body.webUrl)) || '';
                     } catch (jsonErr) {
                         // If not JSON, check if response text itself is a valid URL
                         if (trimmedText.startsWith('http://') || trimmedText.startsWith('https://')) {
@@ -7672,6 +7845,17 @@ window.clearSapForm = clearSapForm;
 window.renderRecurringBarChart = renderRecurringBarChart;
 window.handleLogin = handleLogin;
 
+// Helper to generate the exact report print/PDF filename: "Transfer Sheet From Date - To Date"
+function getSummaryReportFileName() {
+    const startSelector = document.getElementById('summaryStartDateSelector');
+    const endSelector = document.getElementById('summaryEndDateSelector');
+    const defaults = typeof getWeeklySummaryDefaultDates === 'function' ? getWeeklySummaryDefaultDates() : { start: '2026-06-15', end: '2026-06-21' };
+    const fromDate = (startSelector && startSelector.value) ? startSelector.value : defaults.start;
+    const toDate = (endSelector && endSelector.value) ? endSelector.value : defaults.end;
+    return `Transfer Sheet From ${fromDate} - To ${toDate}`;
+}
+window.getSummaryReportFileName = getSummaryReportFileName;
+
 // PRINT WEEKLY SUMMARY REPORT WITH LAYOUT SELECTION
 function printSummaryReport(layout) {
     if (layout === 'one-page') {
@@ -7684,6 +7868,18 @@ function printSummaryReport(layout) {
     const menu = document.getElementById('printDropdownMenu');
     if (menu) menu.classList.add('hidden');
     
+    const originalTitle = document.title || 'DM-A Task Tracking';
+    const printFileName = getSummaryReportFileName();
+    document.title = printFileName;
+
+    const restoreTitle = () => {
+        document.body.classList.remove('print-one-page');
+        document.title = originalTitle;
+    };
+
+    window.addEventListener('afterprint', restoreTitle, { once: true });
+    setTimeout(restoreTitle, 2500);
+
     try {
         // Try native print first (works in direct web view or if allow-modals sandbox is active)
         window.print();
@@ -7697,15 +7893,26 @@ function printSummaryReport(layout) {
                 // Remove all script elements to prevent JS execution in new window
                 printDoc.querySelectorAll('script').forEach(s => s.remove());
                 
+                const titleTag = printDoc.querySelector('title');
+                if (titleTag) {
+                    titleTag.textContent = printFileName;
+                } else {
+                    const newTitle = printDoc.createElement('title');
+                    newTitle.textContent = printFileName;
+                    if (printDoc.head) printDoc.head.appendChild(newTitle);
+                }
+
                 const cleanHtml = '<!DOCTYPE html>\n<html>' + printDoc.innerHTML + '</html>';
                 
                 printWindow.document.open();
                 printWindow.document.write(cleanHtml);
+                printWindow.document.title = printFileName;
                 printWindow.document.close();
                 
                 // Trigger print once content is written
                 setTimeout(() => {
                     if (printWindow.print) {
+                        printWindow.document.title = printFileName;
                         printWindow.print();
                     }
                 }, 500);
@@ -8755,17 +8962,21 @@ function renderMobileDashboard() {
     const dateFromVal = mobDateFromEl?.value || '';
     const dateToVal = mobDateToEl?.value || '';
 
-    // Filter tasks by active date range for summary metrics and workload breakdown (Fig 3)
+    // Filter tasks by active date range for workload breakdown (Fig 3)
     let dateFilteredTasks = tasks;
     if (dateFromVal || dateToVal) {
         dateFilteredTasks = tasks.filter(t => isTaskInDateRange(t, dateFromVal, dateToVal));
     }
 
-    // 1. Calculate overall metrics from date-filtered tasks (Fig 3 overview)
-    const totalCount = dateFilteredTasks.length;
-    const inProgressCount = dateFilteredTasks.filter(t => t.currentStatus === 'In Progress' || t.currentStatus === 'Open').length;
-    const rtsCount = dateFilteredTasks.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed').length;
-    const aogCount = dateFilteredTasks.filter(t => t.priorityLevel === 'AOG' || t.priorityLevel === 'High').length;
+    // Include active backlog tasks if in progress in KPI metrics
+    const mobInProgressBacklog = tasks.filter(t => t.currentStatus === 'In Progress' && (!t.createdDate || !dateToVal || t.createdDate <= dateToVal) && !dateFilteredTasks.some(d => d.id === t.id));
+    const mobKpiTasks = [...dateFilteredTasks, ...mobInProgressBacklog];
+
+    // 1. Calculate overall metrics from date-filtered tasks + in-progress backlog (Fig 3 overview)
+    const totalCount = mobKpiTasks.length;
+    const inProgressCount = mobKpiTasks.filter(t => t.currentStatus === 'In Progress' || t.currentStatus === 'Open').length;
+    const rtsCount = mobKpiTasks.filter(t => t.currentStatus === 'RTS' || t.currentStatus === 'Completed').length;
+    const aogCount = mobKpiTasks.filter(t => t.priorityLevel === 'AOG' || t.priorityLevel === 'High').length;
 
     const mobTotalEl = document.getElementById('mobTotalTasks');
     const mobInProgressEl = document.getElementById('mobInProgressTasks');
@@ -9004,6 +9215,16 @@ function renderMobileDashboardTasks() {
         `;
         return;
     }
+
+    // Sort tasks by priority from Top to Bottom: 1. AOG, 2. High, 3. Moderate, 4. Low
+    filtered.sort((a, b) => {
+        const pA = getPriorityWeight(a.priorityLevel);
+        const pB = getPriorityWeight(b.priorityLevel);
+        if (pA !== pB) return pA - pB;
+        const dateA = a.rtsDate && a.rtsDate !== 'N/A' ? new Date(a.rtsDate).getTime() : (a.createdDate ? new Date(a.createdDate).getTime() : 0);
+        const dateB = b.rtsDate && b.rtsDate !== 'N/A' ? new Date(b.rtsDate).getTime() : (b.createdDate ? new Date(b.createdDate).getTime() : 0);
+        return (dateA || 0) - (dateB || 0);
+    });
 
     listContainer.innerHTML = filtered.map(t => {
         const priorityColor = t.priorityLevel === 'AOG' ? '#ef4444' : t.priorityLevel === 'High' ? '#f59e0b' : t.priorityLevel === 'Medium' ? '#3b82f6' : '#10b981';
