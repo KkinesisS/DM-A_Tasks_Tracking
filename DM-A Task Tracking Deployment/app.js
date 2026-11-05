@@ -11,12 +11,18 @@ let eventListenersSet = false;
 function initSupabase() {
     const localUrl = localStorage.getItem('mro_supabase_url');
     const localKey = localStorage.getItem('mro_supabase_anon_key');
+    const credentialsChanged = Boolean(localUrl && localKey && (localUrl !== window.supabaseUrl || localKey !== window.supabaseKey));
     
     if (localUrl && localKey) {
         window.supabaseUrl = localUrl;
         window.supabaseKey = localKey;
     }
     
+    // Reuse existing client if already created with active Realtime subscriptions in index2.html
+    if (window.supabaseClient && !credentialsChanged) {
+        return;
+    }
+
     if (window.supabaseUrl && window.supabaseKey && window.supabaseUrl !== 'YOUR_SUPABASE_URL' && window.supabaseKey !== 'YOUR_SUPABASE_ANON_KEY' && typeof supabase !== 'undefined') {
         try {
             window.supabaseClient = supabase.createClient(window.supabaseUrl, window.supabaseKey);
@@ -2271,22 +2277,18 @@ function setupEventListeners() {
         });
     }
 
-    // Modal click-outside to close
+    // Modal click-outside disabled to prevent accidental closure
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
-            // Prevent accidental closure: detailsModal (and taskModal) can only be closed via its close buttons
-            if (e.target.id === 'detailsModal' || e.target.id === 'mobileTaskDetailsModal') {
-                return;
-            }
-            closeModal(e.target.id);
+            // Prevent accidental closure: modals can only be closed via their close (X) button
+            return;
         }
     });
 
-    // Keyboard ESC to close
+    // Keyboard ESC to close disabled for taskModal & detailsModal to prevent accidental closure
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            closeModal('taskModal');
-            // detailsModal requires clicking the close button to avoid accidental close
+            // Require clicking the top-right close button to avoid accidental close
         }
     });
 
@@ -2297,14 +2299,14 @@ function setupEventListeners() {
     const uploadArea = document.querySelector('.file-upload-area');
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
-        uploadArea.style.borderColor = 'var(--team-avionics)';
+        uploadArea.classList.add('drag-over');
     });
     uploadArea.addEventListener('dragleave', () => {
-        uploadArea.style.borderColor = '';
+        uploadArea.classList.remove('drag-over');
     });
     uploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
-        uploadArea.style.borderColor = '';
+        uploadArea.classList.remove('drag-over');
         if (e.dataTransfer.files.length > 0) {
             processFiles(e.dataTransfer.files);
         }
@@ -2380,9 +2382,10 @@ function setupEventListeners() {
 
         const text = textInput.value.trim();
         const author = authorInput.value.trim() || 'DMA Staff';
+        const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
 
-        if (!text) {
-            alert('Please enter an update.');
+        if (!text && !hasFile) {
+            alert('Please enter an update or attach a file.');
             return;
         }
 
@@ -4034,6 +4037,9 @@ function formatTimelineUpdateHtml(updateText, task) {
 }
 
 function saveTaskWithUploads(taskToSave, wasExternal) {
+    (taskToSave.attachments || []).forEach(att => {
+        delete att.uploadProgress;
+    });
     const pendingAttachments = (taskToSave.attachments || []).filter(att => att.isPendingUpload);
 
     if (pendingAttachments.length === 0) {
@@ -4509,7 +4515,73 @@ function exportToPdf() {
 function handleFileSelect(e) {
     if (e.target.files.length > 0) {
         processFiles(e.target.files);
+        e.target.value = '';
     }
+}
+
+function getFileExtensionLabel(file) {
+    if (!file) return 'FILE';
+    if (file.type === 'url') return 'LINK';
+    const name = file.name || '';
+    const parts = name.split('.');
+    if (parts.length > 1) {
+        const ext = parts[parts.length - 1].toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (ext) return ext.slice(0, 4);
+    }
+    return 'FILE';
+}
+
+function getFileTypeBadgeSvg(file) {
+    const ext = getFileExtensionLabel(file);
+    const isImage = /^(JPG|JPEG|PNG|GIF|WEBP|SVG|BMP|HEIC)$/.test(ext) || (file && file.type && file.type.startsWith('image/'));
+    const isZip = /^(ZIP|RAR|7Z|TAR|GZ)$/.test(ext);
+    const isUrl = file && file.type === 'url';
+
+    if (isImage) {
+        return `
+            <svg viewBox="0 0 28 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="2" width="22" height="28" rx="2"></rect>
+                <line x1="3" y1="21" x2="25" y2="21"></line>
+                <circle cx="9.5" cy="8.5" r="2"></circle>
+                <polyline points="4,19 10.5,12.5 15,16.5 19.5,11.5 24,17"></polyline>
+                <text x="14" y="27.8" text-anchor="middle" fill="currentColor" stroke="none" font-size="6.5" font-weight="700" font-family="Inter, sans-serif" letter-spacing="0.3">${ext}</text>
+            </svg>
+        `;
+    }
+    if (isZip) {
+        return `
+            <svg viewBox="0 0 28 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="2" width="22" height="28" rx="2"></rect>
+                <line x1="3" y1="21" x2="25" y2="21"></line>
+                <line x1="14" y1="3" x2="14" y2="12" stroke-dasharray="2 2"></line>
+                <rect x="12" y="12" width="4" height="5" rx="1"></rect>
+                <text x="14" y="27.8" text-anchor="middle" fill="currentColor" stroke="none" font-size="6.5" font-weight="700" font-family="Inter, sans-serif" letter-spacing="0.3">${ext}</text>
+            </svg>
+        `;
+    }
+    if (isUrl) {
+        return `
+            <svg viewBox="0 0 28 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 2H5a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9z"></path>
+                <polyline points="18 2 18 9 25 9"></polyline>
+                <line x1="3" y1="21" x2="25" y2="21"></line>
+                <path d="M11.5 14.5a2.5 2.5 0 0 1 3.5 0l1.5 1.5a2.5 2.5 0 0 1-3.5 3.5"></path>
+                <path d="M16.5 13.5a2.5 2.5 0 0 0-3.5 0l-1.5 1.5a2.5 2.5 0 0 0 3.5 3.5"></path>
+                <text x="14" y="27.8" text-anchor="middle" fill="currentColor" stroke="none" font-size="6" font-weight="700" font-family="Inter, sans-serif" letter-spacing="0.2">${ext}</text>
+            </svg>
+        `;
+    }
+    return `
+        <svg viewBox="0 0 28 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 2H5a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9z"></path>
+            <polyline points="18 2 18 9 25 9"></polyline>
+            <line x1="3" y1="21" x2="25" y2="21"></line>
+            <line x1="7" y1="12" x2="17" y2="12"></line>
+            <line x1="7" y1="15" x2="21" y2="15"></line>
+            <line x1="7" y1="18" x2="18" y2="18"></line>
+            <text x="14" y="27.8" text-anchor="middle" fill="currentColor" stroke="none" font-size="6.5" font-weight="700" font-family="Inter, sans-serif" letter-spacing="0.3">${ext}</text>
+        </svg>
+    `;
 }
 
 function processFiles(fileList) {
@@ -4523,36 +4595,7 @@ function processFiles(fileList) {
         return;
     }
 
-    const taskId = document.getElementById('taskId') ? document.getElementById('taskId').value : '';
-    let assignedTeam = document.getElementById('assignedTeam') ? document.getElementById('assignedTeam').value : '';
-    let dateStr = new Date().toISOString().split('T')[0];
-    
-    let aircraftRegInput = document.getElementById('aircraftReg');
-    let aircraftReg = aircraftRegInput ? aircraftRegInput.value.trim().toUpperCase() || 'N-A' : 'N-A';
-    let taskTopicInput = document.getElementById('taskTopic');
-    let topic = taskTopicInput ? taskTopicInput.value.trim() || 'General' : 'General';
-    
-    if (taskId) {
-        const existingTask = tasks.find(t => t.id === taskId);
-        if (existingTask) {
-            if (!assignedTeam && existingTask.assignedTeam) {
-                assignedTeam = existingTask.assignedTeam;
-            }
-            if (existingTask.createdDate) {
-                dateStr = existingTask.createdDate;
-            }
-            if (existingTask.aircraftReg && (aircraftReg === '' || aircraftReg === 'N-A')) {
-                aircraftReg = existingTask.aircraftReg;
-            }
-            if (existingTask.topic || existingTask.taskDescription) {
-                if (topic === '' || topic === 'General') {
-                    topic = existingTask.topic || existingTask.taskDescription;
-                }
-            }
-        }
-    }
-
-    Array.from(fileList).forEach(file => {
+    Array.from(fileList).forEach((file, idx) => {
         // Size check: 20MB for cloud storage, 1MB for local storage fallback
         const maxLimit = hasCloud ? 20 * 1024 * 1024 : 1024 * 1024;
         if (file.size > maxLimit) {
@@ -4560,17 +4603,57 @@ function processFiles(fileList) {
             return;
         }
 
+        const attEntry = {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            data: '',
+            isPendingUpload: true,
+            fileObj: file,
+            uploadProgress: 8
+        };
+        formAttachments.push(attEntry);
+        renderFilePreviews();
+
+        let readerDone = false;
+        const startTime = Date.now();
+        const minDuration = 550 + (idx * 120);
+
+        const progressTimer = setInterval(() => {
+            if (!formAttachments.includes(attEntry)) {
+                clearInterval(progressTimer);
+                return;
+            }
+            const elapsed = Date.now() - startTime;
+            const timePct = Math.min(95, Math.round((elapsed / minDuration) * 100));
+            if (readerDone && elapsed >= minDuration) {
+                attEntry.uploadProgress = 100;
+                clearInterval(progressTimer);
+                renderFilePreviews();
+            } else if (timePct > (attEntry.uploadProgress || 0)) {
+                attEntry.uploadProgress = timePct;
+                renderFilePreviews();
+            }
+        }, 65);
+
         const reader = new FileReader();
+        reader.onprogress = function(e) {
+            if (e.lengthComputable && formAttachments.includes(attEntry)) {
+                const realPct = Math.min(95, Math.round((e.loaded / e.total) * 100));
+                if (realPct > (attEntry.uploadProgress || 0)) {
+                    attEntry.uploadProgress = realPct;
+                    renderFilePreviews();
+                }
+            }
+        };
         reader.onload = function(e) {
-            formAttachments.push({
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                data: e.target.result, // Base64 data URL
-                isPendingUpload: true,
-                fileObj: file
-            });
-            renderFilePreviews();
+            attEntry.data = e.target.result; // Base64 data URL
+            readerDone = true;
+            if (Date.now() - startTime >= minDuration) {
+                attEntry.uploadProgress = 100;
+                clearInterval(progressTimer);
+                renderFilePreviews();
+            }
         };
         reader.readAsDataURL(file);
     });
@@ -4578,39 +4661,70 @@ function processFiles(fileList) {
 
 function renderFilePreviews() {
     const list = document.getElementById('filePreviewList');
+    if (!list) return;
     list.innerHTML = '';
 
     formAttachments.forEach((file, index) => {
+        const isUploading = typeof file.uploadProgress === 'number' && file.uploadProgress < 100;
+        const progress = isUploading ? Math.max(0, Math.min(99, Math.round(file.uploadProgress))) : 100;
         const item = document.createElement('div');
-        item.className = 'file-item';
+        item.className = `file-item${isUploading ? ' is-uploading' : ' is-complete'}`;
 
         const isUrl = file.type === 'url';
-        const sizeLabel = isUrl ? 'Link' : `${(file.size / 1024).toFixed(1)} KB`;
-        
-        const iconSvg = isUrl ? `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-        ` : `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-        `;
+        const sizeKB = (file.size || 0) / 1024;
+        const sizeLabel = isUrl
+            ? 'Link'
+            : sizeKB >= 1024
+                ? `${(sizeKB / 1024).toFixed(2)} MB`
+                : `${sizeKB.toFixed(1)} KB`;
 
-        item.innerHTML = `
-            <div class="file-item-name">
-                ${iconSvg}
-                <span class="file-preview-text" title="${escapeHTMLApp(file.name)}">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
-            </div>
-            <button type="button" class="remove-file" onclick="removeAttachment(${index})" title="Remove attachment">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        `;
+        const iconSvg = getFileTypeBadgeSvg(file);
+
+        if (isUploading) {
+            item.innerHTML = `
+                <div class="file-item-top-row">
+                    <div class="file-item-name">
+                        <span class="file-type-icon">${iconSvg}</span>
+                        <span class="file-preview-text" title="${escapeHTMLApp(file.name)}">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
+                    </div>
+                </div>
+                <div class="file-progress-row">
+                    <div class="file-progress-track">
+                        <div class="file-progress-fill" style="width: ${progress}%;"></div>
+                        <span class="file-progress-label-base">Uploading... ${progress}%</span>
+                        <span class="file-progress-label-fill" style="clip-path: inset(0 ${100 - progress}% 0 0);">Uploading... ${progress}%</span>
+                    </div>
+                    <button type="button" class="remove-file" onclick="removeAttachment(${index})" title="Cancel upload">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            `;
+        } else {
+            item.innerHTML = `
+                <div class="file-item-top-row">
+                    <div class="file-item-name">
+                        <span class="file-type-icon">${iconSvg}</span>
+                        <span class="file-preview-text" title="${escapeHTMLApp(file.name)}">${escapeHTMLApp(file.name)} <span class="file-size-label">(${sizeLabel})</span></span>
+                    </div>
+                    <div class="file-item-actions">
+                        <span class="file-check-badge" title="Ready to attach">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                        <button type="button" class="remove-file" onclick="removeAttachment(${index})" title="Remove attachment">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
         list.appendChild(item);
     });
 }

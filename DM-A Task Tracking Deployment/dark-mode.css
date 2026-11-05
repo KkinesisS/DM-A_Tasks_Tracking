@@ -245,17 +245,41 @@ html.dark-mode .download-file-btn:hover {
 }
 
 /* File Upload Area */
-html.dark-mode .file-upload-area {
-    background-color: rgba(26, 14, 29, 0.4) !important;
-    border-color: rgba(147, 80, 115, 0.25) !important;
+html.dark-mode .file-upload-widget {
+    background-color: rgba(26, 14, 29, 0.55) !important;
+    border-color: rgba(147, 80, 115, 0.3) !important;
 }
-html.dark-mode .file-upload-area:hover {
-    border-color: rgba(147, 80, 115, 0.6) !important;
-    background-color: rgba(147, 80, 115, 0.1) !important;
+html.dark-mode .file-upload-area {
+    background-color: rgba(26, 14, 29, 0.35) !important;
+    border-color: rgba(147, 80, 115, 0.35) !important;
+}
+html.dark-mode .file-upload-area:hover,
+html.dark-mode .file-upload-area.drag-over {
+    border-color: #60a5fa !important;
+    background-color: rgba(59, 130, 246, 0.08) !important;
+}
+html.dark-mode .file-upload-area .upload-text {
+    color: #e2e8f0 !important;
 }
 html.dark-mode .file-item {
-    background-color: rgba(80, 45, 85, 0.2) !important;
-    border-color: rgba(147, 80, 115, 0.2) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+html.dark-mode .file-item .file-item-name {
+    color: #cbd5e1;
+}
+html.dark-mode .file-item.is-complete .file-item-name,
+html.dark-mode .file-item.is-complete .file-item-name .file-type-icon {
+    color: #60a5fa;
+}
+html.dark-mode .file-progress-track {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+html.dark-mode .remove-file {
+    background-color: rgba(148, 163, 184, 0.35);
+}
+html.dark-mode .remove-file:hover {
+    background-color: #ef4444;
 }
 
 /* Kanban column styles */
