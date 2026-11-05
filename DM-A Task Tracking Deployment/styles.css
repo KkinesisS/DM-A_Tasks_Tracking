@@ -1,8 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
+/* Print-only task cards: hidden on screen */
+#printTaskCards { display: none; }
+
 :root {
-    /* Base Colors (Light Mode - Monochromatic Purple Theme) */
-    --bg-dark: #E1D8EF;         /* Ghost (#E1D8EF) */
+    /* Base Colors (Light Mode - Light Gray #D9D9D9) */
+    --bg-dark: #D9D9D9;         /* Light Gray (#D9D9D9) */
     --bg-card: #ffffff;
     --bg-card-hover: #F3EEF9;
     --border-color: #BBADD8;     /* Wisteria (#BBADD8) */
@@ -56,10 +59,13 @@
     box-sizing: border-box;
 }
 
+html, body {
+    background-color: var(--bg-dark);
+}
+
 body {
     background-color: var(--bg-dark);
-    background-image: 
-        linear-gradient(135deg, #E1D8EF 0%, #BBADD8 100%);
+    background-image: none;
     background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-body);
@@ -2966,15 +2972,15 @@ header {
         print-color-adjust: exact !important;
     }
 
-    /* Table styling for print layout */
+    /* Table styling for print layout (table is hidden; print cards shown instead) */
     .table-wrapper {
         overflow: visible !important;
     }
 
     .mro-table {
         width: 100% !important;
-        border-collapse: separate !important; /* Needed for border-radius on rows */
-        border-spacing: 0 !important;    /* Gap between tasks */
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
         margin-top: 0.4rem !important;
     }
 
@@ -4758,16 +4764,150 @@ html.dark-mode .login-card {
 
 
 @media print {
-    .mro-table {
-        border-collapse: collapse !important;
+    /* Remove outer glass-panel wrapper box and orphan header so no blank "WEEKLY REPORT" page is generated */
+    #summaryReportTableContainer,
+    html.dark-mode #summaryReportTableContainer {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
     }
-    .task-group {
+    #summaryReportTableContainer > h3 {
+        display: none !important;
+    }
+
+    /* Hide the interactive table on print; show print-only task cards instead */
+    #summaryReportTableContainer .table-wrapper {
+        display: none !important;
+    }
+    #printTaskCards {
+        display: block !important;
+    }
+
+    /* ---- Print Task Card layout ---- */
+    .print-task-card {
+        display: block !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        margin-bottom: 1.2rem;
+        overflow: hidden;
+        background: #ffffff;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
-    .mro-table tr.task-row td, .mro-table tr.wk-print-log-row td {
-        border-radius: 0 !important; /* clear corner rounding since collapse doesn't support it */
+
+    /* Header: two rows stacked — labels on top, values below */
+    .print-task-card .ptc-header {
+        display: flex !important;
+        flex-direction: column !important;
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+        padding: 0.75rem 1.25rem 0.85rem 1.25rem !important;
+        gap: 0.35rem !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
+    /* Both label row and value row share the same flex layout */
+    .print-task-card .ptc-label-row,
+    .print-task-card .ptc-value-row {
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 0 !important;
+    }
+    /* Label row: clear uppercase column headers on top */
+    .print-task-card .ptc-label-row,
+    .print-task-card .ptc-label-row .ptc-col {
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.06em !important;
+        text-transform: uppercase !important;
+        color: #cbd5e1 !important;
+    }
+    /* Value row: large bold task data below */
+    .print-task-card .ptc-value-row,
+    .print-task-card .ptc-value-row .ptc-col,
+    .print-task-card .ptc-value-row .tbl-reg,
+    .print-task-card .ptc-value-row .tbl-type,
+    .print-task-card .ptc-value-row .badge-priority,
+    .print-task-card .ptc-value-row .badge-status {
+        font-size: 16pt !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.02em !important;
+        color: #ffffff !important;
+        background: transparent !important;
+        border: none !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .print-task-card .ptc-col {
+        display: inline-block;
+        padding: 0 0.5rem !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    /* Column flex widths (applied to both rows) */
+    .print-task-card .ptc-reg    { flex: 1.4; font-weight: 800 !important; }
+    .print-task-card .ptc-type   { flex: 1.4; }
+    .print-task-card .ptc-ata    { flex: 0.7; }
+    .print-task-card .ptc-team   { flex: 2.2; }
+    .print-task-card .ptc-due    { flex: 1.3; }
+    .print-task-card .ptc-prio   { flex: 1.1; }
+    .print-task-card .ptc-status { flex: 1.3; }
+
+    /* Body: description + timeline */
+    .print-task-card .ptc-body {
+        padding: 1rem 1.25rem;
+        background: #ffffff;
+    }
+    .print-task-card .ptc-desc-section {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .print-task-card .ptc-section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 0.4rem;
+    }
+    .print-task-card .ptc-desc-content {
+        font-size: 0.88rem;
+        color: #1e293b;
+        line-height: 1.45;
+    }
+    .print-task-card .ptc-desc-content strong {
+        font-size: 0.95rem;
+        color: #1e293b;
+    }
+
+    /* Status colour stripes on left — wide filled bar */
+    .print-task-card.status-completed {
+        border-left: 14px solid #15803d !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .print-task-card.status-progress {
+        border-left: 14px solid #6b21a8 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .print-task-card.status-open {
+        border-left: 14px solid #475569 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Keep existing: backlog list, etc. */
     #summaryBacklogList {
         max-height: none !important;
         overflow: visible !important;
@@ -4848,7 +4988,7 @@ html.dark-mode .login-card {
 @media print {
     /* Force light mode colors for print regardless of dark mode toggle */
     :root, html.dark-mode {
-        --bg-dark: #E1D8EF !important;
+        --bg-dark: #D9D9D9 !important;
         --bg-card: #ffffff !important;
         --bg-card-hover: #F3EEF9 !important;
         --border-color: #BBADD8 !important;
@@ -4863,6 +5003,7 @@ html.dark-mode .login-card {
     body, html.dark-mode body {
         color: var(--text-primary) !important;
         background-color: var(--bg-card) !important;
+        background-image: none !important;
     }
 }
 @media print {

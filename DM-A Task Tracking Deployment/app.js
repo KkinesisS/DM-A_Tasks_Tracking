@@ -6109,6 +6109,10 @@ function renderWeeklySummaryTab() {
     rtsTableBody.innerHTML = '';
     // Remove dynamic task-group tbodys, preserving the container tbody
     rtsTable.querySelectorAll('tbody.task-group').forEach(tbody => tbody.remove());
+
+    // Clear print-only cards container
+    const printCardsContainer = document.getElementById('printTaskCards');
+    if (printCardsContainer) printCardsContainer.innerHTML = '';
     
     // 5. Weekly Report Table (Active backlog tasks are excluded from the weekly report table)
     const reportTasks = periodTasks;
@@ -6179,11 +6183,9 @@ function renderWeeklySummaryTab() {
             logRow.className = `wk-print-log-row status-${statusClass} ${teamClass}`;
             
             let updatesHtml = '';
+            let timelineItemsHtml = ''; // shared for both table logRow and print card
             if (updates.length > 0) {
-                updatesHtml = `
-                    <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:0.75rem;">Status Updates &amp; Log (${updates.length})</div>
-                    <div class="dhl-timeline">
-                        ${sortedUpdates.map((u, i) => {
+                timelineItemsHtml = sortedUpdates.map((u, i) => {
                             let monthDay = '';
                             let yearVal = '';
                             let timeStr = '';
@@ -6245,7 +6247,11 @@ function renderWeeklySummaryTab() {
                                         <div class="dhl-status-subtext">${timeStr} &middot; ${escapeHTMLApp(u.author)}</div>
                                     </div>
                                 </div>`;
-                        }).join('')}
+                        }).join('');
+                updatesHtml = `
+                    <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:0.75rem;">Status Updates &amp; Log (${updates.length})</div>
+                    <div class="dhl-timeline">
+                        ${timelineItemsHtml}
                     </div>
                 `;
             } else {
@@ -6272,6 +6278,50 @@ function renderWeeklySummaryTab() {
                 </td>`;
             taskGroup.appendChild(logRow);
               rtsTable.appendChild(taskGroup);
+
+            // Build print-only card (reliable break-inside: avoid as a block element)
+            if (printCardsContainer) {
+                const card = document.createElement('div');
+                card.className = `print-task-card prio-${prioClass} status-${statusClass} ${teamClass}`;
+                card.innerHTML = `
+                    <div class="ptc-header">
+                        <!-- Label row -->
+                        <div class="ptc-label-row">
+                            <span class="ptc-col ptc-reg">Aircraft Reg</span>
+                            <span class="ptc-col ptc-type">Aircraft Type</span>
+                            <span class="ptc-col ptc-ata">ATA</span>
+                            <span class="ptc-col ptc-team">Team</span>
+                            <span class="ptc-col ptc-due">Due Date</span>
+                            <span class="ptc-col ptc-prio">Priority</span>
+                            <span class="ptc-col ptc-status">Status</span>
+                        </div>
+                        <!-- Value row -->
+                        <div class="ptc-value-row">
+                            <span class="ptc-col ptc-reg"><span class="tbl-reg">${t.aircraftReg}</span></span>
+                            <span class="ptc-col ptc-type"><span class="tbl-type">${t.aircraftType || 'A320'}</span></span>
+                            <span class="ptc-col ptc-ata">${t.ataChapter || 'N/A'}</span>
+                            <span class="ptc-col ptc-team">${(t.assignedTeam || '').split(',').map(s => s.trim().replace(' Team', '')).join(', ')}</span>
+                            <span class="ptc-col ptc-due">${t.rtsDate}</span>
+                            <span class="ptc-col ptc-prio"><span class="badge-priority ${prioClass}">${t.priorityLevel}</span></span>
+                            <span class="ptc-col ptc-status"><span class="badge-status ${statusClass}">${t.currentStatus}</span></span>
+                        </div>
+                    </div>
+                    <div class="ptc-body">
+                        <div class="ptc-desc-section">
+                            <div class="ptc-section-label">Description</div>
+                            <div class="ptc-desc-content">
+                                <strong>${escapeHTMLApp(t.topic || 'No Topic')}</strong>
+                                <div style="margin-top:0.3rem;white-space:pre-wrap;">${escapeHTMLApp(t.taskDescription || '')}</div>
+                            </div>
+                        </div>
+                        <div class="ptc-log-section">
+                            <div class="ptc-section-label">Status Updates &amp; Log (${updates.length})</div>
+                            ${updates.length > 0 ? `<div class="dhl-timeline">${timelineItemsHtml}</div>` : '<div style="font-size:0.85rem;font-style:italic;color:#64748b;">No status updates recorded.</div>'}
+                        </div>
+                    </div>
+                `;
+                printCardsContainer.appendChild(card);
+            }
           });
     }
 }
