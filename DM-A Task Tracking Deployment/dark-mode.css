@@ -693,6 +693,26 @@ html.dark-mode .team-list-section {
     border: 1px solid rgba(147, 80, 115, 0.25) !important;
 }
 
+html.dark-mode .team-list-section .table-wrapper {
+    background: transparent !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row td:first-child {
+    border-left: 1.5px solid rgba(147, 80, 115, 0.45) !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row td:last-child {
+    border-right: 1.5px solid rgba(147, 80, 115, 0.45) !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row:hover {
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5) !important;
+}
+
 html.dark-mode .team-section-header {
     background: rgba(26, 14, 29, 0.95) !important;
     border-bottom: 1px solid rgba(147, 80, 115, 0.3) !important;

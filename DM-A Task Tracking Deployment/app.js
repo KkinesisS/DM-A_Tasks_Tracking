@@ -960,6 +960,19 @@ function isArchivedToHistory(task) {
     return diffDays >= 7;
 }
 
+function matchesTaskUpdateLogs(task, q) {
+    if (!q || !task || !task.comments) return false;
+    let commentsArr = task.comments;
+    if (typeof commentsArr === 'string') {
+        try { commentsArr = JSON.parse(commentsArr); } catch (e) { return false; }
+    }
+    if (!Array.isArray(commentsArr)) return false;
+    return commentsArr.some(c =>
+        (c && c.text && String(c.text).toLowerCase().includes(q)) ||
+        (c && c.author && String(c.author).toLowerCase().includes(q))
+    );
+}
+
 function getFilteredTasks() {
     return tasks.filter(task => {
         // Exclude tasks archived to History (completed > 7 days ago)
@@ -971,11 +984,14 @@ function getFilteredTasks() {
         // Search matches
         const searchLower = activeFilters.search.toLowerCase();
         const matchesSearch = 
-            task.aircraftReg.toLowerCase().includes(searchLower) ||
+            (task.aircraftReg || '').toLowerCase().includes(searchLower) ||
             (task.aircraftType || '').toLowerCase().includes(searchLower) ||
-            task.requestor.toLowerCase().includes(searchLower) ||
-            task.taskDescription.toLowerCase().includes(searchLower) ||
-            (task.customId || task.id || '').toLowerCase().includes(searchLower);
+            (task.ataChapter || '').toLowerCase().includes(searchLower) ||
+            (task.topic || '').toLowerCase().includes(searchLower) ||
+            (task.requestor || '').toLowerCase().includes(searchLower) ||
+            (task.taskDescription || '').toLowerCase().includes(searchLower) ||
+            (task.customId || task.id || '').toLowerCase().includes(searchLower) ||
+            matchesTaskUpdateLogs(task, searchLower);
 
         // Team filter matches — supports multiple selected teams and comma-separated multi-team task values
         const selectedTeams = Array.isArray(activeFilters.teams) && activeFilters.teams.length > 0 
@@ -1009,10 +1025,12 @@ function getHistoryTasks(searchQuery) {
         const q = searchQuery.toLowerCase();
         return (
             (task.aircraftReg || '').toLowerCase().includes(q) ||
-            (task.topic || task.taskDescription || '').toLowerCase().includes(q) ||
+            (task.topic || '').toLowerCase().includes(q) ||
+            (task.taskDescription || '').toLowerCase().includes(q) ||
             (task.assignedTeam || '').toLowerCase().includes(q) ||
             (task.ataChapter || '').toLowerCase().includes(q) ||
-            (task.customId || task.id || '').toLowerCase().includes(q)
+            (task.customId || task.id || '').toLowerCase().includes(q) ||
+            matchesTaskUpdateLogs(task, q)
         );
     });
 }
@@ -1496,16 +1514,6 @@ function createTaskCard(task) {
                     </div>` : ''}
                 </div>
             </div>
-            <div class="quick-update-box" style="margin-top: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 0.5rem; display: flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation();" ondragstart="event.stopPropagation();">
-                <input type="text" placeholder="Type status update..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addQuickUpdate('${task.id}', this);}" style="flex-grow: 1; font-size: 0.75rem; padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); outline: none; font-family: var(--font-body); box-sizing: border-box;" />
-                <input type="file" id="quickUpdateFile_${task.id}" style="display: none;" onchange="uploadQuickUpdateFile('${task.id}', this)" />
-                <label for="quickUpdateFile_${task.id}" class="btn btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 6px; margin: 0; min-height: auto; width: auto; height: auto; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;" title="Attach File">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                    </svg>
-                </label>
-                <button type="button" class="btn btn-secondary" onclick="addQuickUpdate('${task.id}', this.closest('.quick-update-box').querySelector('input[type=text]'));" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; margin: 0; min-height: auto; width: auto; height: auto; font-weight: 600;">Add</button>
-            </div>
         </div>
     `;
 
@@ -1580,13 +1588,13 @@ function renderList(filteredTasks) {
                 <td><span class="tbl-type">${task.aircraftType || 'A320'}</span></td>
                 <td><span class="tbl-ata">${task.ataChapter || 'N/A'}</span></td>
                 <td><span class="badge-priority ${prioClass}">${task.priorityLevel}</span></td>
-                <td><div class="tbl-desc" title="${task.taskDescription}"><strong>${task.topic || 'No Topic'}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${task.taskDescription}</span></div></td>
-                <td><span>${task.createdDate || 'N/A'}</span></td>
-                <td><span>${task.currentStatus === 'Completed' && task.completedDate ? `<strong style="color: #10b981;">Done ${task.completedDate}</strong><br><span style="font-size: 0.72rem; color: #f59e0b; font-weight: 500;">(${getCompletedExpirationText(task.completedDate)})</span>` : task.rtsDate}</span></td>
-                <td><span>${task.requestor}</span></td>
-                <td><span class="badge-status ${statusClass}">${task.currentStatus}</span></td>
-                <td style="text-align: right;">
-                    <div style="display: inline-flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation()">
+                <td><div class="tbl-desc" title="${task.taskDescription}"><strong class="tbl-topic">${task.topic || 'No Topic'}</strong><br><span class="tbl-subdesc">${task.taskDescription}</span></div></td>
+                <td class="tbl-date"><span>${task.createdDate || 'N/A'}</span></td>
+                <td class="tbl-date"><span>${task.currentStatus === 'Completed' && task.completedDate ? `<strong style="color: #10b981; font-size: 0.74rem;">Done ${task.completedDate}</strong><br><span style="font-size: 0.63rem; color: #f59e0b; font-weight: 500; letter-spacing: -0.01em;">(${getCompletedExpirationText(task.completedDate)})</span>` : task.rtsDate}</span></td>
+                <td class="tbl-requestor" title="${task.requestor}"><span>${task.requestor}</span></td>
+                <td class="tbl-status"><span class="badge-status ${statusClass}">${task.currentStatus}</span></td>
+                <td class="tbl-actions" style="text-align: right;">
+                    <div style="display: inline-flex; gap: 0.25rem; align-items: center;" onclick="event.stopPropagation()">
                         <span class="action-icon" title="${task.comments ? task.comments.length : 0} update(s)" style="display: inline-flex; align-items: center; gap: 2px; cursor: default; background: none; border: none; padding: 0; margin-right: 0.25rem;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -9361,7 +9369,8 @@ function renderMobileDashboardTasks() {
             (t.assignedTeam && t.assignedTeam.toLowerCase().includes(searchVal)) ||
             (t.topic && t.topic.toLowerCase().includes(searchVal)) ||
             (t.priorityLevel && t.priorityLevel.toLowerCase().includes(searchVal)) ||
-            (t.currentStatus && t.currentStatus.toLowerCase().includes(searchVal))
+            (t.currentStatus && t.currentStatus.toLowerCase().includes(searchVal)) ||
+            matchesTaskUpdateLogs(t, searchVal)
         );
     }
 

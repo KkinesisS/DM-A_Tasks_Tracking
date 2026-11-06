@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -749,7 +749,7 @@ header {
 
 .card-content-wrapper {
     background: var(--bg-card);
-    border: 1.5px dashed var(--border-color);
+    border: none;
     border-radius: 14px;
     margin: 24px 0 0 0;
     padding: 1rem;
@@ -1029,6 +1029,12 @@ header {
     overflow-x: auto;
 }
 
+.team-list-section .table-wrapper {
+    padding: 0 0.65rem 0.65rem 0.65rem;
+    background: #f8fafc;
+    overflow-x: hidden;
+}
+
 .mro-table {
     width: 100%;
     border-collapse: collapse;
@@ -1036,21 +1042,47 @@ header {
     min-width: 900px;
 }
 
+.team-list-section .mro-table {
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    min-width: 0;
+    width: 100%;
+}
+
 .mro-table th {
     background: #ffffff;
-    padding: 0.75rem 0.75rem;
+    padding: 0.65rem 0.6rem;
     font-family: var(--font-heading);
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     color: var(--text-secondary);
     border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.team-list-section .mro-table th {
+    background: transparent;
+    padding: 0.5rem 0.4rem 0.25rem 0.4rem;
+    font-size: 0.7rem;
+    border-bottom: 1px solid var(--border-color);
+    width: 1%;
+}
+
+.team-list-section .mro-table th:nth-child(5) {
+    width: 99%;
+}
+
+.team-list-section .mro-table th:last-child {
+    width: 1% !important;
 }
 
 .mro-table td {
-    padding: 0.75rem 0.75rem;
+    padding: 0.6rem 0.6rem;
     border-bottom: 1px solid rgba(0,0,0,0.03);
     vertical-align: middle;
+    font-size: 0.8rem;
+    line-height: 1.35;
     transition: var(--transition);
 }
 
@@ -1062,36 +1094,130 @@ header {
     background: #f8fafc;
 }
 
+/* Bulge / Raised Card Boundary for Each Task Row in List View */
+.team-list-section .mro-table tbody tr.task-row {
+    border-radius: 10px;
+    box-shadow: 0 2px 5px -1px rgba(15, 23, 42, 0.07), 0 1px 3px -1px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.team-list-section .mro-table tbody tr.task-row td {
+    background: #ffffff;
+    border-top: 1px solid #cbd5e1;
+    border-bottom: 2px solid #cbd5e1;
+    padding: 0.55rem 0.4rem;
+    font-size: 0.76rem;
+    width: 1%;
+    white-space: nowrap;
+}
+
+.team-list-section .mro-table tbody tr.task-row td:nth-child(5) {
+    width: 99%;
+    max-width: 0;
+}
+
+.team-list-section .mro-table tbody tr.task-row td:first-child {
+    border-left: 1.5px solid #cbd5e1;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding-left: 0.75rem;
+}
+
+.team-list-section .mro-table tbody tr.task-row td:last-child {
+    border-right: 1.5px solid #cbd5e1;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding-right: 0.65rem;
+}
+
+.team-list-section .mro-table tbody tr.task-row:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 14px -3px rgba(15, 23, 42, 0.11), 0 3px 5px -3px rgba(15, 23, 42, 0.07);
+}
+
+.team-list-section .mro-table tbody tr.task-row:hover td {
+    background: #ffffff;
+    border-top-color: #94a3b8;
+    border-bottom-color: #94a3b8;
+}
+
+.team-list-section .mro-table tbody tr.task-row:hover td:first-child {
+    border-left-color: #94a3b8;
+}
+
+.team-list-section .mro-table tbody tr.task-row:hover td:last-child {
+    border-right-color: #94a3b8;
+}
+
 .tbl-reg {
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: var(--text-primary);
+    white-space: nowrap;
 }
 
 .tbl-type,
 .tbl-ata {
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 0.76rem;
     color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 .tbl-desc {
-    max-width: 320px;
+    max-width: 380px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text-secondary);
+    line-height: 1.35;
+}
+
+.team-list-section .tbl-desc {
+    width: 100%;
+    max-width: 100%;
+}
+
+.tbl-topic {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tbl-subdesc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.tbl-date {
+    white-space: nowrap;
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+}
+
+.tbl-requestor {
+    white-space: nowrap;
+    font-size: 0.75rem;
+    max-width: 115px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tbl- request, .tbl-status {
+    white-space: nowrap;
+    padding-right: 0.25rem !important;
 }
 
 .badge-status {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.75rem;
+    gap: 0.3rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    padding: 2px 8px;
+    padding: 2px 7px;
     border-radius: 12px;
+    white-space: nowrap;
 }
 
 .badge-status.open { background: #f1f5f9; color: #475569; }
@@ -6100,6 +6226,26 @@ html.dark-mode .team-list-section {
     border: 1px solid rgba(147, 80, 115, 0.25) !important;
 }
 
+html.dark-mode .team-list-section .table-wrapper {
+    background: transparent !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row td:first-child {
+    border-left: 1.5px solid rgba(147, 80, 115, 0.45) !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row td:last-child {
+    border-right: 1.5px solid rgba(147, 80, 115, 0.45) !important;
+}
+
+html.dark-mode .team-list-section .mro-table tbody tr.task-row:hover {
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5) !important;
+}
+
 html.dark-mode .team-section-header {
     background: rgba(26, 14, 29, 0.95) !important;
     border-bottom: 1px solid rgba(147, 80, 115, 0.3) !important;
@@ -6389,7 +6535,7 @@ html.dark-mode .team-section-header {
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input id="searchInput" type="text" placeholder="Search by Aircraft Reg, Description, Requestor...">
+                    <input id="searchInput" type="text" placeholder="Search by Reg, Topic, Description, Status Update, Requestor...">
                 </div>
 
                 <!-- Filters & Views -->
@@ -9994,12 +10140,18 @@ let eventListenersSet = false;
 function initSupabase() {
     const localUrl = localStorage.getItem('mro_supabase_url');
     const localKey = localStorage.getItem('mro_supabase_anon_key');
+    const credentialsChanged = Boolean(localUrl && localKey && (localUrl !== window.supabaseUrl || localKey !== window.supabaseKey));
     
     if (localUrl && localKey) {
         window.supabaseUrl = localUrl;
         window.supabaseKey = localKey;
     }
     
+    // Reuse existing client if already created with active Realtime subscriptions in index2.html
+    if (window.supabaseClient && !credentialsChanged) {
+        return;
+    }
+
     if (window.supabaseUrl && window.supabaseKey && window.supabaseUrl !== 'YOUR_SUPABASE_URL' && window.supabaseKey !== 'YOUR_SUPABASE_ANON_KEY' && typeof supabase !== 'undefined') {
         try {
             window.supabaseClient = supabase.createClient(window.supabaseUrl, window.supabaseKey);
@@ -10937,6 +11089,19 @@ function isArchivedToHistory(task) {
     return diffDays >= 7;
 }
 
+function matchesTaskUpdateLogs(task, q) {
+    if (!q || !task || !task.comments) return false;
+    let commentsArr = task.comments;
+    if (typeof commentsArr === 'string') {
+        try { commentsArr = JSON.parse(commentsArr); } catch (e) { return false; }
+    }
+    if (!Array.isArray(commentsArr)) return false;
+    return commentsArr.some(c =>
+        (c && c.text && String(c.text).toLowerCase().includes(q)) ||
+        (c && c.author && String(c.author).toLowerCase().includes(q))
+    );
+}
+
 function getFilteredTasks() {
     return tasks.filter(task => {
         // Exclude tasks archived to History (completed > 7 days ago)
@@ -10948,11 +11113,14 @@ function getFilteredTasks() {
         // Search matches
         const searchLower = activeFilters.search.toLowerCase();
         const matchesSearch = 
-            task.aircraftReg.toLowerCase().includes(searchLower) ||
+            (task.aircraftReg || '').toLowerCase().includes(searchLower) ||
             (task.aircraftType || '').toLowerCase().includes(searchLower) ||
-            task.requestor.toLowerCase().includes(searchLower) ||
-            task.taskDescription.toLowerCase().includes(searchLower) ||
-            (task.customId || task.id || '').toLowerCase().includes(searchLower);
+            (task.ataChapter || '').toLowerCase().includes(searchLower) ||
+            (task.topic || '').toLowerCase().includes(searchLower) ||
+            (task.requestor || '').toLowerCase().includes(searchLower) ||
+            (task.taskDescription || '').toLowerCase().includes(searchLower) ||
+            (task.customId || task.id || '').toLowerCase().includes(searchLower) ||
+            matchesTaskUpdateLogs(task, searchLower);
 
         // Team filter matches — supports multiple selected teams and comma-separated multi-team task values
         const selectedTeams = Array.isArray(activeFilters.teams) && activeFilters.teams.length > 0 
@@ -10986,10 +11154,12 @@ function getHistoryTasks(searchQuery) {
         const q = searchQuery.toLowerCase();
         return (
             (task.aircraftReg || '').toLowerCase().includes(q) ||
-            (task.topic || task.taskDescription || '').toLowerCase().includes(q) ||
+            (task.topic || '').toLowerCase().includes(q) ||
+            (task.taskDescription || '').toLowerCase().includes(q) ||
             (task.assignedTeam || '').toLowerCase().includes(q) ||
             (task.ataChapter || '').toLowerCase().includes(q) ||
-            (task.customId || task.id || '').toLowerCase().includes(q)
+            (task.customId || task.id || '').toLowerCase().includes(q) ||
+            matchesTaskUpdateLogs(task, q)
         );
     });
 }
@@ -11473,16 +11643,6 @@ function createTaskCard(task) {
                     </div>` : ''}
                 </div>
             </div>
-            <div class="quick-update-box" style="margin-top: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 0.5rem; display: flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation();" ondragstart="event.stopPropagation();">
-                <input type="text" placeholder="Type status update..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addQuickUpdate('${task.id}', this);}" style="flex-grow: 1; font-size: 0.75rem; padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); outline: none; font-family: var(--font-body); box-sizing: border-box;" />
-                <input type="file" id="quickUpdateFile_${task.id}" style="display: none;" onchange="uploadQuickUpdateFile('${task.id}', this)" />
-                <label for="quickUpdateFile_${task.id}" class="btn btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; border-radius: 6px; margin: 0; min-height: auto; width: auto; height: auto; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;" title="Attach File">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                    </svg>
-                </label>
-                <button type="button" class="btn btn-secondary" onclick="addQuickUpdate('${task.id}', this.closest('.quick-update-box').querySelector('input[type=text]'));" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; margin: 0; min-height: auto; width: auto; height: auto; font-weight: 600;">Add</button>
-            </div>
         </div>
     `;
 
@@ -11557,13 +11717,13 @@ function renderList(filteredTasks) {
                 <td><span class="tbl-type">${task.aircraftType || 'A320'}</span></td>
                 <td><span class="tbl-ata">${task.ataChapter || 'N/A'}</span></td>
                 <td><span class="badge-priority ${prioClass}">${task.priorityLevel}</span></td>
-                <td><div class="tbl-desc" title="${task.taskDescription}"><strong>${task.topic || 'No Topic'}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${task.taskDescription}</span></div></td>
-                <td><span>${task.createdDate || 'N/A'}</span></td>
-                <td><span>${task.currentStatus === 'Completed' && task.completedDate ? `<strong style="color: #10b981;">Done ${task.completedDate}</strong><br><span style="font-size: 0.72rem; color: #f59e0b; font-weight: 500;">(${getCompletedExpirationText(task.completedDate)})</span>` : task.rtsDate}</span></td>
-                <td><span>${task.requestor}</span></td>
-                <td><span class="badge-status ${statusClass}">${task.currentStatus}</span></td>
-                <td style="text-align: right;">
-                    <div style="display: inline-flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation()">
+                <td><div class="tbl-desc" title="${task.taskDescription}"><strong class="tbl-topic">${task.topic || 'No Topic'}</strong><br><span class="tbl-subdesc">${task.taskDescription}</span></div></td>
+                <td class="tbl-date"><span>${task.createdDate || 'N/A'}</span></td>
+                <td class="tbl-date"><span>${task.currentStatus === 'Completed' && task.completedDate ? `<strong style="color: #10b981; font-size: 0.74rem;">Done ${task.completedDate}</strong><br><span style="font-size: 0.63rem; color: #f59e0b; font-weight: 500; letter-spacing: -0.01em;">(${getCompletedExpirationText(task.completedDate)})</span>` : task.rtsDate}</span></td>
+                <td class="tbl-requestor" title="${task.requestor}"><span>${task.requestor}</span></td>
+                <td class="tbl-status"><span class="badge-status ${statusClass}">${task.currentStatus}</span></td>
+                <td class="tbl-actions" style="text-align: right;">
+                    <div style="display: inline-flex; gap: 0.25rem; align-items: center;" onclick="event.stopPropagation()">
                         <span class="action-icon" title="${task.comments ? task.comments.length : 0} update(s)" style="display: inline-flex; align-items: center; gap: 2px; cursor: default; background: none; border: none; padding: 0; margin-right: 0.25rem;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -19338,7 +19498,8 @@ function renderMobileDashboardTasks() {
             (t.assignedTeam && t.assignedTeam.toLowerCase().includes(searchVal)) ||
             (t.topic && t.topic.toLowerCase().includes(searchVal)) ||
             (t.priorityLevel && t.priorityLevel.toLowerCase().includes(searchVal)) ||
-            (t.currentStatus && t.currentStatus.toLowerCase().includes(searchVal))
+            (t.currentStatus && t.currentStatus.toLowerCase().includes(searchVal)) ||
+            matchesTaskUpdateLogs(t, searchVal)
         );
     }
 
