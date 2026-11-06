@@ -5787,6 +5787,19 @@ function renderWeeklySummaryTab() {
     const teamHidden = document.getElementById('summaryTeamHidden');
     const selectedTeams = teamHidden && teamHidden.value ? teamHidden.value.split(',').map(s => s.trim()).filter(Boolean) : [];
 
+    // Update Weekly Summary header & print header based on selected team(s)
+    const summaryTitleText = (selectedTeams.length > 0 && selectedTeams.length < 6)
+        ? `${selectedTeams.join(', ')} Weekly Summary`
+        : 'Weekly Engineering Summary';
+    const summaryTitleHeader = document.getElementById('summaryTitleHeader');
+    const printSummaryTitle = document.getElementById('printSummaryTitle');
+    if (summaryTitleHeader) {
+        summaryTitleHeader.textContent = summaryTitleText;
+    }
+    if (printSummaryTitle) {
+        printSummaryTitle.textContent = summaryTitleText;
+    }
+
     // Filter tasks by selected teams & date range (tasks with status updates/logs, creation, or completion in the period)
     const periodTasks = weeklyTasks.filter(t => {
         // 1. Team filtering
